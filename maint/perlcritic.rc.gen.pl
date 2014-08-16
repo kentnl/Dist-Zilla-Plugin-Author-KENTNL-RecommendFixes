@@ -23,6 +23,11 @@ for my $wordlist (@stopwords) {
   $bundle->add_or_append_policy_field( 'Documentation::PodSpelling' => ( 'stop_words' => $wordlist ) );
 }
 
+$bundle->remove_policy('RegularExpressions::RequireExtendedFormatting');
+$bundle->remove_policy('RegularExpressions::RequireLineBoundaryMatching');
+$bundle->remove_policy('RegularExpressions::RequireDotMatchAnything');
+
+
 #$bundle->add_or_append_policy_field(
 #  'Subroutines::ProhibitCallsToUndeclaredSubs' => ( 'exempt_subs' => 'String::Formatter::str_rf' ), );
 
