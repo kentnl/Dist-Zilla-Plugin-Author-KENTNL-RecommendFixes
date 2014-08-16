@@ -21,9 +21,9 @@ with 'Dist::Zilla::Role::InstallTool';
 
 use Term::ANSIColor qw( colored );
 
-sub severe { return colored( [ 'red',     @_ ] ) }
-sub bad    { return colored( [ 'magenta', @_ ] ) }
-sub meh    { return colored( [ 'yellow',  @_ ] ) }
+sub severe { return colored( ['red'],     @_ ) }
+sub bad    { return colored( ['magenta'], @_ ) }
+sub meh    { return colored( ['yellow'],  @_ ) }
 
 sub _log_severe {
   my ( $self, @args ) = @_;
@@ -219,28 +219,28 @@ lsub travis_conf_ok => sub {
 };
 
 lsub dist_ini_ok => sub {
-  my ( $self ) = @_;
+  my ($self) = @_;
   return unless $self->has_dist_ini;
-  my (@lines) = $self->root->child('dist.ini')->lines_utf8({ chomp => 1 });
+  my (@lines) = $self->root->child('dist.ini')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  if( not grep { $_ =~ /dzil bakeini/ } @lines ) {
+  if ( not grep { $_ =~ /dzil bakeini/ } @lines ) {
     $self->_log_meh("dist.ini not baked");
     undef $ok;
   }
-  if( not grep { $_ =~ /normal_form\s*=\s*numify/ } @lines ) {
+  if ( not grep { $_ =~ /normal_form\s*=\s*numify/ } @lines ) {
     $self->_log_meh("dist.ini does not set numify as its normal form");
     undef $ok;
   }
-  if( not grep { $_ =~ /mantissa\s*=\s*6/ } @lines ) {
+  if ( not grep { $_ =~ /mantissa\s*=\s*6/ } @lines ) {
     $self->_log_meh("dist.ini does set mantissa = 6");
     undef $ok;
   }
   return $ok;
 };
 lsub weaver_ini_ok => sub {
-  my ( $self ) = @_;
+  my ($self) = @_;
   return unless $self->has_weaver_ini;
-  my ( @lines ) = $self->root->child('weaver.ini')->lines_utf8({ chomp => 1 });
+  my (@lines) = $self->root->child('weaver.ini')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
   if ( not grep { $_ =~ /-SingleEncoding/ } @lines ) {
     $self->_log_meh('weaver.ini does not set -SingleEncoding');
@@ -248,9 +248,14 @@ lsub weaver_ini_ok => sub {
   }
   return $ok;
 };
+
 sub setup_installer {
   my ($self) = @_;
-
+  $self->has_git;
+  $self->has_git_config;
+  $self->has_dist_ini;
+  $self->has_dist_ini_meta;
+  $self->has_weaver_ini;
 }
 
 __PACKAGE__->meta->make_immutable;
