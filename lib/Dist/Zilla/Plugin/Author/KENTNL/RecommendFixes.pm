@@ -330,7 +330,7 @@ This module just informs me during C<dzil build> that a bunch of
 changes that I intend to make to multiple modules have not been applied
 to the current distribution.
 
-It does this by spewing coloured output.
+It does this by spewing colored output.
 
 =head1 AUTHOR
 
