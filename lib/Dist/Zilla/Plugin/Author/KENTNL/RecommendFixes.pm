@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001001';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -122,7 +122,7 @@ lsub has_new_changes_deps => sub {
     $self->_log_meh( $file . ' does not exist (legacy changes format)' );
     undef $ok;
   }
-  for my $file ( map { $self->root->child( 'misc', $_ ) } @changes ) {
+  for my $file ( map { $self->root->child( $_ ) } @changes ) {
     next unless $file->exists;
     $self->_log_meh( $file . ' exists (legacy changes format)' );
     undef $ok;
@@ -320,7 +320,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.001000
+version 0.001001
 
 =head1 DESCRIPTION
 
