@@ -122,7 +122,7 @@ lsub has_new_changes_deps => sub {
     $self->_log_meh( $file . ' does not exist (legacy changes format)' );
     undef $ok;
   }
-  for my $file ( map { $self->root->child( 'misc', $_ ) } @changes ) {
+  for my $file ( map { $self->root->child( $_ ) } @changes ) {
     next unless $file->exists;
     $self->_log_meh( $file . ' exists (legacy changes format)' );
     undef $ok;
