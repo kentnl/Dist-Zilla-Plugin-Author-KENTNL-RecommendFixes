@@ -256,6 +256,19 @@ sub setup_installer {
   $self->has_dist_ini;
   $self->has_dist_ini_meta;
   $self->has_weaver_ini;
+  $self->has_travis_yml;
+  $self->has_perltidyrc;
+  $self->has_gitignore;
+  $self->has_changes;
+  $self->has_new_changes_deps;
+  $self->has_new_perlcritic_deps;
+  $self->has_new_perlcritic_gen;
+  $self->git_repo_notkentfredric;
+  $self->travis_conf_ok;
+  $self->dist_ini_ok;
+  $self->weaver_ini_ok;
+  
+  
 }
 
 __PACKAGE__->meta->make_immutable;
