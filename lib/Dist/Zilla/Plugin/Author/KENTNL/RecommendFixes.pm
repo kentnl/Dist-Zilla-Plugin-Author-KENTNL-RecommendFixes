@@ -106,6 +106,12 @@ lsub has_changes => sub {
   $self->_log_meh('Changes does not exist');
   return;
 };
+lsub has_license => sub {
+  my ($self) = @_;
+  return 1 if $self->root->child('LICENSE')->exists;
+  $self->_log_meh('LICENSE does not exist');
+  return;
+};
 
 lsub has_new_changes_deps => sub {
   my ($self)  = @_;
@@ -248,6 +254,32 @@ lsub weaver_ini_ok => sub {
   }
   return $ok;
 };
+lsub dist_ini_meta_ok => sub {
+  my ( $self ) = @_;
+  return unless $self->has_dist_ini_meta;
+  my (@lines) = $self->root->child('dist.ini.meta')->lines_utf8({ chomp => 1 });
+  my $ok = 1; 
+  if ( not grep { $_ =~ /bumpversions\s*=\s*1/ } @lines ) {
+    $self->_log_meh('not using bumpversions');
+    undef $ok;
+  }
+  if ( not grep { $_ =~ /toolkit\s*=\s*eumm/ } @lines ) {
+    $self->_log_meh('not using eumm');
+    undef $ok;
+  }
+  if ( not grep { $_ =~ /toolkit_hardness\s*=\s*soft/ } @lines ) {
+    $self->_log_meh('not using soft dependencies');
+    undef $ok;
+  }
+  if ( not grep { $_ =~ /copyfiles\s*=.*LICENSE/ } @lines ) {
+    $self->_log_meh('no copyfiles = LICENSE');
+    undef $ok;
+  }
+  if ( not grep { $_ =~ /srcreadme\s*=.*/ } @lines ) {
+    $self->_log_meh('no srcreadme =');
+    undef $ok;
+  }
+};
 
 sub setup_installer {
   my ($self) = @_;
@@ -260,15 +292,14 @@ sub setup_installer {
   $self->has_perltidyrc;
   $self->has_gitignore;
   $self->has_changes;
+  $self->has_license;
   $self->has_new_changes_deps;
   $self->has_new_perlcritic_deps;
   $self->has_new_perlcritic_gen;
   $self->git_repo_notkentfredric;
   $self->travis_conf_ok;
   $self->dist_ini_ok;
-  $self->weaver_ini_ok;
-  
-  
+  $self->dist_ini_meta_ok; 
 }
 
 __PACKAGE__->meta->make_immutable;
