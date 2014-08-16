@@ -230,15 +230,15 @@ lsub dist_ini_ok => sub {
   my (@lines) = $self->root->child('dist.ini')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
   if ( not grep { $_ =~ /dzil bakeini/ } @lines ) {
-    $self->_log_meh("dist.ini not baked");
+    $self->_log_meh('dist.ini not baked');
     undef $ok;
   }
   if ( not grep { $_ =~ /normal_form\s*=\s*numify/ } @lines ) {
-    $self->_log_meh("dist.ini does not set numify as its normal form");
+    $self->_log_meh('dist.ini does not set numify as its normal form');
     undef $ok;
   }
   if ( not grep { $_ =~ /mantissa\s*=\s*6/ } @lines ) {
-    $self->_log_meh("dist.ini does set mantissa = 6");
+    $self->_log_meh('dist.ini does set mantissa = 6');
     undef $ok;
   }
   return $ok;
