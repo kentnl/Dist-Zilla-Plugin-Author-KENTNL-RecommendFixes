@@ -5,6 +5,15 @@ NAME
 VERSION
     version 0.001000
 
+DESCRIPTION
+    Nothing interesting to see here.
+
+    This module just informs me during "dzil build" that a bunch of changes
+    that I intend to make to multiple modules have not been applied to the
+    current distribution.
+
+    It does this by spewing coloured output.
+
 AUTHOR
     Kent Fredric <kentfredric@gmail.com>
 

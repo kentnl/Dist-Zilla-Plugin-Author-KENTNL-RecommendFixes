@@ -255,10 +255,10 @@ lsub weaver_ini_ok => sub {
   return $ok;
 };
 lsub dist_ini_meta_ok => sub {
-  my ( $self ) = @_;
+  my ($self) = @_;
   return unless $self->has_dist_ini_meta;
-  my (@lines) = $self->root->child('dist.ini.meta')->lines_utf8({ chomp => 1 });
-  my $ok = 1; 
+  my (@lines) = $self->root->child('dist.ini.meta')->lines_utf8( { chomp => 1 } );
+  my $ok = 1;
   if ( not grep { $_ =~ /bumpversions\s*=\s*1/ } @lines ) {
     $self->_log_meh('not using bumpversions');
     undef $ok;
@@ -299,7 +299,7 @@ sub setup_installer {
   $self->git_repo_notkentfredric;
   $self->travis_conf_ok;
   $self->dist_ini_ok;
-  $self->dist_ini_meta_ok; 
+  $self->dist_ini_meta_ok;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -320,6 +320,16 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 =head1 VERSION
 
 version 0.001000
+
+=head1 DESCRIPTION
+
+Nothing interesting to see here.
+
+This module just informs me during C<dzil build> that a bunch of
+changes that I intend to make to multiple modules have not been applied
+to the current distribution.
+
+It does this by spewing coloured output.
 
 =head1 AUTHOR
 
