@@ -1,5 +1,7 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.001002 2014-08-16T21:41:20Z
+
 0.001001 2014-08-16T21:40:56Z
  [00 Trivial]
  - don't think misc/ are bad when they're good.
