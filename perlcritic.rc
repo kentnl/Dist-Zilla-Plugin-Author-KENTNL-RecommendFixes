@@ -21,7 +21,7 @@ verbose = 9
 
 [Bangs::ProhibitUselessRegexModifiers]
 
-[Bangs::ProhibitVagueNames]
+[-Bangs::ProhibitVagueNames]
 
 [-BuiltinFunctions::ProhibitBooleanGrep]
 
@@ -230,7 +230,7 @@ allowed_pragmata = diagnostics feature perlversion strict warnings utf8
 
 [Modules::ProhibitEvilModules]
 
-[Modules::ProhibitExcessMainComplexity]
+[-Modules::ProhibitExcessMainComplexity]
 
 [Modules::ProhibitModuleShebang]
 
@@ -282,7 +282,7 @@ allowed_pragmata = diagnostics feature perlversion strict warnings utf8
 
 [RegularExpressions::ProhibitEnumeratedClasses]
 
-[RegularExpressions::ProhibitEscapedMetacharacters]
+[-RegularExpressions::ProhibitEscapedMetacharacters]
 
 [RegularExpressions::ProhibitFixedStringMatches]
 
