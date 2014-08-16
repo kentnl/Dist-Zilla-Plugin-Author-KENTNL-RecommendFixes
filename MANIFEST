@@ -9,6 +9,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+dist.ini.meta
 lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm
 maint/perlcritic.rc.gen.pl
 misc/perlcritic.deps
