@@ -21,23 +21,23 @@ with 'Dist::Zilla::Role::InstallTool';
 
 use Term::ANSIColor qw( colored );
 
-sub severe { return colored( ['red'],     @_ ) }
-sub bad    { return colored( ['magenta'], @_ ) }
-sub meh    { return colored( ['yellow'],  @_ ) }
+sub severe { my (@args) = @_; return colored( ['red'],     @args ) }
+sub bad    { my (@args) = @_; return colored( ['magenta'], @args ) }
+sub meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
 
 sub _log_severe {
   my ( $self, @args ) = @_;
-  $self->log( severe(@args) );
+  return $self->log( severe(@args) );
 }
 
 sub _log_bad {
   my ( $self, @args ) = @_;
-  $self->log( bad(@args) );
+  return $self->log( bad(@args) );
 }
 
 sub _log_meh {
   my ( $self, @args ) = @_;
-  $self->log( bad(@args) );
+  return $self->log( bad(@args) );
 }
 
 lsub root => sub {
@@ -300,6 +300,7 @@ sub setup_installer {
   $self->travis_conf_ok;
   $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
+  return;
 }
 
 __PACKAGE__->meta->make_immutable;
