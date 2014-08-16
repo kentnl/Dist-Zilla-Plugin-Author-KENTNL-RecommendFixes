@@ -332,6 +332,8 @@ to the current distribution.
 
 It does this by spewing colored output.
 
+=for Pod::Coverage bad meh setup_installer severe
+
 =head1 AUTHOR
 
 Kent Fredric <kentfredric@gmail.com>
