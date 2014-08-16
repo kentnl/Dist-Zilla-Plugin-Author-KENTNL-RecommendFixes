@@ -26,6 +26,7 @@ for my $wordlist (@stopwords) {
 $bundle->remove_policy('RegularExpressions::RequireExtendedFormatting');
 $bundle->remove_policy('RegularExpressions::RequireLineBoundaryMatching');
 $bundle->remove_policy('RegularExpressions::RequireDotMatchAnything');
+$bundle->remove_policy('BuiltinFunctions::ProhibitBooleanGrep');
 
 
 #$bundle->add_or_append_policy_field(
