@@ -140,16 +140,8 @@ lsub has_new_changes_deps => sub {
 lsub has_new_perlcritic_deps => sub {
   my ($self) = @_;
   my $ok = 1;
-  for my $file ( map { $self->root->child( 'misc', $_ ) } qw( perlcritic.deps ) ) {
-    next if $file->exists;
-    $self->_log_meh( $file . ' does not exist (legacy perlcritic deps format)' );
-    undef $ok;
-  }
-  for my $file ( map { $self->root->child($_) } qw( perlcritic.deps ) ) {
-    next unless $file->exists;
-    $self->_log_meh( $file . ' exists (legacy perlcritic deps format)' );
-    undef $ok;
-  }
+  $self->_assert_path_meh( 'misc', 'perlcritic.deps' ) or undef $ok;
+  $self->_assert_nonpath_meh('perlcritic.deps') or undef $ok;
   return $ok;
 };
 
