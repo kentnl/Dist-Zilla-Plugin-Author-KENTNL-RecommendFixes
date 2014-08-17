@@ -112,11 +112,9 @@ lsub changes => sub {
   return $self->_assert_path_meh('Changes');
 };
 
-lsub has_license => sub {
+lsub license => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('LICENSE')->exists;
-  $self->_log_meh('LICENSE does not exist');
-  return;
+  return $self->_assert_path_meh('LICENSE');
 };
 
 lsub has_new_changes_deps => sub {
@@ -298,7 +296,7 @@ sub setup_installer {
   $self->perltidyrc;
   $self->gitignore;
   $self->changes;
-  $self->has_license;
+  $self->license;
   $self->has_new_changes_deps;
   $self->has_new_perlcritic_deps;
   $self->has_new_perlcritic_gen;
