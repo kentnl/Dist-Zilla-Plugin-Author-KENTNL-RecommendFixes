@@ -92,11 +92,9 @@ lsub weaver_ini => sub {
   return $self->_assert_path_meh('weaver.ini');
 };
 
-lsub has_travis_yml => sub {
+lsub travis_yml => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('.travis.yml')->exists;
-  $self->_log_meh('.travis.yml does not exist');
-  return;
+  return $self->_assert_path_meh('.travis.yml');
 };
 
 lsub has_perltidyrc => sub {
@@ -189,7 +187,7 @@ lsub git_repo_notkentfredric => sub {
 
 lsub travis_conf_ok => sub {
   my ($self) = @_;
-  return unless $self->has_travis_yml;
+  return unless $self->travis_yml;
   my $data = YAML::Tiny->read( $self->root->child('.travis.yml')->stringify )->[0];
   my $minc = '/matrix/include/*/';
   my $ok   = 1;
@@ -299,7 +297,7 @@ sub setup_installer {
   $self->dist_ini;
   $self->dist_ini_meta;
   $self->weaver_ini;
-  $self->has_travis_yml;
+  $self->travis_yml;
   $self->has_perltidyrc;
   $self->gitignore;
   $self->has_changes;
