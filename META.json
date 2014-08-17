@@ -84,6 +84,7 @@
          "requires" : {
             "Data::DPath" : "0",
             "Dist::Zilla::Role::InstallTool" : "0",
+            "JSON" : "0",
             "MooX::Lsub" : "0",
             "Moose" : "0",
             "Path::Tiny" : "0",
@@ -183,6 +184,7 @@
          "Dist::Zilla::Role::InstallTool" : "5.020",
          "ExtUtils::MakeMaker" : "6.98",
          "File::Spec" : "3.48",
+         "JSON" : "2.90",
          "MooX::Lsub" : "0.001003",
          "Moose" : "2.1211",
          "Path::Tiny" : "0.056",
