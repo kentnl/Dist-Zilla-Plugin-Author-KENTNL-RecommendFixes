@@ -97,11 +97,9 @@ lsub travis_yml => sub {
   return $self->_assert_path_meh('.travis.yml');
 };
 
-lsub has_perltidyrc => sub {
+lsub perltidyrc => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('.perltidyrc')->exists;
-  $self->_log_meh('.perltidyrc does not exist');
-  return;
+  return $self->_assert_path_meh('.perltidyrc');
 };
 
 lsub gitignore => sub {
@@ -298,7 +296,7 @@ sub setup_installer {
   $self->dist_ini_meta;
   $self->weaver_ini;
   $self->travis_yml;
-  $self->has_perltidyrc;
+  $self->perltidyrc;
   $self->gitignore;
   $self->has_changes;
   $self->has_license;
