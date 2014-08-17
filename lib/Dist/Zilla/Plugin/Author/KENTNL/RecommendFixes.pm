@@ -107,12 +107,11 @@ lsub gitignore => sub {
   return $self->_assert_path_meh('.gitignore');
 };
 
-lsub has_changes => sub {
+lsub changes => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('Changes')->exists;
-  $self->_log_meh('Changes does not exist');
-  return;
+  return $self->_assert_path_meh('Changes');
 };
+
 lsub has_license => sub {
   my ($self) = @_;
   return 1 if $self->root->child('LICENSE')->exists;
@@ -298,7 +297,7 @@ sub setup_installer {
   $self->travis_yml;
   $self->perltidyrc;
   $self->gitignore;
-  $self->has_changes;
+  $self->changes;
   $self->has_license;
   $self->has_new_changes_deps;
   $self->has_new_perlcritic_deps;
