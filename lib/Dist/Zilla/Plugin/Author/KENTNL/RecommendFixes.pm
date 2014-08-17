@@ -215,50 +215,46 @@ lsub git_repo_notkentfredric => sub {
   return $self->_assert_nonmatch_bad( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
 };
 
+lsub travis_conf => sub {
+  my ($self) = @_;
+  return unless my $file = $self->travis_yml;
+  my ( $r, $ok );
+  eval {
+    $r  = YAML::Tiny->read( $file->stringify )->[0];
+    $ok = 1;
+  };
+  return unless $ok;
+  return $r;
+};
+
+sub _matrix_include_perl { my ($perl) = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
+sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' }
+sub _branch_only                 { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
+sub _clone_scripts               { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
+
 lsub travis_conf_ok => sub {
   my ($self) = @_;
-  return unless $self->travis_yml;
-  my $data = YAML::Tiny->read( $self->root->child('.travis.yml')->stringify )->[0];
+  return unless my $conf = $self->travis_conf;
+  my $path = $self->travis_yml;
   my $minc = '/matrix/include/*/';
   my $ok   = 1;
-  if ( not dpath( $minc . 'env[ value =~ /COVERAGE_TESTING=1/ ]' )->match($data) ) {
-    $self->_log_bad('Does not do coverage testing');
-    undef $ok;
-  }
+  $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' )
+    or undef $ok;
   for my $perl (qw( 5.21 5.20 5.10 )) {
-    if ( not dpath( $minc . 'perl[ value eq "' . $perl . '"]' )->match($data) ) {
-      $self->_log_bad( 'Does not test on ' . $perl );
-      undef $ok;
-    }
+    $self->_assert_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
   }
   for my $perl (qw( 5.8 )) {
-    if ( not dpath( $minc . 'perl[ value eq "' . $perl . '"]' )->match($data) ) {
-      $self->_log_meh( 'Does not test on ' . $perl );
-      undef $ok;
-    }
+    $self->_assert_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
   }
-
   for my $perl (qw( 5.19 )) {
-    if ( dpath( $minc . 'perl[ value eq "' . $perl . '"]' )->match($data) ) {
-      $self->_log_bad( 'Tests on ' . $perl );
-      undef $ok;
-    }
+    $self->_assert_not_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
   }
   for my $perl (qw( 5.18 )) {
-    if ( dpath( $minc . 'perl[ value eq "' . $perl . '"]' )->match($data) ) {
-      $self->_log_meh( 'Tests on ' . $perl );
-      undef $ok;
-    }
+    $self->_assert_not_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
   }
-  if ( not dpath('/before_install/*[ value =~/git clone.*maint-travis-ci/ ]')->match($data) ) {
-    $self->_log_bad('Does not clone travis ci module');
-    undef $ok;
-  }
+  $self->_assert_dpath_bad( $conf, _clone_scripts(), $path . ' should clone travis ci module' );
   for my $branch (qw( master build/master releases )) {
-    if ( not dpath( '/branches/only/*[ value eq "' . $branch . '"]' )->match($data) ) {
-      $self->_log_bad( 'Does not test branch ' . $branch );
-      undef $ok;
-    }
+    $self->_assert_dpath_bad( $conf, _branch_only($branch), $path . ' should test this branch ' );
   }
   return $ok;
 };
