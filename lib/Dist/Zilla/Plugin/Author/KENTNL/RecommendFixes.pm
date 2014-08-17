@@ -61,6 +61,14 @@ sub _assert_path_meh {
   return;
 }
 
+sub _assert_nonpath_meh {
+  my ( $self, @apath ) = @_;
+  my $path = $self->_relpath(@apath);
+  return $path unless $path->exists;
+  $self->_log_meh( $path . ' exists' );
+  return;
+}
+
 lsub root => sub {
   my ($self) = @_;
   return path( $self->zilla->root );
