@@ -154,23 +154,18 @@ lsub has_new_perlcritic_deps => sub {
   return $ok;
 };
 
+lsub perlcritic_gen => sub {
+  my ($self) = @_;
+  return $self->_assert_path_meh( 'maint', 'perlcritic.rc.gen.pl' );
+};
+
 lsub has_new_perlcritic_gen => sub {
   my ($self) = @_;
-  my $file = $self->root->child( 'maint', 'perlcritic.rc.gen.pl' );
-  if ( not $file->exists ) {
-    $self->_log_meh( 'no ' . $file );
-    return;
-  }
+  return unless my $file = $self->perlcritic_gen;
   my @lines = $file->lines_utf8( { chomp => 1 } );
-  my $ok = 1;
-  if ( not grep { $_ =~ /Path::Tiny/ } @lines ) {
-    $self->_log_meh( $file . ' does not use Path::Tiny' );
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /\.\/misc/ } @lines ) {
-    $self->_log_meh( $file . ' does not write to misc/ ' );
-    undef $ok;
-  }
+  my $ok;
+  $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' ) or undef $ok;
+  $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' ) or undef $ok;
   return $ok;
 };
 
