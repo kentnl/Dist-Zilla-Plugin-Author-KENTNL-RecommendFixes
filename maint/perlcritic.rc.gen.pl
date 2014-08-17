@@ -26,10 +26,12 @@ for my $wordlist (@stopwords) {
 $bundle->remove_policy('RegularExpressions::RequireExtendedFormatting');
 $bundle->remove_policy('RegularExpressions::RequireLineBoundaryMatching');
 $bundle->remove_policy('RegularExpressions::RequireDotMatchAnything');
-$bundle->remove_policy('BuiltinFunctions::ProhibitBooleanGrep');
+
+#$bundle->remove_policy('BuiltinFunctions::ProhibitBooleanGrep');
 $bundle->remove_policy('Bangs::ProhibitVagueNames');
 $bundle->remove_policy('RegularExpressions::ProhibitEscapedMetacharacters');
-$bundle->remove_policy('Modules::ProhibitExcessMainComplexity');
+
+#$bundle->remove_policy('Modules::ProhibitExcessMainComplexity');
 
 #$bundle->add_or_append_policy_field(
 #  'Subroutines::ProhibitCallsToUndeclaredSubs' => ( 'exempt_subs' => 'String::Formatter::str_rf' ), );

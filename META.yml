@@ -5,7 +5,10 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
   Test::More: '0.89'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: '0'
@@ -18,7 +21,7 @@ name: Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 provides:
   Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes:
     file: lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm
-    version: '0.001001'
+    version: '0.002000'
 requires:
   Data::DPath: '0'
   Dist::Zilla::Role::InstallTool: '0'
@@ -35,12 +38,13 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes.git
-version: '0.001001'
+version: '0.002000'
 x_BuiltWith:
   modules:
     CPAN::Meta: '2.142060'
     Data::DPath: '0.50'
     Dist::Zilla::App::Command::bakeini: '0.001002'
+    Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes: '0.002001'
     Dist::Zilla::Plugin::Authority: '1.006'
     Dist::Zilla::Plugin::AutoPrereqs: '5.020'
     Dist::Zilla::Plugin::BumpVersionAfterRelease: '0.002'
@@ -84,7 +88,7 @@ x_BuiltWith:
     Dist::Zilla::Plugin::TestRelease: '5.020'
     Dist::Zilla::Plugin::Twitter: '0.025'
     Dist::Zilla::Plugin::UploadToCPAN: '5.020'
-    Dist::Zilla::PluginBundle::Author::KENTNL: '2.017002'
+    Dist::Zilla::PluginBundle::Author::KENTNL: '2.018000'
     Dist::Zilla::Role::InstallTool: '5.020'
     ExtUtils::MakeMaker: '6.98'
     File::Spec: '3.48'
@@ -95,11 +99,14 @@ x_BuiltWith:
     Term::ANSIColor: '4.03'
     Test::CPAN::Changes: '0.30'
     Test::CPAN::Meta: '0.23'
+    Test::DZil: '5.020'
+    Test::Fatal: '0.013'
     Test::Kwalitee: '1.22'
     Test::More: '1.001003'
     Test::Pod: '1.48'
     Test::Pod::Coverage: '1.10'
     YAML::Tiny: '1.63'
+    lib: '0.63'
     strict: '1.08'
     utf8: '1.14'
     warnings: '1.24'
@@ -379,6 +386,10 @@ x_Dist_Zilla:
       name: '@Author::KENTNL/MakeMaker'
       version: '5.020'
     -
+      class: Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes
+      name: '@Author::KENTNL/Author::KENTNL::RecommendFixes'
+      version: '0.002000'
+    -
       class: Dist::Zilla::Plugin::ReadmeFromPod
       name: '@Author::KENTNL/ReadmeFromPod'
       version: '0.21'
@@ -443,7 +454,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           signed: '0'
-          tag: 0.001001-source
+          tag: 0.002000-source
           tag_format: '%v-source'
           tag_message: v%v
           time_zone: local
@@ -497,7 +508,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: releases
           signed: '0'
-          tag: '0.001001'
+          tag: '0.002000'
           tag_format: '%v'
           tag_message: v%v
           time_zone: local
@@ -563,10 +574,6 @@ x_Dist_Zilla:
           type: requires
       name: Prereqs
       version: '5.020'
-    -
-      class: Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes
-      name: Author::KENTNL::RecommendFixes
-      version: '0.001001'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

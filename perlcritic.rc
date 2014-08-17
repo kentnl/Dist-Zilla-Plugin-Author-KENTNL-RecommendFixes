@@ -23,7 +23,7 @@ verbose = 9
 
 [-Bangs::ProhibitVagueNames]
 
-[-BuiltinFunctions::ProhibitBooleanGrep]
+[BuiltinFunctions::ProhibitBooleanGrep]
 
 [BuiltinFunctions::ProhibitComplexMappings]
 
@@ -230,7 +230,7 @@ allowed_pragmata = diagnostics feature perlversion strict warnings utf8
 
 [Modules::ProhibitEvilModules]
 
-[-Modules::ProhibitExcessMainComplexity]
+[Modules::ProhibitExcessMainComplexity]
 
 [Modules::ProhibitModuleShebang]
 
