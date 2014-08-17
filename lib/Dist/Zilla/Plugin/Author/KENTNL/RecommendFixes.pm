@@ -184,11 +184,11 @@ lsub travis_conf => sub {
   my ($self) = @_;
   return unless my $file = $self->travis_yml;
   my ( $r, $ok );
-  my $rval = eval {
+  return unless eval {
     $r  = YAML::Tiny->read( $file->stringify )->[0];
     $ok = 1;
   };
-  return unless !$rval or $ok;
+  return unless $ok;
   return $r;
 };
 
@@ -236,7 +236,6 @@ sub travis_conf_ok {
   my ($self) = @_;
   return unless my $conf = $self->travis_conf;
   my $path = $self->travis_yml;
-  my $minc = '/matrix/include/*/';
   my $ok   = 1;
 
   undef $ok unless $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' );
