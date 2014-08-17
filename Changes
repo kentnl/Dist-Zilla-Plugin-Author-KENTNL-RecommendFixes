@@ -1,6 +1,6 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.002000 2014-08-17T09:14:21Z
+0.002000 2014-08-17T09:16:08Z
  [00 Minor]
  - Code internally overhauled to be less spur-of-the-moment and maintainable.
  - Now has a list of modules to unrecommend if seen in $distmeta;
