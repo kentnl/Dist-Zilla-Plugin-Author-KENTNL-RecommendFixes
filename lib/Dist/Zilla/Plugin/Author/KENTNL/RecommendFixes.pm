@@ -308,8 +308,9 @@ sub avoid_old_modules {
   return unless my $distmeta = $self->zilla->distmeta;
   my $ok;
   for my $bad ( @{ $self->unrecommend } ) {
-    $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/' . $bad, 'Try avoid ' . $bad );
+    undef $ok unless $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/' . $bad, 'Try avoid ' . $bad );
   }
+  return $ok;
 }
 
 sub setup_installer {
