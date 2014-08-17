@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+ [Bugfix]
+ - 'ok' state tracking within a few subs was wrong, @haarg++
 
 0.002000 2014-08-17T09:16:08Z
  [00 Minor]
