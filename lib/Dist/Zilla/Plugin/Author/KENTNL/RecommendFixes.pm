@@ -348,7 +348,7 @@ to the current distribution.
 
 It does this by spewing colored output.
 
-=for Pod::Coverage bad meh setup_installer severe
+=for Pod::Coverage setup_installer
 
 =head1 AUTHOR
 
