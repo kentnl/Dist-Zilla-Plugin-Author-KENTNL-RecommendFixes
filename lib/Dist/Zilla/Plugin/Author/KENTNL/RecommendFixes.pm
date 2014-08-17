@@ -82,12 +82,11 @@ lsub dist_ini => sub {
   return $self->_assert_path_bad('dist.ini');
 };
 
-lsub has_dist_ini_meta => sub {
+lsub dist_ini_meta => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('dist.ini.meta')->exists;
-  $self->_log_meh('dist.ini.meta does not exist, dist is not baked');
-  return;
+  return $self->_assert_path_meh('dist.ini.meta');
 };
+
 lsub has_weaver_ini => sub {
   my ($self) = @_;
   return 1 if $self->root->child('weaver.ini')->exists;
@@ -270,7 +269,7 @@ lsub weaver_ini_ok => sub {
 };
 lsub dist_ini_meta_ok => sub {
   my ($self) = @_;
-  return unless $self->has_dist_ini_meta;
+  return unless $self->dist_ini_meta;
   my (@lines) = $self->root->child('dist.ini.meta')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
   if ( not grep { $_ =~ /bumpversions\s*=\s*1/ } @lines ) {
@@ -300,7 +299,7 @@ sub setup_installer {
   $self->git;
   $self->git_config;
   $self->dist_ini;
-  $self->has_dist_ini_meta;
+  $self->dist_ini_meta;
   $self->has_weaver_ini;
   $self->has_travis_yml;
   $self->has_perltidyrc;
