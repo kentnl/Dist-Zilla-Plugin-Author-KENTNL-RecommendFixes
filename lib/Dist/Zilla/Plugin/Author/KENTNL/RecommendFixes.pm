@@ -40,6 +40,11 @@ sub _log_meh {
   return $self->log( _meh(@args) );
 }
 
+sub _relpath {
+  my ( $self, @args ) = @_;
+  return $self->root->child(@args);
+}
+
 lsub root => sub {
   my ($self) = @_;
   return path( $self->zilla->root );
