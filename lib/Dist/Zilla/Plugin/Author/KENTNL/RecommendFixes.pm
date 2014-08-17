@@ -27,22 +27,22 @@ sub _meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
 
 sub _log_severe {
   my ( $self, @args ) = @_;
-  return $self->log( _severe(@args) );
+  return $self->log( { prefix => _severe("severe ") }, @args );
 }
 
 sub _log_bad {
   my ( $self, @args ) = @_;
-  return $self->log( _bad(@args) );
+  return $self->log( { prefix => _bad("bad ") }, @args );
 }
 
 sub _log_meh {
   my ( $self, @args ) = @_;
-  return $self->log( _meh(@args) );
+  return $self->log( { prefix => _meh("meh ") }, @args );
 }
 
 sub _relpath {
   my ( $self, @args ) = @_;
-  return $self->root->child(@args);
+  return $self->root->child(@args)->relative( $self->root );
 }
 
 sub _assert_path_bad {

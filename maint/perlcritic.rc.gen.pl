@@ -28,7 +28,7 @@ $bundle->remove_policy('RegularExpressions::RequireLineBoundaryMatching');
 $bundle->remove_policy('RegularExpressions::RequireDotMatchAnything');
 
 #$bundle->remove_policy('BuiltinFunctions::ProhibitBooleanGrep');
-#$bundle->remove_policy('Bangs::ProhibitVagueNames');
+$bundle->remove_policy('Bangs::ProhibitVagueNames');
 $bundle->remove_policy('RegularExpressions::ProhibitEscapedMetacharacters');
 
 #$bundle->remove_policy('Modules::ProhibitExcessMainComplexity');
