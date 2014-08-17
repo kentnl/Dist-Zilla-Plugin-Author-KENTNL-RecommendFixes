@@ -58,16 +58,14 @@ lsub root => sub {
   return path( $self->zilla->root );
 };
 
-lsub has_git => sub {
+lsub git => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('.git')->exists;
-  $self->_log_bad('.git does not exist');
-  return;
+  return $self->_assert_path_bad('.git');
 };
 
 lsub has_git_config => sub {
   my ($self) = @_;
-  return unless $self->has_git;
+  return unless $self->git;
   return 1 if $self->root->child( '.git', 'config' )->exists;
   $self->_log_bad('.git/config does not exist');
   return;
@@ -296,7 +294,7 @@ lsub dist_ini_meta_ok => sub {
 
 sub setup_installer {
   my ($self) = @_;
-  $self->has_git;
+  $self->git;
   $self->has_git_config;
   $self->has_dist_ini;
   $self->has_dist_ini_meta;
