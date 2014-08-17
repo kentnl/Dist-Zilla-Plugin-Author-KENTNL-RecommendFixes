@@ -44,6 +44,7 @@ x_BuiltWith:
     CPAN::Meta: '2.142060'
     Data::DPath: '0.50'
     Dist::Zilla::App::Command::bakeini: '0.001002'
+    Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes: '0.001002'
     Dist::Zilla::Plugin::Authority: '1.006'
     Dist::Zilla::Plugin::AutoPrereqs: '5.020'
     Dist::Zilla::Plugin::BumpVersionAfterRelease: '0.002'
@@ -385,6 +386,10 @@ x_Dist_Zilla:
       name: '@Author::KENTNL/MakeMaker'
       version: '5.020'
     -
+      class: Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes
+      name: '@Author::KENTNL/Author::KENTNL::RecommendFixes'
+      version: '0.001002'
+    -
       class: Dist::Zilla::Plugin::ReadmeFromPod
       name: '@Author::KENTNL/ReadmeFromPod'
       version: '0.21'
@@ -569,10 +574,6 @@ x_Dist_Zilla:
           type: requires
       name: Prereqs
       version: '5.020'
-    -
-      class: Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes
-      name: Author::KENTNL::RecommendFixes
-      version: '0.001002'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
