@@ -175,7 +175,7 @@ lsub license => sub {
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
-lsub has_new_changes_deps => sub {
+sub has_new_changes_deps {
   my ($self) = @_;
   my $ok = 1;
   for my $file ( @{ $self->changes_deps_files } ) {
@@ -183,22 +183,22 @@ lsub has_new_changes_deps => sub {
     $self->_assert_nonpath_meh($file) or undef $ok;
   }
   return $ok;
-};
+}
 
-lsub has_new_perlcritic_deps => sub {
+sub has_new_perlcritic_deps {
   my ($self) = @_;
   my $ok = 1;
   $self->_assert_path_meh( 'misc', 'perlcritic.deps' ) or undef $ok;
   $self->_assert_nonpath_meh('perlcritic.deps') or undef $ok;
   return $ok;
-};
+}
 
 lsub perlcritic_gen => sub {
   my ($self) = @_;
   return $self->_assert_path_meh( 'maint', 'perlcritic.rc.gen.pl' );
 };
 
-lsub has_new_perlcritic_gen => sub {
+sub has_new_perlcritic_gen {
   my ($self) = @_;
   return unless my $file = $self->perlcritic_gen;
   my @lines = $file->lines_utf8( { chomp => 1 } );
@@ -206,14 +206,14 @@ lsub has_new_perlcritic_gen => sub {
   $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' ) or undef $ok;
   $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' ) or undef $ok;
   return $ok;
-};
+}
 
-lsub git_repo_notkentfredric => sub {
+sub git_repo_notkentfredric {
   my ($self) = @_;
   return unless my $config = $self->git_config;
   my @lines = $config->lines_utf8( { chomp => 1 } );
   return $self->_assert_nonmatch_bad( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
-};
+}
 
 lsub travis_conf => sub {
   my ($self) = @_;
@@ -232,7 +232,7 @@ sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVE
 sub _branch_only                 { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
 sub _clone_scripts               { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
 
-lsub travis_conf_ok => sub {
+sub travis_conf_ok {
   my ($self) = @_;
   return unless my $conf = $self->travis_conf;
   my $path = $self->travis_yml;
@@ -257,7 +257,7 @@ lsub travis_conf_ok => sub {
     $self->_assert_dpath_bad( $conf, _branch_only($branch), $path . ' should test this branch ' );
   }
   return $ok;
-};
+}
 
 lsub dist_ini_ok => sub {
   my ($self) = @_;
