@@ -351,6 +351,13 @@ to the current distribution.
 
 It does this by spewing colored output.
 
-=for Pod::Coverage setup_installer dist_ini_meta_ok dist_ini_ok git_repo_notkentfredric has_new_changes_deps has_new_perlcritic_deps has_new_perlcritic_gen travis_conf_ok weaver_ini_ok
+=begin Pod::Coverage
+
+setup_installer dist_ini_meta_ok dist_ini_ok
+git_repo_notkentfredric has_new_changes_deps
+has_new_perlcritic_deps has_new_perlcritic_gen
+travis_conf_ok weaver_ini_ok avoid_old_modules
+
+=end Pod::Coverage
 
 =cut
