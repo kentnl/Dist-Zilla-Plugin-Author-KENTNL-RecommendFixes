@@ -77,12 +77,11 @@ lsub git_config => sub {
   return $self->_assert_path_bad( '.git', 'config' );
 };
 
-lsub has_dist_ini => sub {
+lsub dist_ini => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('dist.ini')->exists;
-  $self->_log_bad('dist.ini does not exist');
-  return;
+  return $self->_assert_path_bad('dist.ini');
 };
+
 lsub has_dist_ini_meta => sub {
   my ($self) = @_;
   return 1 if $self->root->child('dist.ini.meta')->exists;
@@ -241,7 +240,7 @@ lsub travis_conf_ok => sub {
 
 lsub dist_ini_ok => sub {
   my ($self) = @_;
-  return unless $self->has_dist_ini;
+  return unless $self->dist_ini;
   my (@lines) = $self->root->child('dist.ini')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
   if ( not grep { $_ =~ /dzil bakeini/ } @lines ) {
@@ -300,7 +299,7 @@ sub setup_installer {
   my ($self) = @_;
   $self->git;
   $self->git_config;
-  $self->has_dist_ini;
+  $self->dist_ini;
   $self->has_dist_ini_meta;
   $self->has_weaver_ini;
   $self->has_travis_yml;
