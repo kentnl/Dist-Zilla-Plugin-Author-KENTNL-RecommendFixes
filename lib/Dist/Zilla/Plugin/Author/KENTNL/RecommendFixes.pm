@@ -184,7 +184,7 @@ lsub travis_conf => sub {
   my ($self) = @_;
   return unless my $file = $self->travis_yml;
   my ( $r, $ok );
-  eval {
+  return unless eval {
     $r  = YAML::Tiny->read( $file->stringify )->[0];
     $ok = 1;
   };
@@ -236,7 +236,6 @@ sub travis_conf_ok {
   my ($self) = @_;
   return unless my $conf = $self->travis_conf;
   my $path = $self->travis_yml;
-  my $minc = '/matrix/include/*/';
   my $ok   = 1;
 
   undef $ok unless $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' );
@@ -334,6 +333,6 @@ to the current distribution.
 
 It does this by spewing colored output.
 
-=for Pod::Coverage bad meh setup_installer severe
+=for Pod::Coverage setup_installer dist_ini_meta_ok dist_ini_ok git_repo_notkentfredric has_new_changes_deps has_new_perlcritic_deps has_new_perlcritic_gen travis_conf_ok weaver_ini_ok
 
 =cut
