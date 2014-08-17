@@ -270,17 +270,13 @@ sub dist_ini_ok {
   return $ok;
 }
 
-lsub weaver_ini_ok => sub {
+sub weaver_ini_ok {
   my ($self) = @_;
-  return unless $self->weaver_ini;
-  my (@lines) = $self->root->child('weaver.ini')->lines_utf8( { chomp => 1 } );
-  my $ok = 1;
-  if ( not grep { $_ =~ /-SingleEncoding/ } @lines ) {
-    $self->_log_meh('weaver.ini does not set -SingleEncoding');
-    undef $ok;
-  }
-  return $ok;
-};
+  return unless my $weave = $self->weaver_ini;
+  my (@lines) = $weave->lines_utf8( { chomp => 1 } );
+  return $self->_assert_match_meh( \@lines, /-SingleEncoding/, $weave . ' should set -SingleEncoding' );
+}
+
 lsub dist_ini_meta_ok => sub {
   my ($self) = @_;
   return unless $self->dist_ini_meta;
