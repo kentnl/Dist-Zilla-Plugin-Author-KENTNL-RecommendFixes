@@ -37,7 +37,7 @@ sub _log_bad {
 
 sub _log_meh {
   my ( $self, @args ) = @_;
-  return $self->log( _bad(@args) );
+  return $self->log( _meh(@args) );
 }
 
 lsub root => sub {
