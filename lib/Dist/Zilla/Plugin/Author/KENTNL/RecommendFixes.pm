@@ -175,45 +175,10 @@ lsub license => sub {
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
-sub has_new_changes_deps {
-  my ($self) = @_;
-  my $ok = 1;
-  for my $file ( @{ $self->changes_deps_files } ) {
-    $self->_assert_path_meh( 'misc', $file ) or undef $ok;
-    $self->_assert_nonpath_meh($file) or undef $ok;
-  }
-  return $ok;
-}
-
-sub has_new_perlcritic_deps {
-  my ($self) = @_;
-  my $ok = 1;
-  $self->_assert_path_meh( 'misc', 'perlcritic.deps' ) or undef $ok;
-  $self->_assert_nonpath_meh('perlcritic.deps') or undef $ok;
-  return $ok;
-}
-
 lsub perlcritic_gen => sub {
   my ($self) = @_;
   return $self->_assert_path_meh( 'maint', 'perlcritic.rc.gen.pl' );
 };
-
-sub has_new_perlcritic_gen {
-  my ($self) = @_;
-  return unless my $file = $self->perlcritic_gen;
-  my @lines = $file->lines_utf8( { chomp => 1 } );
-  my $ok;
-  $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' ) or undef $ok;
-  $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' ) or undef $ok;
-  return $ok;
-}
-
-sub git_repo_notkentfredric {
-  my ($self) = @_;
-  return unless my $config = $self->git_config;
-  my @lines = $config->lines_utf8( { chomp => 1 } );
-  return $self->_assert_nonmatch_bad( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
-}
 
 lsub travis_conf => sub {
   my ($self) = @_;
@@ -227,8 +192,43 @@ lsub travis_conf => sub {
   return $r;
 };
 
-sub _matrix_include_perl { my ($perl) = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
+sub has_new_changes_deps {
+  my ($self) = @_;
+  my $ok = 1;
+  for my $file ( @{ $self->changes_deps_files } ) {
+    undef $ok unless $self->_assert_path_meh( 'misc', $file );
+    undef $ok unless $self->_assert_nonpath_meh($file);
+  }
+  return $ok;
+}
+
+sub has_new_perlcritic_deps {
+  my ($self) = @_;
+  my $ok = 1;
+  undef $ok unless $self->_assert_path_meh( 'misc', 'perlcritic.deps' );
+  undef $ok unless $self->_assert_nonpath_meh('perlcritic.deps');
+  return $ok;
+}
+
+sub has_new_perlcritic_gen {
+  my ($self) = @_;
+  return unless my $file = $self->perlcritic_gen;
+  my @lines = $file->lines_utf8( { chomp => 1 } );
+  my $ok;
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' );
+  return $ok;
+}
+
+sub git_repo_notkentfredric {
+  my ($self) = @_;
+  return unless my $config = $self->git_config;
+  my @lines = $config->lines_utf8( { chomp => 1 } );
+  return $self->_assert_nonmatch_bad( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
+}
+
 sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' }
+sub _matrix_include_perl         { my ($perl) = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
 sub _branch_only                 { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
 sub _clone_scripts               { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
 
@@ -238,83 +238,64 @@ sub travis_conf_ok {
   my $path = $self->travis_yml;
   my $minc = '/matrix/include/*/';
   my $ok   = 1;
-  $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' )
-    or undef $ok;
+
+  undef $ok unless $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' );
+
   for my $perl (qw( 5.21 5.20 5.10 )) {
-    $self->_assert_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
+    undef $ok
+      unless $self->_assert_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
   }
   for my $perl (qw( 5.8 )) {
-    $self->_assert_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
+    undef $ok
+      unless $self->_assert_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
   }
   for my $perl (qw( 5.19 )) {
-    $self->_assert_not_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
+    undef $ok
+      unless $self->_assert_not_dpath_bad( $conf, _matrix_include_perl($perl),
+      $path . ' should not test on this version of perl' );
   }
   for my $perl (qw( 5.18 )) {
-    $self->_assert_not_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
+    undef $ok
+      unless $self->_assert_not_dpath_meh( $conf, _matrix_include_perl($perl),
+      $path . ' should not test on this version of perl' );
   }
-  $self->_assert_dpath_bad( $conf, _clone_scripts(), $path . ' should clone travis ci module' );
+  undef $ok unless $self->_assert_dpath_bad( $conf, _clone_scripts(), $path . ' should clone travis ci module' );
   for my $branch (qw( master build/master releases )) {
-    $self->_assert_dpath_bad( $conf, _branch_only($branch), $path . ' should test this branch ' );
+    undef $ok unless $self->_assert_dpath_bad( $conf, _branch_only($branch), $path . ' should test this branch ' );
   }
   return $ok;
 }
 
-lsub dist_ini_ok => sub {
+sub dist_ini_ok {
   my ($self) = @_;
-  return unless $self->dist_ini;
-  my (@lines) = $self->root->child('dist.ini')->lines_utf8( { chomp => 1 } );
+  return unless my $ini = $self->dist_ini;
+  my (@lines) = $ini->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  if ( not grep { $_ =~ /dzil bakeini/ } @lines ) {
-    $self->_log_meh('dist.ini not baked');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /normal_form\s*=\s*numify/ } @lines ) {
-    $self->_log_meh('dist.ini does not set numify as its normal form');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /mantissa\s*=\s*6/ } @lines ) {
-    $self->_log_meh('dist.ini does set mantissa = 6');
-    undef $ok;
-  }
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/dzil bakeini/,             $ini . ' not baked' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/normal_form\s*=\s*numify/, $ini . ' should set numify as normal form' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/mantissa\s*=\s*6/,         $ini . ' should set mantissa = 6' );
   return $ok;
-};
-lsub weaver_ini_ok => sub {
+}
+
+sub weaver_ini_ok {
   my ($self) = @_;
-  return unless $self->weaver_ini;
-  my (@lines) = $self->root->child('weaver.ini')->lines_utf8( { chomp => 1 } );
+  return unless my $weave = $self->weaver_ini;
+  my (@lines) = $weave->lines_utf8( { chomp => 1 } );
+  return $self->_assert_match_meh( \@lines, qr/-SingleEncoding/, $weave . ' should set -SingleEncoding' );
+}
+
+sub dist_ini_meta_ok {
+  my ($self) = @_;
+  return unless my $dmeta = $self->dist_ini_meta;
+  my (@lines) = $dmeta->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  if ( not grep { $_ =~ /-SingleEncoding/ } @lines ) {
-    $self->_log_meh('weaver.ini does not set -SingleEncoding');
-    undef $ok;
-  }
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/bumpversions\s*=\s*1/,        $dmeta . ' should use bumpversions' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/toolkit\s*=\s*eumm/,          $dmeta . ' should use eumm' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/toolkit_hardness\s*=\s*soft/, $dmeta . ' should use soft dependencies' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/copyfiles\s*=.*LICENSE/,      $dmeta . ' should copyfiles = LICENSE' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/srcreadme\s*=.*/,             $dmeta . ' should set srcreadme =' );
   return $ok;
-};
-lsub dist_ini_meta_ok => sub {
-  my ($self) = @_;
-  return unless $self->dist_ini_meta;
-  my (@lines) = $self->root->child('dist.ini.meta')->lines_utf8( { chomp => 1 } );
-  my $ok = 1;
-  if ( not grep { $_ =~ /bumpversions\s*=\s*1/ } @lines ) {
-    $self->_log_meh('not using bumpversions');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /toolkit\s*=\s*eumm/ } @lines ) {
-    $self->_log_meh('not using eumm');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /toolkit_hardness\s*=\s*soft/ } @lines ) {
-    $self->_log_meh('not using soft dependencies');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /copyfiles\s*=.*LICENSE/ } @lines ) {
-    $self->_log_meh('no copyfiles = LICENSE');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /srcreadme\s*=.*/ } @lines ) {
-    $self->_log_meh('no srcreadme =');
-    undef $ok;
-  }
-};
+}
 
 sub setup_installer {
   my ($self) = @_;
