@@ -259,25 +259,17 @@ sub travis_conf_ok {
   return $ok;
 }
 
-lsub dist_ini_ok => sub {
+sub dist_ini_ok {
   my ($self) = @_;
-  return unless $self->dist_ini;
-  my (@lines) = $self->root->child('dist.ini')->lines_utf8( { chomp => 1 } );
+  return unless my $ini = $self->dist_ini;
+  my (@lines) = $ini->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  if ( not grep { $_ =~ /dzil bakeini/ } @lines ) {
-    $self->_log_meh('dist.ini not baked');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /normal_form\s*=\s*numify/ } @lines ) {
-    $self->_log_meh('dist.ini does not set numify as its normal form');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /mantissa\s*=\s*6/ } @lines ) {
-    $self->_log_meh('dist.ini does set mantissa = 6');
-    undef $ok;
-  }
+  $self->_assert_match_meh( \@lines, qr/dzil bakeini/,             $ini . ' not baked' )                        or undef $ok;
+  $self->_assert_match_meh( \@lines, qr/normal_form\s*=\s*numify/, $ini . ' should set numify as normal form' ) or undef $ok;
+  $self->_assert_match_meh( \@lines, qr/mantissa\s*=\s*6/,         $ini . ' should set mantissa = 6' )          or undef $ok;
   return $ok;
-};
+}
+
 lsub weaver_ini_ok => sub {
   my ($self) = @_;
   return unless $self->weaver_ini;
