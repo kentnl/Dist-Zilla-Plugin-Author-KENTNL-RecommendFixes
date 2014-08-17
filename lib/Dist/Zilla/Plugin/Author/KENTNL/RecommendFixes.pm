@@ -64,7 +64,7 @@ sub _assert_path_meh {
 sub _assert_nonpath_meh {
   my ( $self, @apath ) = @_;
   my $path = $self->_relpath(@apath);
-  return $path unless $path->exists;
+  return 1 unless $path->exists;
   $self->_log_meh( $path . ' exists' );
   return;
 }
