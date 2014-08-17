@@ -299,7 +299,7 @@ sub dist_ini_meta_ok {
 sub avoid_old_modules {
   my ( $self ) = @_;
   return unless my $distmeta = $self->zilla->distmeta;
-  $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/Path::Tiny', 'Try avoid Path::Class' );
+  $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/Path::', 'Try avoid Path::Class' );
 }
 
 sub setup_installer {
