@@ -196,8 +196,8 @@ sub has_new_changes_deps {
   my ($self) = @_;
   my $ok = 1;
   for my $file ( @{ $self->changes_deps_files } ) {
-    $self->_assert_path_meh( 'misc', $file ) or undef $ok;
-    $self->_assert_nonpath_meh($file) or undef $ok;
+    undef $ok unless $self->_assert_path_meh( 'misc', $file );
+    undef $ok unless $self->_assert_nonpath_meh($file);
   }
   return $ok;
 }
@@ -205,8 +205,8 @@ sub has_new_changes_deps {
 sub has_new_perlcritic_deps {
   my ($self) = @_;
   my $ok = 1;
-  $self->_assert_path_meh( 'misc', 'perlcritic.deps' ) or undef $ok;
-  $self->_assert_nonpath_meh('perlcritic.deps') or undef $ok;
+  undef $ok unless $self->_assert_path_meh( 'misc', 'perlcritic.deps' );
+  undef $ok unless $self->_assert_nonpath_meh('perlcritic.deps');
   return $ok;
 }
 
@@ -215,8 +215,8 @@ sub has_new_perlcritic_gen {
   return unless my $file = $self->perlcritic_gen;
   my @lines = $file->lines_utf8( { chomp => 1 } );
   my $ok;
-  $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' ) or undef $ok;
-  $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' ) or undef $ok;
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' );
   return $ok;
 }
 
@@ -238,23 +238,30 @@ sub travis_conf_ok {
   my $path = $self->travis_yml;
   my $minc = '/matrix/include/*/';
   my $ok   = 1;
-  $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' )
-    or undef $ok;
+
+  undef $ok unless $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' );
+
   for my $perl (qw( 5.21 5.20 5.10 )) {
-    $self->_assert_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
+    undef $ok
+      unless $self->_assert_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
   }
   for my $perl (qw( 5.8 )) {
-    $self->_assert_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
+    undef $ok
+      unless $self->_assert_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
   }
   for my $perl (qw( 5.19 )) {
-    $self->_assert_not_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
+    undef $ok
+      unless $self->_assert_not_dpath_bad( $conf, _matrix_include_perl($perl),
+      $path . ' should not test on this version of perl' );
   }
   for my $perl (qw( 5.18 )) {
-    $self->_assert_not_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
+    undef $ok
+      unless $self->_assert_not_dpath_meh( $conf, _matrix_include_perl($perl),
+      $path . ' should not test on this version of perl' );
   }
-  $self->_assert_dpath_bad( $conf, _clone_scripts(), $path . ' should clone travis ci module' );
+  undef $ok unless $self->_assert_dpath_bad( $conf, _clone_scripts(), $path . ' should clone travis ci module' );
   for my $branch (qw( master build/master releases )) {
-    $self->_assert_dpath_bad( $conf, _branch_only($branch), $path . ' should test this branch ' );
+    undef $ok unless $self->_assert_dpath_bad( $conf, _branch_only($branch), $path . ' should test this branch ' );
   }
   return $ok;
 }
@@ -264,9 +271,9 @@ sub dist_ini_ok {
   return unless my $ini = $self->dist_ini;
   my (@lines) = $ini->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  $self->_assert_match_meh( \@lines, qr/dzil bakeini/,             $ini . ' not baked' )                        or undef $ok;
-  $self->_assert_match_meh( \@lines, qr/normal_form\s*=\s*numify/, $ini . ' should set numify as normal form' ) or undef $ok;
-  $self->_assert_match_meh( \@lines, qr/mantissa\s*=\s*6/,         $ini . ' should set mantissa = 6' )          or undef $ok;
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/dzil bakeini/,             $ini . ' not baked' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/normal_form\s*=\s*numify/, $ini . ' should set numify as normal form' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/mantissa\s*=\s*6/,         $ini . ' should set mantissa = 6' );
   return $ok;
 }
 
