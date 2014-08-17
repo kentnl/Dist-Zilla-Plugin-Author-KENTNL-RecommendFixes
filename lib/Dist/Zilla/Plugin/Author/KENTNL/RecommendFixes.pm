@@ -184,11 +184,11 @@ lsub travis_conf => sub {
   my ($self) = @_;
   return unless my $file = $self->travis_yml;
   my ( $r, $ok );
-  eval {
+  my $rval = eval {
     $r  = YAML::Tiny->read( $file->stringify )->[0];
     $ok = 1;
   };
-  return unless $ok;
+  return unless !$rval or $ok;
   return $r;
 };
 
