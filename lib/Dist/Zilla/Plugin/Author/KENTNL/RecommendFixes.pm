@@ -181,12 +181,9 @@ lsub has_new_perlcritic_gen => sub {
 
 lsub git_repo_notkentfredric => sub {
   my ($self) = @_;
-  return unless $self->git_config;
-  if ( grep { $_ =~ /kentfredric/ } $self->root->child( '.git', 'config' )->lines_utf8( { chomp => 1 } ) ) {
-    $self->_log_bad('git repo points to kentfredric');
-    return;
-  }
-  return 1;
+  return unless my $config = $self->git_config;
+  my @lines = $config->lines_utf8( { chomp => 1 } );
+  return $self->_assert_nonmatch_bad( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
 };
 
 lsub travis_conf_ok => sub {
