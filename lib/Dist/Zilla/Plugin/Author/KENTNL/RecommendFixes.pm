@@ -175,6 +175,23 @@ lsub license => sub {
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
+lsub perlcritic_gen => sub {
+  my ($self) = @_;
+  return $self->_assert_path_meh( 'maint', 'perlcritic.rc.gen.pl' );
+};
+
+lsub travis_conf => sub {
+  my ($self) = @_;
+  return unless my $file = $self->travis_yml;
+  my ( $r, $ok );
+  eval {
+    $r  = YAML::Tiny->read( $file->stringify )->[0];
+    $ok = 1;
+  };
+  return unless $ok;
+  return $r;
+};
+
 sub has_new_changes_deps {
   my ($self) = @_;
   my $ok = 1;
@@ -193,11 +210,6 @@ sub has_new_perlcritic_deps {
   return $ok;
 }
 
-lsub perlcritic_gen => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh( 'maint', 'perlcritic.rc.gen.pl' );
-};
-
 sub has_new_perlcritic_gen {
   my ($self) = @_;
   return unless my $file = $self->perlcritic_gen;
@@ -215,20 +227,8 @@ sub git_repo_notkentfredric {
   return $self->_assert_nonmatch_bad( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
 }
 
-lsub travis_conf => sub {
-  my ($self) = @_;
-  return unless my $file = $self->travis_yml;
-  my ( $r, $ok );
-  eval {
-    $r  = YAML::Tiny->read( $file->stringify )->[0];
-    $ok = 1;
-  };
-  return unless $ok;
-  return $r;
-};
-
-sub _matrix_include_perl { my ($perl) = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
 sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' }
+sub _matrix_include_perl         { my ($perl) = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
 sub _branch_only                 { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
 sub _clone_scripts               { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
 
