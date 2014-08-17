@@ -214,7 +214,7 @@ sub has_new_perlcritic_gen {
   my ($self) = @_;
   return unless my $file = $self->perlcritic_gen;
   my @lines = $file->lines_utf8( { chomp => 1 } );
-  my $ok;
+  my $ok = 1;
   undef $ok unless $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' );
   undef $ok unless $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' );
   return $ok;
@@ -306,7 +306,7 @@ lsub unrecommend => sub {
 sub avoid_old_modules {
   my ($self) = @_;
   return unless my $distmeta = $self->zilla->distmeta;
-  my $ok;
+  my $ok = 1;
   for my $bad ( @{ $self->unrecommend } ) {
     undef $ok unless $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/' . $bad, 'Try avoid ' . $bad );
   }
