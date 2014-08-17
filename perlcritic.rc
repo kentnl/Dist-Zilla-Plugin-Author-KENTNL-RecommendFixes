@@ -23,7 +23,7 @@ verbose = 9
 
 [-Bangs::ProhibitVagueNames]
 
-[-BuiltinFunctions::ProhibitBooleanGrep]
+[BuiltinFunctions::ProhibitBooleanGrep]
 
 [BuiltinFunctions::ProhibitComplexMappings]
 
