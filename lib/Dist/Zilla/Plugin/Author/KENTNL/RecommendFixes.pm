@@ -21,23 +21,100 @@ with 'Dist::Zilla::Role::InstallTool';
 
 use Term::ANSIColor qw( colored );
 
-sub severe { my (@args) = @_; return colored( ['red'],     @args ) }
-sub bad    { my (@args) = @_; return colored( ['magenta'], @args ) }
-sub meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
+sub _severe { my (@args) = @_; return colored( ['red'],     @args ) }
+sub _bad    { my (@args) = @_; return colored( ['magenta'], @args ) }
+sub _meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
 
 sub _log_severe {
   my ( $self, @args ) = @_;
-  return $self->log( severe(@args) );
+  return $self->log( _severe(@args) );
 }
 
 sub _log_bad {
   my ( $self, @args ) = @_;
-  return $self->log( bad(@args) );
+  return $self->log( _bad(@args) );
 }
 
 sub _log_meh {
   my ( $self, @args ) = @_;
-  return $self->log( bad(@args) );
+  return $self->log( _meh(@args) );
+}
+
+sub _relpath {
+  my ( $self, @args ) = @_;
+  return $self->root->child(@args);
+}
+
+sub _assert_path_bad {
+  my ( $self, @apath ) = @_;
+  my $path = $self->_relpath(@apath);
+  return $path if $path->exists;
+  $self->_log_bad( $path . ' does not exist' );
+  return;
+}
+
+sub _assert_path_meh {
+  my ( $self, @apath ) = @_;
+  my $path = $self->_relpath(@apath);
+  return $path if $path->exists;
+  $self->_log_meh( $path . ' does not exist' );
+  return;
+}
+
+sub _assert_nonpath_meh {
+  my ( $self, @apath ) = @_;
+  my $path = $self->_relpath(@apath);
+  return 1 unless $path->exists;
+  $self->_log_meh( $path . ' exists' );
+  return;
+}
+
+sub _assert_match_meh {
+  my ( $self, $list, $match, $reason ) = @_;
+  for my $line ( @{$list} ) {
+    return 1 if $line =~ $match;
+  }
+  $self->_log_meh("does not match $match, $reason");
+  return;
+}
+
+sub _assert_nonmatch_bad {
+  my ( $self, $list, $match, $reason ) = @_;
+  for my $line ( @{$list} ) {
+    if ( $line =~ $match ) {
+      $self->_log_bad("does match $match, $reason");
+      return;
+    }
+  }
+  return 1;
+}
+
+sub _assert_dpath_bad {
+  my ( $self, $data, $path, $reason ) = @_;
+  return 1 if dpath($path)->match($data);
+  $self->_log_bad("Did not match expression $path, $reason");
+  return;
+}
+
+sub _assert_not_dpath_bad {
+  my ( $self, $data, $path, $reason ) = @_;
+  return 1 unless dpath($path)->match($data);
+  $self->_log_bad("Did match expression $path, $reason");
+  return;
+}
+
+sub _assert_dpath_meh {
+  my ( $self, $data, $path, $reason ) = @_;
+  return 1 if dpath($path)->match($data);
+  $self->_log_meh("Did not match expression $path, $reason");
+  return;
+}
+
+sub _assert_not_dpath_meh {
+  my ( $self, $data, $path, $reason ) = @_;
+  return 1 unless dpath($path)->match($data);
+  $self->_log_meh("Did match expression $path, $reason");
+  return;
 }
 
 lsub root => sub {
@@ -45,87 +122,65 @@ lsub root => sub {
   return path( $self->zilla->root );
 };
 
-lsub has_git => sub {
+lsub git => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('.git')->exists;
-  $self->_log_bad('.git does not exist');
-  return;
+  return $self->_assert_path_bad('.git');
 };
 
-lsub has_git_config => sub {
+lsub git_config => sub {
   my ($self) = @_;
-  return unless $self->has_git;
-  return 1 if $self->root->child( '.git', 'config' )->exists;
-  $self->_log_bad('.git/config does not exist');
-  return;
+  return unless $self->git;
+  return $self->_assert_path_bad( '.git', 'config' );
 };
 
-lsub has_dist_ini => sub {
+lsub dist_ini => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('dist.ini')->exists;
-  $self->_log_bad('dist.ini does not exist');
-  return;
-};
-lsub has_dist_ini_meta => sub {
-  my ($self) = @_;
-  return 1 if $self->root->child('dist.ini.meta')->exists;
-  $self->_log_meh('dist.ini.meta does not exist, dist is not baked');
-  return;
-};
-lsub has_weaver_ini => sub {
-  my ($self) = @_;
-  return 1 if $self->root->child('weaver.ini')->exists;
-  $self->_log_meh('weaver.ini does not exist');
-  return;
+  return $self->_assert_path_bad('dist.ini');
 };
 
-lsub has_travis_yml => sub {
+lsub dist_ini_meta => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('.travis.yml')->exists;
-  $self->_log_meh('.travis.yml does not exist');
-  return;
+  return $self->_assert_path_meh('dist.ini.meta');
 };
 
-lsub has_perltidyrc => sub {
+lsub weaver_ini => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('.perltidyrc')->exists;
-  $self->_log_meh('.perltidyrc does not exist');
-  return;
+  return $self->_assert_path_meh('weaver.ini');
 };
 
-lsub has_gitignore => sub {
+lsub travis_yml => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('.gitignore')->exists;
-  $self->_log_meh('.gitignore does not exist');
-  return;
+  return $self->_assert_path_meh('.travis.yml');
 };
 
-lsub has_changes => sub {
+lsub perltidyrc => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('Changes')->exists;
-  $self->_log_meh('Changes does not exist');
-  return;
+  return $self->_assert_path_meh('.perltidyrc');
 };
-lsub has_license => sub {
+
+lsub gitignore => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('LICENSE')->exists;
-  $self->_log_meh('LICENSE does not exist');
-  return;
+  return $self->_assert_path_meh('.gitignore');
 };
+
+lsub changes => sub {
+  my ($self) = @_;
+  return $self->_assert_path_meh('Changes');
+};
+
+lsub license => sub {
+  my ($self) = @_;
+  return $self->_assert_path_meh('LICENSE');
+};
+
+lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
 lsub has_new_changes_deps => sub {
-  my ($self)  = @_;
-  my $ok      = 1;
-  my @changes = qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all );
-  for my $file ( map { $self->root->child( 'misc', $_ ) } @changes ) {
-    next if $file->exists;
-    $self->_log_meh( $file . ' does not exist (legacy changes format)' );
-    undef $ok;
-  }
-  for my $file ( map { $self->root->child( $_ ) } @changes ) {
-    next unless $file->exists;
-    $self->_log_meh( $file . ' exists (legacy changes format)' );
-    undef $ok;
+  my ($self) = @_;
+  my $ok = 1;
+  for my $file ( @{ $self->changes_deps_files } ) {
+    $self->_assert_path_meh( 'misc', $file ) or undef $ok;
+    $self->_assert_nonpath_meh($file) or undef $ok;
   }
   return $ok;
 };
@@ -133,100 +188,80 @@ lsub has_new_changes_deps => sub {
 lsub has_new_perlcritic_deps => sub {
   my ($self) = @_;
   my $ok = 1;
-  for my $file ( map { $self->root->child( 'misc', $_ ) } qw( perlcritic.deps ) ) {
-    next if $file->exists;
-    $self->_log_meh( $file . ' does not exist (legacy perlcritic deps format)' );
-    undef $ok;
-  }
-  for my $file ( map { $self->root->child($_) } qw( perlcritic.deps ) ) {
-    next unless $file->exists;
-    $self->_log_meh( $file . ' exists (legacy perlcritic deps format)' );
-    undef $ok;
-  }
+  $self->_assert_path_meh( 'misc', 'perlcritic.deps' ) or undef $ok;
+  $self->_assert_nonpath_meh('perlcritic.deps') or undef $ok;
   return $ok;
+};
+
+lsub perlcritic_gen => sub {
+  my ($self) = @_;
+  return $self->_assert_path_meh( 'maint', 'perlcritic.rc.gen.pl' );
 };
 
 lsub has_new_perlcritic_gen => sub {
   my ($self) = @_;
-  my $file = $self->root->child( 'maint', 'perlcritic.rc.gen.pl' );
-  if ( not $file->exists ) {
-    $self->_log_meh( 'no ' . $file );
-    return;
-  }
+  return unless my $file = $self->perlcritic_gen;
   my @lines = $file->lines_utf8( { chomp => 1 } );
-  my $ok = 1;
-  if ( not grep { $_ =~ /Path::Tiny/ } @lines ) {
-    $self->_log_meh( $file . ' does not use Path::Tiny' );
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /\.\/misc/ } @lines ) {
-    $self->_log_meh( $file . ' does not write to misc/ ' );
-    undef $ok;
-  }
+  my $ok;
+  $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' ) or undef $ok;
+  $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' ) or undef $ok;
   return $ok;
 };
 
 lsub git_repo_notkentfredric => sub {
   my ($self) = @_;
-  return unless $self->has_git_config;
-  if ( grep { $_ =~ /kentfredric/ } $self->root->child( '.git', 'config' )->lines_utf8( { chomp => 1 } ) ) {
-    $self->_log_bad('git repo points to kentfredric');
-    return;
-  }
-  return 1;
+  return unless my $config = $self->git_config;
+  my @lines = $config->lines_utf8( { chomp => 1 } );
+  return $self->_assert_nonmatch_bad( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
 };
+
+lsub travis_conf => sub {
+  my ($self) = @_;
+  return unless my $file = $self->travis_yml;
+  my ( $r, $ok );
+  eval {
+    $r  = YAML::Tiny->read( $file->stringify )->[0];
+    $ok = 1;
+  };
+  return unless $ok;
+  return $r;
+};
+
+sub _matrix_include_perl { my ($perl) = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
+sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' }
+sub _branch_only                 { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
+sub _clone_scripts               { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
 
 lsub travis_conf_ok => sub {
   my ($self) = @_;
-  return unless $self->has_travis_yml;
-  my $data = YAML::Tiny->read( $self->root->child('.travis.yml')->stringify )->[0];
+  return unless my $conf = $self->travis_conf;
+  my $path = $self->travis_yml;
   my $minc = '/matrix/include/*/';
   my $ok   = 1;
-  if ( not dpath( $minc . 'env[ value =~ /COVERAGE_TESTING=1/ ]' )->match($data) ) {
-    $self->_log_bad('Does not do coverage testing');
-    undef $ok;
-  }
+  $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' )
+    or undef $ok;
   for my $perl (qw( 5.21 5.20 5.10 )) {
-    if ( not dpath( $minc . 'perl[ value eq "' . $perl . '"]' )->match($data) ) {
-      $self->_log_bad( 'Does not test on ' . $perl );
-      undef $ok;
-    }
+    $self->_assert_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
   }
   for my $perl (qw( 5.8 )) {
-    if ( not dpath( $minc . 'perl[ value eq "' . $perl . '"]' )->match($data) ) {
-      $self->_log_meh( 'Does not test on ' . $perl );
-      undef $ok;
-    }
+    $self->_assert_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
   }
-
   for my $perl (qw( 5.19 )) {
-    if ( dpath( $minc . 'perl[ value eq "' . $perl . '"]' )->match($data) ) {
-      $self->_log_bad( 'Tests on ' . $perl );
-      undef $ok;
-    }
+    $self->_assert_not_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
   }
   for my $perl (qw( 5.18 )) {
-    if ( dpath( $minc . 'perl[ value eq "' . $perl . '"]' )->match($data) ) {
-      $self->_log_meh( 'Tests on ' . $perl );
-      undef $ok;
-    }
+    $self->_assert_not_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
   }
-  if ( not dpath('/before_install/*[ value =~/git clone.*maint-travis-ci/ ]')->match($data) ) {
-    $self->_log_bad('Does not clone travis ci module');
-    undef $ok;
-  }
+  $self->_assert_dpath_bad( $conf, _clone_scripts(), $path . ' should clone travis ci module' );
   for my $branch (qw( master build/master releases )) {
-    if ( not dpath( '/branches/only/*[ value eq "' . $branch . '"]' )->match($data) ) {
-      $self->_log_bad( 'Does not test branch ' . $branch );
-      undef $ok;
-    }
+    $self->_assert_dpath_bad( $conf, _branch_only($branch), $path . ' should test this branch ' );
   }
   return $ok;
 };
 
 lsub dist_ini_ok => sub {
   my ($self) = @_;
-  return unless $self->has_dist_ini;
+  return unless $self->dist_ini;
   my (@lines) = $self->root->child('dist.ini')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
   if ( not grep { $_ =~ /dzil bakeini/ } @lines ) {
@@ -245,7 +280,7 @@ lsub dist_ini_ok => sub {
 };
 lsub weaver_ini_ok => sub {
   my ($self) = @_;
-  return unless $self->has_weaver_ini;
+  return unless $self->weaver_ini;
   my (@lines) = $self->root->child('weaver.ini')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
   if ( not grep { $_ =~ /-SingleEncoding/ } @lines ) {
@@ -256,7 +291,7 @@ lsub weaver_ini_ok => sub {
 };
 lsub dist_ini_meta_ok => sub {
   my ($self) = @_;
-  return unless $self->has_dist_ini_meta;
+  return unless $self->dist_ini_meta;
   my (@lines) = $self->root->child('dist.ini.meta')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
   if ( not grep { $_ =~ /bumpversions\s*=\s*1/ } @lines ) {
@@ -283,16 +318,16 @@ lsub dist_ini_meta_ok => sub {
 
 sub setup_installer {
   my ($self) = @_;
-  $self->has_git;
-  $self->has_git_config;
-  $self->has_dist_ini;
-  $self->has_dist_ini_meta;
-  $self->has_weaver_ini;
-  $self->has_travis_yml;
-  $self->has_perltidyrc;
-  $self->has_gitignore;
-  $self->has_changes;
-  $self->has_license;
+  $self->git;
+  $self->git_config;
+  $self->dist_ini;
+  $self->dist_ini_meta;
+  $self->weaver_ini;
+  $self->travis_yml;
+  $self->perltidyrc;
+  $self->gitignore;
+  $self->changes;
+  $self->license;
   $self->has_new_changes_deps;
   $self->has_new_perlcritic_deps;
   $self->has_new_perlcritic_gen;
