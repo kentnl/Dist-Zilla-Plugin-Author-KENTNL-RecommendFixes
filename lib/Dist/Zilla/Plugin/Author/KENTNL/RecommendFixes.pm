@@ -125,19 +125,14 @@ lsub license => sub {
   return $self->_assert_path_meh('LICENSE');
 };
 
+lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
+
 lsub has_new_changes_deps => sub {
-  my ($self)  = @_;
-  my $ok      = 1;
-  my @changes = qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all );
-  for my $file ( map { $self->root->child( 'misc', $_ ) } @changes ) {
-    next if $file->exists;
-    $self->_log_meh( $file . ' does not exist (legacy changes format)' );
-    undef $ok;
-  }
-  for my $file ( map { $self->root->child( $_ ) } @changes ) {
-    next unless $file->exists;
-    $self->_log_meh( $file . ' exists (legacy changes format)' );
-    undef $ok;
+  my ($self) = @_;
+  my $ok = 1;
+  for my $file ( @{ $self->changes_deps_files } ) {
+    $self->_assert_path_meh( 'misc', $file ) or undef $ok;
+    $self->_assert_nonpath_meh($file) or undef $ok;
   }
   return $ok;
 };
