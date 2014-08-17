@@ -69,6 +69,15 @@ sub _assert_nonpath_meh {
   return;
 }
 
+sub _assert_match_meh {
+  my ( $self, $list, $match, $reason ) = @_;
+  for my $line ( @{$list} ) {
+    return 1 if $line =~ $match;
+  }
+  $self->_log_meh("does not match $match, $reason");
+  return;
+}
+
 lsub root => sub {
   my ($self) = @_;
   return path( $self->zilla->root );
