@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.002000';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -307,8 +307,8 @@ sub avoid_old_modules {
   my ($self) = @_;
   return unless my $distmeta = $self->zilla->distmeta;
   my $ok;
-  for my $bad ( @{ $self->unrecommend }) {
-    $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/' . $bad , 'Try avoid ' . $bad );
+  for my $bad ( @{ $self->unrecommend } ) {
+    $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/' . $bad, 'Try avoid ' . $bad );
   }
 }
 
@@ -352,7 +352,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.001002
+version 0.002000
 
 =head1 DESCRIPTION
 
