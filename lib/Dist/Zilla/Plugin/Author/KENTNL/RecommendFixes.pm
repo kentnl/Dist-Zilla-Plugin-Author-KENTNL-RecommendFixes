@@ -87,11 +87,9 @@ lsub dist_ini_meta => sub {
   return $self->_assert_path_meh('dist.ini.meta');
 };
 
-lsub has_weaver_ini => sub {
+lsub weaver_ini => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('weaver.ini')->exists;
-  $self->_log_meh('weaver.ini does not exist');
-  return;
+  return $self->_assert_path_meh('weaver.ini');
 };
 
 lsub has_travis_yml => sub {
@@ -258,7 +256,7 @@ lsub dist_ini_ok => sub {
 };
 lsub weaver_ini_ok => sub {
   my ($self) = @_;
-  return unless $self->has_weaver_ini;
+  return unless $self->weaver_ini;
   my (@lines) = $self->root->child('weaver.ini')->lines_utf8( { chomp => 1 } );
   my $ok = 1;
   if ( not grep { $_ =~ /-SingleEncoding/ } @lines ) {
@@ -300,7 +298,7 @@ sub setup_installer {
   $self->git_config;
   $self->dist_ini;
   $self->dist_ini_meta;
-  $self->has_weaver_ini;
+  $self->weaver_ini;
   $self->has_travis_yml;
   $self->has_perltidyrc;
   $self->gitignore;
