@@ -78,6 +78,16 @@ sub _assert_match_meh {
   return;
 }
 
+sub _assert_nonmatch_bad {
+  my ( $self, $list, $match, $reason ) = @_;
+  for my $line ( @{$list} ) {
+    if ( $line =~ $match ) {
+      $self->_log_bad("does match $match, $reason");
+      return;
+    }
+  }
+  return 1;
+}
 lsub root => sub {
   my ($self) = @_;
   return path( $self->zilla->root );
