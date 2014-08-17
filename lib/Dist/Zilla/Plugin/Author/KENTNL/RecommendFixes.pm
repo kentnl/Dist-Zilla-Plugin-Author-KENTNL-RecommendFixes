@@ -27,17 +27,17 @@ sub _meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
 
 sub _log_severe {
   my ( $self, @args ) = @_;
-  return $self->log( { prefix => _severe("severe ") }, @args );
+  return $self->log( { prefix => _severe('severe ') }, _severe(@args) );
 }
 
 sub _log_bad {
   my ( $self, @args ) = @_;
-  return $self->log( { prefix => _bad("bad ") }, @args );
+  return $self->log( { prefix => _bad('bad ') }, _bad(@args) );
 }
 
 sub _log_meh {
   my ( $self, @args ) = @_;
-  return $self->log( { prefix => _meh("meh ") }, @args );
+  return $self->log( { prefix => _meh('meh ') }, _meh(@args) );
 }
 
 sub _relpath {
