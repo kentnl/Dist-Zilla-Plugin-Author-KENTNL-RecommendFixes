@@ -21,23 +21,23 @@ with 'Dist::Zilla::Role::InstallTool';
 
 use Term::ANSIColor qw( colored );
 
-sub severe { my (@args) = @_; return colored( ['red'],     @args ) }
-sub bad    { my (@args) = @_; return colored( ['magenta'], @args ) }
-sub meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
+sub _severe { my (@args) = @_; return colored( ['red'],     @args ) }
+sub _bad    { my (@args) = @_; return colored( ['magenta'], @args ) }
+sub _meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
 
 sub _log_severe {
   my ( $self, @args ) = @_;
-  return $self->log( severe(@args) );
+  return $self->log( _severe(@args) );
 }
 
 sub _log_bad {
   my ( $self, @args ) = @_;
-  return $self->log( bad(@args) );
+  return $self->log( _bad(@args) );
 }
 
 sub _log_meh {
   my ( $self, @args ) = @_;
-  return $self->log( bad(@args) );
+  return $self->log( _bad(@args) );
 }
 
 lsub root => sub {
