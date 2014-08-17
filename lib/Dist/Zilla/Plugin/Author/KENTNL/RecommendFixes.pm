@@ -274,35 +274,21 @@ sub weaver_ini_ok {
   my ($self) = @_;
   return unless my $weave = $self->weaver_ini;
   my (@lines) = $weave->lines_utf8( { chomp => 1 } );
-  return $self->_assert_match_meh( \@lines, /-SingleEncoding/, $weave . ' should set -SingleEncoding' );
+  return $self->_assert_match_meh( \@lines, qr/-SingleEncoding/, $weave . ' should set -SingleEncoding' );
 }
 
-lsub dist_ini_meta_ok => sub {
+sub dist_ini_meta_ok {
   my ($self) = @_;
-  return unless $self->dist_ini_meta;
-  my (@lines) = $self->root->child('dist.ini.meta')->lines_utf8( { chomp => 1 } );
+  return unless my $dmeta = $self->dist_ini_meta;
+  my (@lines) = $dmeta->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  if ( not grep { $_ =~ /bumpversions\s*=\s*1/ } @lines ) {
-    $self->_log_meh('not using bumpversions');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /toolkit\s*=\s*eumm/ } @lines ) {
-    $self->_log_meh('not using eumm');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /toolkit_hardness\s*=\s*soft/ } @lines ) {
-    $self->_log_meh('not using soft dependencies');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /copyfiles\s*=.*LICENSE/ } @lines ) {
-    $self->_log_meh('no copyfiles = LICENSE');
-    undef $ok;
-  }
-  if ( not grep { $_ =~ /srcreadme\s*=.*/ } @lines ) {
-    $self->_log_meh('no srcreadme =');
-    undef $ok;
-  }
-};
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/bumpversions\s*=\s*1/,        $dmeta . ' should use bumpversions' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/toolkit\s*=\s*eumm/,          $dmeta . ' should use eumm' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/toolkit_hardness\s*=\s*soft/, $dmeta . ' should use soft dependencies' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/copyfiles\s*=.*LICENSE/,      $dmeta . ' should copyfiles = LICENSE' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/srcreadme\s*=.*/,             $dmeta . ' should set srcreadme =' );
+  return $ok;
+}
 
 sub setup_installer {
   my ($self) = @_;
