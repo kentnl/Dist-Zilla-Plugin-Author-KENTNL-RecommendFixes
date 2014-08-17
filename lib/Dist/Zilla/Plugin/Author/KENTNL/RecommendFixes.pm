@@ -63,12 +63,10 @@ lsub git => sub {
   return $self->_assert_path_bad('.git');
 };
 
-lsub has_git_config => sub {
+lsub git_config => sub {
   my ($self) = @_;
   return unless $self->git;
-  return 1 if $self->root->child( '.git', 'config' )->exists;
-  $self->_log_bad('.git/config does not exist');
-  return;
+  return $self->_assert_path_bad( '.git', 'config' );
 };
 
 lsub has_dist_ini => sub {
@@ -179,7 +177,7 @@ lsub has_new_perlcritic_gen => sub {
 
 lsub git_repo_notkentfredric => sub {
   my ($self) = @_;
-  return unless $self->has_git_config;
+  return unless $self->git_config;
   if ( grep { $_ =~ /kentfredric/ } $self->root->child( '.git', 'config' )->lines_utf8( { chomp => 1 } ) ) {
     $self->_log_bad('git repo points to kentfredric');
     return;
@@ -295,7 +293,7 @@ lsub dist_ini_meta_ok => sub {
 sub setup_installer {
   my ($self) = @_;
   $self->git;
-  $self->has_git_config;
+  $self->git_config;
   $self->has_dist_ini;
   $self->has_dist_ini_meta;
   $self->has_weaver_ini;
