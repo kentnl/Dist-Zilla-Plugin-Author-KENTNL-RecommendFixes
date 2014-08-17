@@ -296,6 +296,12 @@ sub dist_ini_meta_ok {
   return $ok;
 }
 
+sub avoid_old_modules {
+  my ( $self ) = @_;
+  return unless my $distmeta = $self->zilla->distmeta;
+  $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/Path::Tiny', 'Try avoid Path::Class' );
+}
+
 sub setup_installer {
   my ($self) = @_;
   $self->git;
@@ -315,6 +321,7 @@ sub setup_installer {
   $self->travis_conf_ok;
   $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
+  $self->avoid_old_modules;
   return;
 }
 
