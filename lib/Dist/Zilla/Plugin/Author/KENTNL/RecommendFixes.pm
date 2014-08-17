@@ -296,10 +296,20 @@ sub dist_ini_meta_ok {
   return $ok;
 }
 
+lsub unrecommend => sub {
+  [
+    qw( Path::Class Path::Class::File Path::Class::Dir JSON JSON::XS JSON::Any Path::IsDev Path::FindDev ),
+    qw( File::ShareDir::ProjectDistDir File::Find File::Find::Rule ),
+  ];
+};
+
 sub avoid_old_modules {
-  my ( $self ) = @_;
+  my ($self) = @_;
   return unless my $distmeta = $self->zilla->distmeta;
-  $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/Path::', 'Try avoid Path::Class' );
+  my $ok;
+  for my $bad ( @{ $self->unrecommend }) {
+    $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/' . $bad , 'Try avoid ' . $bad );
+  }
 }
 
 sub setup_installer {
