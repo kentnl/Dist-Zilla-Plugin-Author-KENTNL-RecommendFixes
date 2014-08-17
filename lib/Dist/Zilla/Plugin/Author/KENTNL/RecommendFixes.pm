@@ -88,6 +88,35 @@ sub _assert_nonmatch_bad {
   }
   return 1;
 }
+
+sub _assert_dpath_bad {
+  my ( $self, $data, $path, $reason ) = @_;
+  return 1 if dpath($path)->match($data);
+  $self->_log_bad("Did not match expression $path, $reason");
+  return;
+}
+
+sub _assert_not_dpath_bad {
+  my ( $self, $data, $path, $reason ) = @_;
+  return 1 unless dpath($path)->match($data);
+  $self->_log_bad("Did match expression $path, $reason");
+  return;
+}
+
+sub _assert_dpath_meh {
+  my ( $self, $data, $path, $reason ) = @_;
+  return 1 if dpath($path)->match($data);
+  $self->_log_meh("Did not match expression $path, $reason");
+  return;
+}
+
+sub _assert_not_dpath_meh {
+  my ( $self, $data, $path, $reason ) = @_;
+  return 1 unless dpath($path)->match($data);
+  $self->_log_meh("Did match expression $path, $reason");
+  return;
+}
+
 lsub root => sub {
   my ($self) = @_;
   return path( $self->zilla->root );
