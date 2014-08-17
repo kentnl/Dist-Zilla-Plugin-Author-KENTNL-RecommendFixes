@@ -69,7 +69,6 @@ do { my $x = {
                       'requires' => {
                                       'Data::DPath' => '0',
                                       'Dist::Zilla::Role::InstallTool' => '0',
-                                      'JSON' => '0',
                                       'MooX::Lsub' => '0',
                                       'Moose' => '0',
                                       'Path::Tiny' => '0',

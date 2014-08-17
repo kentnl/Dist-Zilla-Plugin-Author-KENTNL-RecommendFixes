@@ -312,8 +312,6 @@ sub avoid_old_modules {
   }
 }
 
-use JSON;
-
 sub setup_installer {
   my ($self) = @_;
   $self->git;
