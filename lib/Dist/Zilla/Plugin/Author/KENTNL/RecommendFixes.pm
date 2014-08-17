@@ -110,11 +110,9 @@ lsub has_perltidyrc => sub {
   return;
 };
 
-lsub has_gitignore => sub {
+lsub gitignore => sub {
   my ($self) = @_;
-  return 1 if $self->root->child('.gitignore')->exists;
-  $self->_log_meh('.gitignore does not exist');
-  return;
+  return $self->_assert_path_meh('.gitignore');
 };
 
 lsub has_changes => sub {
@@ -307,7 +305,7 @@ sub setup_installer {
   $self->has_weaver_ini;
   $self->has_travis_yml;
   $self->has_perltidyrc;
-  $self->has_gitignore;
+  $self->gitignore;
   $self->has_changes;
   $self->has_license;
   $self->has_new_changes_deps;
