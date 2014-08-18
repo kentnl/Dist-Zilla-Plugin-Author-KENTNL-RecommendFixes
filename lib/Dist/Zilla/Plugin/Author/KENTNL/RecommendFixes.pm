@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -298,8 +298,12 @@ sub dist_ini_meta_ok {
 
 lsub unrecommend => sub {
   [
-    qw( Path::Class Path::Class::File Path::Class::Dir JSON JSON::XS JSON::Any Path::IsDev Path::FindDev ),
-    qw( File::ShareDir::ProjectDistDir File::Find File::Find::Rule ),
+    qw( Path::Class Path::Class::File Path::Class::Dir ),    # Path::Tiny preferred
+    qw( JSON JSON::XS JSON::Any ),                           # JSON::MaybeXS preferred
+    qw( Path::IsDev Path::FindDev ),                         # Ugh, this is such a bad idea
+    qw( File::ShareDir::ProjectDistDir ),                    # Whhhy
+    qw( File::Find File::Find::Rule ),                       # Path::Iterator::Rule is much better
+    qw( Class::Load ),                                       # Module::Runtime preferred
   ];
 };
 
@@ -353,7 +357,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 DESCRIPTION
 
