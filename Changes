@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 0.002002 2014-08-17T18:49:31Z
+ [00 Minor]
+ - add Class::Load to things to derecommend: Module::Runtime is muchly preferred.
 
 0.002001 2014-08-17T18:48:43Z
  [Bugfix]
