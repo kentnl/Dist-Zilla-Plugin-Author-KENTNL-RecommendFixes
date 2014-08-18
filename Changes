@@ -1,6 +1,12 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+ [00 Minor]
+ - add Class::Load to things to derecommend: Module::Runtime is muchly preferred.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
 
 0.002001 2014-08-17T18:48:43Z
  [Bugfix]
