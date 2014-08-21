@@ -102,12 +102,11 @@
             "Test::More" : "1.001003"
          },
          "requires" : {
+            "Dist::Zilla::Util::Test::KENTNL" : "1.0001002",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Test::DZil" : "0",
-            "Test::Fatal" : "0",
-            "Test::More" : "0.89",
-            "lib" : "0"
+            "Test::More" : "0.89"
          }
       }
    },
@@ -181,6 +180,7 @@
          "Dist::Zilla::Plugin::UploadToCPAN" : "5.020",
          "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.020000",
          "Dist::Zilla::Role::InstallTool" : "5.020",
+         "Dist::Zilla::Util::Test::KENTNL" : "1.001002",
          "ExtUtils::MakeMaker" : "6.98",
          "File::Spec" : "3.49",
          "MooX::Lsub" : "0.001003",
@@ -191,13 +191,11 @@
          "Test::CPAN::Changes" : "0.30",
          "Test::CPAN::Meta" : "0.23",
          "Test::DZil" : "5.020",
-         "Test::Fatal" : "0.013",
          "Test::Kwalitee" : "1.22",
          "Test::More" : "1.001003",
          "Test::Pod" : "1.48",
          "Test::Pod::Coverage" : "1.10",
          "YAML::Tiny" : "1.63",
-         "lib" : "0.63",
          "strict" : "1.08",
          "utf8" : "1.14",
          "warnings" : "1.26"
