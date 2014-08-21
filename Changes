@@ -1,5 +1,7 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.002004 2014-08-21T05:45:58Z
+
 0.002003 2014-08-21T05:45:11Z
  [00 Minor]
  - Reframe tests in terms of now exported version of dztest.
