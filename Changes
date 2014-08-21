@@ -1,6 +1,13 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+ [00 Minor]
+ - Reframe tests in terms of now exported version of dztest.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002002, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: +1 -2
 
 0.002002 2014-08-18T04:36:16Z
  [00 Minor]

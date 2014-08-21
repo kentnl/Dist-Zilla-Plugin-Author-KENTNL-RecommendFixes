@@ -2,15 +2,13 @@ use strict;
 use warnings;
 
 use Test::More;
+use Dist::Zilla::Util::Test::KENTNL 1.0001002 qw( dztest );
 use Test::DZil qw( simple_ini );
-
-use lib 't/lib';
-use dztest;
 
 # ABSTRACT: basic test
 
 my $ini = simple_ini( ['Author::KENTNL::RecommendFixes'] );
-my $dz = dztest->new();
+my $dz = dztest();
 
 $dz->add_file( 'dist.ini', $ini );
 $dz->build_ok;
