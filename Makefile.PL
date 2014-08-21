@@ -32,14 +32,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Dist::Zilla::Util::Test::KENTNL" => "1.0001002",
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::DZil" => 0,
-    "Test::Fatal" => 0,
-    "Test::More" => "0.89",
-    "lib" => 0
+    "Test::More" => "0.89"
   },
-  "VERSION" => "0.002002",
+  "VERSION" => "0.002003",
   "test" => {
     "TESTS" => "t/*.t t/00-compile/*.t"
   }
@@ -49,6 +48,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::DPath" => 0,
   "Dist::Zilla::Role::InstallTool" => 0,
+  "Dist::Zilla::Util::Test::KENTNL" => "1.0001002",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "MooX::Lsub" => 0,
@@ -56,10 +56,8 @@ my %FallbackPrereqs = (
   "Path::Tiny" => 0,
   "Term::ANSIColor" => 0,
   "Test::DZil" => 0,
-  "Test::Fatal" => 0,
   "Test::More" => "0.89",
   "YAML::Tiny" => 0,
-  "lib" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0
