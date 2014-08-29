@@ -7,6 +7,9 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
  [Checks]
  - Now scrapes lib/ and t/ and recommends various things for DZil plugin work.
+ - author=kentfredric is now warned against.
+ - gitversions is now warned against
+ - failure to have one of bumpversions or gitversions is a serious warning
 
  [Dependencies::Stats]
  - Dependencies changed since 0.002003, see misc/*.deps* for details
