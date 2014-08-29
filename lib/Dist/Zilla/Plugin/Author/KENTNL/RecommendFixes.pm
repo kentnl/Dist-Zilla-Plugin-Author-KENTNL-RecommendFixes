@@ -174,7 +174,7 @@ sub travis_conf_ok {
     undef $ok unless $data->assert_dpath( _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.19 )) {
-    undef $ok unless _is_bad{ $data->assert_not_dpath( _matrix_include_perl($perl) ) };
+    undef $ok unless _is_bad { $data->assert_not_dpath( _matrix_include_perl($perl) ) };
   }
   for my $perl (qw( 5.18 )) {
     undef $ok unless $data->assert_not_dpath( _matrix_include_perl($perl) );
@@ -217,6 +217,9 @@ sub dist_ini_meta_ok {
   }
   for my $test ( qr/author.*=.*kentfredric/, qr/git_versions/ ) {
     undef $ok unless $dmeta->assert_not_has_line($test);
+  }
+  if ( ( not $dmeta->has_line(qr/bumpversions\s*=\s*1/) ) and ( not $dmeta->has_line(qr/git_versions/) ) ) {
+    _is_bad { $self->log( $dmeta->stringify . ' has Neither bumpversions=1 or git_versions' ) };
   }
 
   return $ok;
