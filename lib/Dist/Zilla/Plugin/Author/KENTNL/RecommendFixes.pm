@@ -89,7 +89,7 @@ lsub libfiles => sub {
     push @out, $self->_cast_path($thing);
   }
   if ( not @out ) {
-    $self->log("Should have modules in " . $self->libdir );
+    $self->log( "Should have modules in " . $self->libdir );
   }
 
   return \@out;
@@ -105,7 +105,7 @@ lsub tfiles => sub {
     push @out, $self->_cast_path($thing);
   }
   if ( not @out ) {
-    $self->log("Should have tests in " . $self->tdir );
+    $self->log( "Should have tests in " . $self->tdir );
   }
   return \@out;
 
@@ -146,7 +146,6 @@ sub git_repo_notkentfredric {
 
 sub _matrix_include_perl { my ($perl)   = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
 sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
-sub _clone_scripts { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
 
 sub travis_conf_ok {
   my ($self) = @_;
@@ -169,7 +168,7 @@ sub travis_conf_ok {
   for my $perl (qw( 5.18 )) {
     undef $ok unless $data->assert_not_dpath( _matrix_include_perl($perl) );
   }
-  undef $ok unless $data->assert_dpath( _clone_scripts() );
+  undef $ok unless $data->assert_dpath('/before_install/*[ value =~/git clone.*maint-travis-ci/ ]');
   for my $branch (qw( master build/master releases )) {
     undef $ok unless $data->assert_dpath( _branch_only($branch) );
   }
