@@ -88,17 +88,24 @@ lsub libfiles => sub {
     next unless $thing->basename =~ /\.pm\z/msx;
     push @out, $self->_cast_path($thing);
   }
+  if ( not @out ) {
+    $self->log("Should have modules in " . $self->libdir );
+  }
+
   return \@out;
 };
 lsub tfiles => sub {
   my ($self) = @_;
   return [] unless $self->tdir;
   my @out;
-  my $it = $self->libdir->iterator( { recurse => 1 } );
+  my $it = $self->tdir->iterator( { recurse => 1 } );
   while ( my $thing = $it->() ) {
     next if -d $thing;
     next unless $thing->basename =~ /\.t\z/msx;
     push @out, $self->_cast_path($thing);
+  }
+  if ( not @out ) {
+    $self->log("Should have tests in " . $self->tdir );
   }
   return \@out;
 
