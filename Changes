@@ -1,9 +1,22 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.003000 2014-08-21T05:46:11Z
+0.003000 2014-08-29T23:34:32Z
  [00 Major]
  - Interals overhauled again
- 
+ - new checks
+
+ [Checks]
+ - Now scrapes lib/ and t/ and recommends various things for DZil plugin work.
+ - author=kentfredric is now warned against.
+ - gitversions is now warned against
+ - failure to have one of bumpversions or gitversions is a serious warning
+ - derecommend Readonly
+ - check mailmap
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002003, see misc/*.deps* for details
+ - runtime: +1
+
  [Interals]
  - Internals overhauled to have some private classes, greatly simplifying syntax and logic.
 

@@ -194,6 +194,11 @@ sub dist_ini_ok {
   for my $test (@tests) {
     $ini->assert_has_line($test);
   }
+  if ( not $ini->has_line(qr/dzil bakeini/) ) {
+    if ( ( not $ini->has_line(qr/bumpversions\s*=\s*1/) ) and ( not $ini->has_line(qr/git_versions/) ) ) {
+      _is_bad { $self->log( $ini->stringify . ' is unbaked and has Neither bumpversions=1 or git_versions' ) };
+    }
+  }
   return $ok;
 }
 
