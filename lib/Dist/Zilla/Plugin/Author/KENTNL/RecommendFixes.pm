@@ -255,12 +255,14 @@ sub dzil_plugin_check {
   return unless @{ $self->tfiles };
 find_dztest: {
     for my $tfile ( @{ $self->tfiles } ) {
+      $self->log("Step $tfile");
       if ( $tfile->has_line(qr/dzpest/) ) {
         last find_dztest;
       }
     }
     $self->log('A test should probably use dztest (Dist::Zilla::Util::Test::KENTNL)');
   }
+  return;
 }
 
 sub setup_installer {
