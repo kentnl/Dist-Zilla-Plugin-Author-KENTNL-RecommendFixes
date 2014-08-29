@@ -222,6 +222,7 @@ sub setup_installer {
   $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
   $self->avoid_old_modules;
+  $self->mailmap_check;
   return;
 }
 
