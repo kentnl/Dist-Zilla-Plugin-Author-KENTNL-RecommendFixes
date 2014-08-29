@@ -1,7 +1,7 @@
 ---
 abstract: 'Recommend generic changes to the dist.'
 author:
-  - 'Kent Fredric <kentfredric@gmail.com>'
+  - 'Kent Fredric <kentnl@cpan.org>'
 build_requires:
   Dist::Zilla::Util::Test::KENTNL: '1.0001002'
   ExtUtils::MakeMaker: '0'

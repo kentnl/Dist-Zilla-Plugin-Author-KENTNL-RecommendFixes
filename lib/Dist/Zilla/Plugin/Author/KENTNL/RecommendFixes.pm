@@ -432,7 +432,7 @@ travis_conf_ok weaver_ini_ok avoid_old_modules
 
 =head1 AUTHOR
 
-Kent Fredric <kentfredric@gmail.com>
+Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
