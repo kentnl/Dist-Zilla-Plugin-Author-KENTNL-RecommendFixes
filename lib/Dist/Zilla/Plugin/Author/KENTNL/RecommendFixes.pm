@@ -433,6 +433,8 @@ It does this by spewing colored output.
 git_repo_notkentfredric has_new_changes_deps
 has_new_perlcritic_deps has_new_perlcritic_gen
 travis_conf_ok weaver_ini_ok avoid_old_modules
+dzil_plugin_check
+mailmap_check
 
 =head1 AUTHOR
 
