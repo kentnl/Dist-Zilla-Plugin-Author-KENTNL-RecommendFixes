@@ -1,6 +1,15 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+ [00 Major]
+ - Interals overhauled again
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002003, see misc/*.deps* for details
+ - runtime: +1
+
+ [Interals]
+ - Internals overhauled to have some private classes, greatly simplifying syntax and logic.
 
 0.002003 2014-08-21T05:45:11Z
  [00 Minor]

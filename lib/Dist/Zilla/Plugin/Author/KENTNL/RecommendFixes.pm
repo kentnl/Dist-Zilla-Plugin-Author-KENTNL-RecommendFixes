@@ -5,180 +5,78 @@ use utf8;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.002004';
+our $VERSION = '0.003000';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
 # AUTHORITY
 
-use Moose qw( with has );
+use Moose qw( with has around );
 use MooX::Lsub qw( lsub );
 use Path::Tiny qw( path );
 use YAML::Tiny;
-use Data::DPath qw( dpath );
 
 with 'Dist::Zilla::Role::InstallTool';
 
 use Term::ANSIColor qw( colored );
 
-sub _severe { my (@args) = @_; return colored( ['red'],     @args ) }
-sub _bad    { my (@args) = @_; return colored( ['magenta'], @args ) }
-sub _meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
+our $LOG_COLOR = 'yellow';
 
-sub _log_severe {
-  my ( $self, @args ) = @_;
-  return $self->log( { prefix => _severe('severe ') }, _severe(@args) );
+around 'log' => sub {
+  my ( $orig, $self, @args ) = @_;
+  return $self->$orig( map { ref $_ ? $_ : colored( [$LOG_COLOR], $_ ) } @args );
+};
+
+## no critic (Subroutines::ProhibitSubroutinePrototypes,Subroutines::RequireArgUnpacking,Variables::ProhibitLocalVars)
+sub _is_bad(&) { local $LOG_COLOR = 'red'; return $_[0]->() }
+
+sub _badly(&) {
+  my $code = shift;
+  return sub { local $LOG_COLOR = 'red'; return $code->(@_); };
 }
 
-sub _log_bad {
-  my ( $self, @args ) = @_;
-  return $self->log( { prefix => _bad('bad ') }, _bad(@args) );
+sub _cast_path {
+  my ( $self, $path ) = @_;
+  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path->new(
+    path   => $path,
+    logger => sub { shift; $self->log(@_) },
+  );
 }
-
-sub _log_meh {
-  my ( $self, @args ) = @_;
-  return $self->log( { prefix => _meh('meh ') }, _meh(@args) );
-}
+## use critic
 
 sub _relpath {
   my ( $self, @args ) = @_;
-  return $self->root->child(@args)->relative( $self->root );
+  return $self->_cast_path( $self->root->child(@args)->relative( $self->root ) );
 }
 
-sub _assert_path_bad {
-  my ( $self, @apath ) = @_;
-  my $path = $self->_relpath(@apath);
-  return $path if $path->exists;
-  $self->_log_bad( $path . ' does not exist' );
-  return;
+sub _data {
+  my ( $self, $data, $path ) = @_;
+  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Data->new(
+    path   => $path,
+    data   => $data,
+    logger => sub { shift; $self->log(@_) },
+  );
 }
 
-sub _assert_path_meh {
-  my ( $self, @apath ) = @_;
-  my $path = $self->_relpath(@apath);
-  return $path if $path->exists;
-  $self->_log_meh( $path . ' does not exist' );
-  return;
-}
+lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
-sub _assert_nonpath_meh {
-  my ( $self, @apath ) = @_;
-  my $path = $self->_relpath(@apath);
-  return 1 unless $path->exists;
-  $self->_log_meh( $path . ' exists' );
-  return;
-}
+lsub git      => _badly { $_[0]->_relpath('.git')->assert_exists() };
+lsub libdir   => _badly { $_[0]->_relpath('lib')->assert_exists() };
+lsub dist_ini => _badly { $_[0]->_relpath('dist.ini')->assert_exists() };
 
-sub _assert_match_meh {
-  my ( $self, $list, $match, $reason ) = @_;
-  for my $line ( @{$list} ) {
-    return 1 if $line =~ $match;
-  }
-  $self->_log_meh("does not match $match, $reason");
-  return;
-}
+lsub git_config => sub { $_[0]->_relpath( '.git', 'config' )->assert_exists() };
+lsub dist_ini_meta  => sub { $_[0]->_relpath('dist.ini.meta')->assert_exists() };
+lsub weaver_ini     => sub { $_[0]->_relpath('weaver.ini')->assert_exists() };
+lsub travis_yml     => sub { $_[0]->_relpath('.travis.yml')->assert_exists() };
+lsub perltidyrc     => sub { $_[0]->_relpath('.perltidyrc')->assert_exists() };
+lsub gitignore      => sub { $_[0]->_relpath('.gitignore')->assert_exists() };
+lsub changes        => sub { $_[0]->_relpath('Changes')->assert_exists() };
+lsub license        => sub { $_[0]->_relpath('LICENSE')->assert_exists() };
+lsub perlcritic_gen => sub { $_[0]->_relpath( 'maint', 'perlcritic.rc.gen.pl' )->assert_exists() };
 
-sub _assert_nonmatch_bad {
-  my ( $self, $list, $match, $reason ) = @_;
-  for my $line ( @{$list} ) {
-    if ( $line =~ $match ) {
-      $self->_log_bad("does match $match, $reason");
-      return;
-    }
-  }
-  return 1;
-}
-
-sub _assert_dpath_bad {
-  my ( $self, $data, $path, $reason ) = @_;
-  return 1 if dpath($path)->match($data);
-  $self->_log_bad("Did not match expression $path, $reason");
-  return;
-}
-
-sub _assert_not_dpath_bad {
-  my ( $self, $data, $path, $reason ) = @_;
-  return 1 unless dpath($path)->match($data);
-  $self->_log_bad("Did match expression $path, $reason");
-  return;
-}
-
-sub _assert_dpath_meh {
-  my ( $self, $data, $path, $reason ) = @_;
-  return 1 if dpath($path)->match($data);
-  $self->_log_meh("Did not match expression $path, $reason");
-  return;
-}
-
-sub _assert_not_dpath_meh {
-  my ( $self, $data, $path, $reason ) = @_;
-  return 1 unless dpath($path)->match($data);
-  $self->_log_meh("Did match expression $path, $reason");
-  return;
-}
-
-lsub root => sub {
-  my ($self) = @_;
-  return path( $self->zilla->root );
-};
-
-lsub git => sub {
-  my ($self) = @_;
-  return $self->_assert_path_bad('.git');
-};
-
-lsub git_config => sub {
-  my ($self) = @_;
-  return unless $self->git;
-  return $self->_assert_path_bad( '.git', 'config' );
-};
-
-lsub dist_ini => sub {
-  my ($self) = @_;
-  return $self->_assert_path_bad('dist.ini');
-};
-
-lsub dist_ini_meta => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('dist.ini.meta');
-};
-
-lsub weaver_ini => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('weaver.ini');
-};
-
-lsub travis_yml => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('.travis.yml');
-};
-
-lsub perltidyrc => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('.perltidyrc');
-};
-
-lsub gitignore => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('.gitignore');
-};
-
-lsub changes => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('Changes');
-};
-
-lsub license => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('LICENSE');
-};
+lsub tdir => sub { $_[0]->_relpath('t')->assert_exists() };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
-
-lsub perlcritic_gen => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh( 'maint', 'perlcritic.rc.gen.pl' );
-};
 
 lsub travis_conf => sub {
   my ($self) = @_;
@@ -196,8 +94,8 @@ sub has_new_changes_deps {
   my ($self) = @_;
   my $ok = 1;
   for my $file ( @{ $self->changes_deps_files } ) {
-    undef $ok unless $self->_assert_path_meh( 'misc', $file );
-    undef $ok unless $self->_assert_nonpath_meh($file);
+    undef $ok unless $self->_relpath( 'misc', $file )->assert_exists;
+    undef $ok unless $self->_relpath($file)->assert_not_exists;
   }
   return $ok;
 }
@@ -205,62 +103,53 @@ sub has_new_changes_deps {
 sub has_new_perlcritic_deps {
   my ($self) = @_;
   my $ok = 1;
-  undef $ok unless $self->_assert_path_meh( 'misc', 'perlcritic.deps' );
-  undef $ok unless $self->_assert_nonpath_meh('perlcritic.deps');
+  undef $ok unless $self->_relpath( 'misc', 'perlcritic.deps' )->assert_exists;
+  undef $ok unless $self->_relpath('perlcritic.deps')->assert_not_exists;
   return $ok;
 }
 
 sub has_new_perlcritic_gen {
   my ($self) = @_;
   return unless my $file = $self->perlcritic_gen;
-  my @lines = $file->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' );
+  undef $ok unless $file->assert_has_line(qr/Path::Tiny/);
+  undef $ok unless $file->assert_has_line(qr/\.\/misc/);
   return $ok;
 }
 
 sub git_repo_notkentfredric {
   my ($self) = @_;
   return unless my $config = $self->git_config;
-  my @lines = $config->lines_utf8( { chomp => 1 } );
-  return $self->_assert_nonmatch_bad( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
+  return $config->assert_not_has_line(qr/kentfredric/);
 }
 
-sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' }
-sub _matrix_include_perl         { my ($perl) = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
-sub _branch_only                 { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
-sub _clone_scripts               { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
+sub _matrix_include_perl { my ($perl)   = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
+sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
 
 sub travis_conf_ok {
   my ($self) = @_;
   return unless my $conf = $self->travis_conf;
-  my $path = $self->travis_yml;
-  my $ok   = 1;
+  my $data = $self->_data( $self->travis_conf, $self->travis_yml . q[] );
 
-  undef $ok unless $self->_assert_dpath_bad( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' );
+  my $ok = 1;
+
+  undef $ok unless $data->assert_dpath('/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/');
 
   for my $perl (qw( 5.21 5.20 5.10 )) {
-    undef $ok
-      unless $self->_assert_dpath_bad( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
+    undef $ok unless $data->assert_dpath( _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.8 )) {
-    undef $ok
-      unless $self->_assert_dpath_meh( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
+    undef $ok unless $data->assert_dpath( _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.19 )) {
-    undef $ok
-      unless $self->_assert_not_dpath_bad( $conf, _matrix_include_perl($perl),
-      $path . ' should not test on this version of perl' );
+    undef $ok unless _is_bad { $data->assert_not_dpath( _matrix_include_perl($perl) ) };
   }
   for my $perl (qw( 5.18 )) {
-    undef $ok
-      unless $self->_assert_not_dpath_meh( $conf, _matrix_include_perl($perl),
-      $path . ' should not test on this version of perl' );
+    undef $ok unless $data->assert_not_dpath( _matrix_include_perl($perl) );
   }
-  undef $ok unless $self->_assert_dpath_bad( $conf, _clone_scripts(), $path . ' should clone travis ci module' );
+  undef $ok unless _is_bad { $data->assert_dpath('/before_install/*[ value =~/git clone.*maint-travis-ci/ ]') };
   for my $branch (qw( master build/master releases )) {
-    undef $ok unless $self->_assert_dpath_bad( $conf, _branch_only($branch), $path . ' should test this branch ' );
+    undef $ok unless $data->assert_dpath( _branch_only($branch) );
   }
   return $ok;
 }
@@ -268,31 +157,33 @@ sub travis_conf_ok {
 sub dist_ini_ok {
   my ($self) = @_;
   return unless my $ini = $self->dist_ini;
-  my (@lines) = $ini->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/dzil bakeini/,             $ini . ' not baked' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/normal_form\s*=\s*numify/, $ini . ' should set numify as normal form' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/mantissa\s*=\s*6/,         $ini . ' should set mantissa = 6' );
+  my (@tests) = ( qr/dzil bakeini/, qr/normal_form\s*=\s*numify/, qr/mantissa\s*=\s*6/, );
+  for my $test (@tests) {
+    $ini->assert_has_line($test);
+  }
   return $ok;
 }
 
 sub weaver_ini_ok {
   my ($self) = @_;
   return unless my $weave = $self->weaver_ini;
-  my (@lines) = $weave->lines_utf8( { chomp => 1 } );
-  return $self->_assert_match_meh( \@lines, qr/-SingleEncoding/, $weave . ' should set -SingleEncoding' );
+  return $weave->assert_has_line( qr/-SingleEncoding/, );
 }
 
 sub dist_ini_meta_ok {
   my ($self) = @_;
   return unless my $dmeta = $self->dist_ini_meta;
-  my (@lines) = $dmeta->lines_utf8( { chomp => 1 } );
+
+  my (@tests) = (
+    qr/bumpversions\s*=\s*1/, qr/toolkit\s*=\s*eumm/, qr/toolkit_hardness\s*=\s*soft/, qr/copyfiles\s*=.*LICENSE/,
+    qr/srcreadme\s*=.*/,
+  );
   my $ok = 1;
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/bumpversions\s*=\s*1/,        $dmeta . ' should use bumpversions' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/toolkit\s*=\s*eumm/,          $dmeta . ' should use eumm' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/toolkit_hardness\s*=\s*soft/, $dmeta . ' should use soft dependencies' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/copyfiles\s*=.*LICENSE/,      $dmeta . ' should copyfiles = LICENSE' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/srcreadme\s*=.*/,             $dmeta . ' should set srcreadme =' );
+  for my $test (@tests) {
+    undef $ok unless $dmeta->assert_has_line($test);
+  }
+
   return $ok;
 }
 
@@ -310,9 +201,11 @@ lsub unrecommend => sub {
 sub avoid_old_modules {
   my ($self) = @_;
   return unless my $distmeta = $self->zilla->distmeta;
+  my $data = $self->_data( $distmeta, 'distmeta' );
+
   my $ok = 1;
   for my $bad ( @{ $self->unrecommend } ) {
-    undef $ok unless $self->_assert_not_dpath_meh( $distmeta, '/prereqs/*/*/' . $bad, 'Try avoid ' . $bad );
+    undef $ok unless $data->assert_not_dpath( '/prereqs/*/*/' . $bad );
   }
   return $ok;
 }
@@ -343,6 +236,90 @@ sub setup_installer {
 __PACKAGE__->meta->make_immutable;
 no Moose;
 
+## no critic (Modules::ProhibitMultiplePackages)
+{
+
+  package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path;
+
+  use Moose;
+  use overload q[""] => sub { $_[0]->stringify };
+
+  has 'path' =>
+    ( isa => 'Path::Tiny', is => 'ro', handles => [ 'exists', 'lines_utf8', 'stringify', 'iterator' ], required => 1 );
+  has 'logger'            => ( isa => 'CodeRef',  is => 'ro', required   => 1 );
+  has '_lines_utf8_cache' => ( isa => 'ArrayRef', is => 'ro', lazy_build => 1 );
+
+  sub _build__lines_utf8_cache {
+    my ($self) = @_;
+    return [ $self->path->lines_utf8 ];
+  }
+
+  sub has_line {
+    my ( $self, $regex ) = @_;
+    for my $line ( @{ $self->_lines_utf8_cache } ) {
+      return 1 if $line =~ $regex;
+    }
+    return;
+  }
+
+  sub assert_exists {
+    my ( $self, ) = @_;
+    return $self if $self->path->exists;
+    $self->logger->( $self, $self->path->stringify . ' does not exist' );
+    return;
+  }
+
+  sub assert_not_exists {
+    my ( $self, ) = @_;
+    return 1 unless $self->path->exists;
+    $self->logger->( $self, $self->path->stringify . ' exists' );
+    return;
+  }
+
+  sub assert_has_line {
+    my ( $self, $regex, ) = @_;
+    return if $self->has_line($regex);
+    $self->logger->( $self, $self->path->stringify . ' should match ' . $regex );
+    return;
+  }
+
+  sub assert_not_has_line {
+    my ( $self, $regex, ) = @_;
+    return 1 unless $self->has_line($regex);
+    $self->logger->( $self, $self->path->stringify . ' should not match ' . $regex );
+    return;
+  }
+  __PACKAGE__->meta->make_immutable;
+}
+{
+
+  package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Data;
+  use Moose qw( has );
+  use Data::DPath qw( dpath );
+  has 'data'   => ( isa => 'HashRef', is => 'ro', required => 1 );
+  has 'logger' => ( isa => 'CodeRef', is => 'ro', required => 1 );
+  has 'path'   => ( isa => 'Str',     is => 'ro', required => 1 );
+
+  sub dpath_match {
+    my ( $self, $path ) = @_;
+    return dpath($path)->match( $self->data );
+  }
+
+  sub assert_dpath {
+    my ( $self, $path ) = @_;
+    return 1 if $self->dpath_match($path);
+    $self->logger->( $self, $self->path . ' should match ' . $path );
+    return;
+  }
+
+  sub assert_not_dpath {
+    my ( $self, $path ) = @_;
+    return 1 unless $self->dpath_match($path);
+    $self->logger->( $self, $self->path . ' should not match ' . $path );
+    return;
+  }
+  __PACKAGE__->meta->make_immutable;
+}
 1;
 
 =head1 DESCRIPTION
