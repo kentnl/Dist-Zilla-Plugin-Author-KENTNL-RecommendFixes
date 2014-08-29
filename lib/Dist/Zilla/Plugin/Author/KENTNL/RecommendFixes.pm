@@ -30,7 +30,9 @@ with 'Dist::Zilla::Role::InstallTool';
 
   sub assert_exists {
     my ( $self, $cb ) = @_;
-
+    return $self if $self->path->exists;
+    $cb->($self->path->stringify . ' does not exist');
+    return;
   }
 }
 use Term::ANSIColor qw( colored );
