@@ -27,16 +27,17 @@ with 'Dist::Zilla::Role::InstallTool';
   use overload q[""] => sub { $_[0]->stringify };
 
   has 'path' => ( isa => 'Path::Tiny', is => 'ro', handles => [ 'exists', 'lines_utf8', 'stringify' ], required => 1 );
-  has 'logger' => ( isa => 'CodeRef', is => 'ro', required => 1 );
+  has 'logger'            => ( isa => 'CodeRef',  is => 'ro', required   => 1 );
   has '_lines_utf8_cache' => ( isa => 'ArrayRef', is => 'ro', lazy_build => 1 );
 
   sub _build__lines_utf8_cache {
-    my ( $self ) = @_;
+    my ($self) = @_;
     return [ $self->path->lines_utf8 ];
   }
+
   sub has_line {
     my ( $self, $regex ) = @_;
-    for my $line ( @{ $self->_lines_utf8_cache }) {
+    for my $line ( @{ $self->_lines_utf8_cache } ) {
       return 1 if $line =~ $regex;
     }
     return;
@@ -52,6 +53,7 @@ with 'Dist::Zilla::Role::InstallTool';
     $self->logger->( $self, $self->path->stringify . ' does not exist' );
     return;
   }
+
   sub assert_not_exists {
     my ( $self, $cb ) = @_;
     return 1 unless $self->path->exists;
@@ -62,20 +64,22 @@ with 'Dist::Zilla::Role::InstallTool';
     $self->logger->( $self, $self->path->stringify . ' exists' );
     return;
   }
+
   sub assert_has_line {
     my ( $self, $regex, $cb ) = @_;
-    return if $self->has_line( $regex );
-    if ( $cb ) {
+    return if $self->has_line($regex);
+    if ($cb) {
       $cb->( $self, $self->path->stringify, $regex );
       return;
     }
     $self->logger->( $self, $self->path->stringify . ' should match ' . $regex );
     return;
   }
+
   sub assert_not_has_line {
     my ( $self, $regex, $cb ) = @_;
-    return 1 unless $self->has_line( $regex );
-    if ( $cb ) {
+    return 1 unless $self->has_line($regex);
+    if ($cb) {
       $cb->( $self, $self->path->stringify, $regex );
       return;
     }
@@ -202,7 +206,7 @@ sub has_new_perlcritic_deps {
   my ($self) = @_;
   my $ok = 1;
   undef $ok unless $self->_relpath( 'misc', 'perlcritic.deps' )->assert_exists;
-  undef $ok unless $self->_relpath('perlcritic.deps' )->assert_not_exists;
+  undef $ok unless $self->_relpath('perlcritic.deps')->assert_not_exists;
   return $ok;
 }
 
@@ -218,8 +222,7 @@ sub has_new_perlcritic_gen {
 sub git_repo_notkentfredric {
   my ($self) = @_;
   return unless my $config = $self->git_config;
-  my @lines = $config->lines_utf8( { chomp => 1 } );
-  return $self->_assert_nonmatch( \@lines, qr/kentfredric/, $config . ' Should not point to kentfredric' );
+  return $config->assert_not_has_line( qr/kentfredric/ );
 }
 
 sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' }
