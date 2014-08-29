@@ -25,12 +25,17 @@ around 'log' => sub {
   return $self->$orig( map { ref $_ ? $_ : colored( ['yellow'], $_ ) } @args );
 };
 
-sub _relpath {
-  my ( $self, @args ) = @_;
+sub _cast_path {
+  my ( $self, $path ) = @_;
   return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path->new(
-    path   => $self->root->child(@args)->relative( $self->root ),
+    path   => $path,
     logger => sub { shift; $self->log(@_) },
   );
+}
+
+sub _relpath {
+  my ( $self, @args ) = @_;
+  return $self->_cast_path( $self->root->child(@args)->relative( $self->root ) );
 }
 
 sub _data {
@@ -56,6 +61,7 @@ lsub changes        => sub { $_[0]->_relpath('Changes')->assert_exists() };
 lsub license        => sub { $_[0]->_relpath('LICENSE')->assert_exists() };
 lsub mailmap        => sub { $_[0]->_relpath('.mailmap')->assert_exists() };
 lsub perlcritic_gen => sub { $_[0]->_relpath( 'maint', 'perlcritic.rc.gen.pl' )->assert_exists() };
+lsub libdir         => sub { $_[0]->_relpath('lib')->assert_exists() };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
@@ -69,6 +75,19 @@ lsub travis_conf => sub {
   };
   return unless $ok;
   return $r;
+};
+
+lsub libfiles => sub {
+  my ( $self ) = @_;
+  return [] unless $self->libdir;
+  my @out;
+  my $it = $self->libdir->iterator({ recurse => 1 });
+  while ( my $thing = $it->() ){
+    next if -d $thing;
+    next unless $thing->basename =~ /\.pm\z/msx;
+    push @out, $self->_cast_path($thing);
+  }
+  return \@out;
 };
 
 sub has_new_changes_deps {
@@ -197,9 +216,19 @@ sub avoid_old_modules {
 }
 
 sub mailmap_check {
-  my ( $self ) = @_;
+  my ($self) = @_;
   return unless my $mailmap = $self->mailmap;
   $mailmap->assert_has_line(qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/);
+}
+sub dzil_plugin_check {
+  my ( $self ) = @_;
+  return unless $self->libdir;
+  return unless @{ $self->libfiles };
+  my ( @plugins ) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\// } @{ $self->libfiles };
+  return unless @plugins;
+  for my $plugin ( @plugins ) {
+    $plugin->assert_has_line(qr/Dist::Zilla::Util::ConfigDumper/);
+  }
 }
 
 sub setup_installer {
@@ -228,7 +257,6 @@ sub setup_installer {
 
 __PACKAGE__->meta->make_immutable;
 no Moose;
-
 {
 
   package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path;
@@ -236,7 +264,7 @@ no Moose;
   use Moose;
   use overload q[""] => sub { $_[0]->stringify };
 
-  has 'path' => ( isa => 'Path::Tiny', is => 'ro', handles => [ 'exists', 'lines_utf8', 'stringify' ], required => 1 );
+  has 'path' => ( isa => 'Path::Tiny', is => 'ro', handles => [ 'exists', 'lines_utf8', 'stringify','iterator' ], required => 1 );
   has 'logger'            => ( isa => 'CodeRef',  is => 'ro', required   => 1 );
   has '_lines_utf8_cache' => ( isa => 'ArrayRef', is => 'ro', lazy_build => 1 );
 
