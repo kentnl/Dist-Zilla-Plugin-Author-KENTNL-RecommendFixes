@@ -54,6 +54,7 @@ lsub perltidyrc     => sub { $_[0]->_relpath('.perltidyrc')->assert_exists() };
 lsub gitignore      => sub { $_[0]->_relpath('.gitignore')->assert_exists() };
 lsub changes        => sub { $_[0]->_relpath('Changes')->assert_exists() };
 lsub license        => sub { $_[0]->_relpath('LICENSE')->assert_exists() };
+lsub mailmap        => sub { $_[0]->_relpath('.mailmap')->assert_exists() };
 lsub perlcritic_gen => sub { $_[0]->_relpath( 'maint', 'perlcritic.rc.gen.pl' )->assert_exists() };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
@@ -193,6 +194,12 @@ sub avoid_old_modules {
     undef $ok unless $data->assert_not_dpath( '/prereqs/*/*/' . $bad );
   }
   return $ok;
+}
+
+sub mailmap_check {
+  my ( $self ) = @_;
+  return unless my $mailmap = $self->mailmap;
+  $mailmap->assert_has_line(qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/);
 }
 
 sub setup_installer {
