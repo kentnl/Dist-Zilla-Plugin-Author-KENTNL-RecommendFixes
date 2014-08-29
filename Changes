@@ -11,6 +11,7 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
  - gitversions is now warned against
  - failure to have one of bumpversions or gitversions is a serious warning
  - derecommend Readonly
+ - check mailmap
 
  [Dependencies::Stats]
  - Dependencies changed since 0.002003, see misc/*.deps* for details

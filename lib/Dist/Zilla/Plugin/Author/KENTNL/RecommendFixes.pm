@@ -72,6 +72,7 @@ lsub perltidyrc     => sub { $_[0]->_relpath('.perltidyrc')->assert_exists() };
 lsub gitignore      => sub { $_[0]->_relpath('.gitignore')->assert_exists() };
 lsub changes        => sub { $_[0]->_relpath('Changes')->assert_exists() };
 lsub license        => sub { $_[0]->_relpath('LICENSE')->assert_exists() };
+lsub mailmap        => sub { $_[0]->_relpath('.mailmap')->assert_exists() };
 lsub perlcritic_gen => sub { $_[0]->_relpath( 'maint', 'perlcritic.rc.gen.pl' )->assert_exists() };
 
 lsub tdir => sub { $_[0]->_relpath('t')->assert_exists() };
@@ -255,6 +256,11 @@ sub avoid_old_modules {
   return $ok;
 }
 
+sub mailmap_check {
+  my ($self) = @_;
+  return unless my $mailmap = $self->mailmap;
+  return $mailmap->assert_has_line(qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/);
+}
 
 # Hack to avoid matching ourselves.
 sub _plugin_re {
@@ -305,6 +311,7 @@ sub setup_installer {
   $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
   $self->avoid_old_modules;
+  $self->mailmap_check;
   $self->dzil_plugin_check;
   return;
 }
@@ -415,6 +422,7 @@ git_repo_notkentfredric has_new_changes_deps
 has_new_perlcritic_deps has_new_perlcritic_gen
 travis_conf_ok weaver_ini_ok avoid_old_modules
 dzil_plugin_check
+mailmap_check
 
 =end Pod::Coverage
 
