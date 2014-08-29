@@ -239,6 +239,7 @@ lsub unrecommend => sub {
     qw( File::ShareDir::ProjectDistDir ),                    # Whhhy
     qw( File::Find File::Find::Rule ),                       # Path::Iterator::Rule is much better
     qw( Class::Load ),                                       # Module::Runtime preferred
+    qw( Readonly ),                                          # use Const::Fast
   ];
 };
 
