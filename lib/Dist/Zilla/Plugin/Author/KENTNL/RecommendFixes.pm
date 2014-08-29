@@ -270,7 +270,7 @@ sub dist_ini_meta_ok {
   for my $test (@tests) {
     undef $ok unless $dmeta->assert_has_line($test);
   }
-  for my $test ( qr/author.*=.*kentfredric/ ) {
+  for my $test ( qr/author.*=.*kentfredric/, qr/git_versions/ ) {
     undef $ok unless $dmeta->assert_not_has_line($test);
   }
 
