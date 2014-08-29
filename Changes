@@ -4,6 +4,7 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
  [00 Major]
  - Interals overhauled again
  - new checks
+ - metadata
 
  [Checks]
  - Now scrapes lib/ and t/ and recommends various things for DZil plugin work.
@@ -19,6 +20,9 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
  [Interals]
  - Internals overhauled to have some private classes, greatly simplifying syntax and logic.
+
+ [Metadata]
+ - use kentnl for author.
 
 0.002003 2014-08-21T05:45:11Z
  [00 Minor]
