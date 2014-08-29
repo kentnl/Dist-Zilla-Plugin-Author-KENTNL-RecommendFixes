@@ -62,6 +62,7 @@ lsub license        => sub { $_[0]->_relpath('LICENSE')->assert_exists() };
 lsub mailmap        => sub { $_[0]->_relpath('.mailmap')->assert_exists() };
 lsub perlcritic_gen => sub { $_[0]->_relpath( 'maint', 'perlcritic.rc.gen.pl' )->assert_exists() };
 lsub libdir         => sub { $_[0]->_relpath('lib')->assert_exists() };
+lsub tdir           => sub { $_[0]->_relpath('t')->assert_exists() };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
@@ -78,16 +79,29 @@ lsub travis_conf => sub {
 };
 
 lsub libfiles => sub {
-  my ( $self ) = @_;
+  my ($self) = @_;
   return [] unless $self->libdir;
   my @out;
-  my $it = $self->libdir->iterator({ recurse => 1 });
-  while ( my $thing = $it->() ){
+  my $it = $self->libdir->iterator( { recurse => 1 } );
+  while ( my $thing = $it->() ) {
     next if -d $thing;
     next unless $thing->basename =~ /\.pm\z/msx;
     push @out, $self->_cast_path($thing);
   }
   return \@out;
+};
+lsub tfiles => sub {
+  my ($self) = @_;
+  return [] unless $self->tdir;
+  my @out;
+  my $it = $self->libdir->iterator( { recurse => 1 } );
+  while ( my $thing = $it->() ) {
+    next if -d $thing;
+    next unless $thing->basename =~ /\.t\z/msx;
+    push @out, $self->_cast_path($thing);
+  }
+  return \@out;
+
 };
 
 sub has_new_changes_deps {
@@ -222,19 +236,30 @@ sub mailmap_check {
 }
 
 # Hack to avoid matching ourselves.
-sub _plugin_re { 
+sub _plugin_re {
   my $inpn = shift;
   my $pn = join q[::], split qr/\+/, $inpn;
   return qr/$pn/;
 }
+
 sub dzil_plugin_check {
-  my ( $self ) = @_;
+  my ($self) = @_;
   return unless $self->libdir;
   return unless @{ $self->libfiles };
-  my ( @plugins ) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\//msx } @{ $self->libfiles };
+  my (@plugins) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\//msx } @{ $self->libfiles };
   return unless @plugins;
-  for my $plugin ( @plugins ) {
-    $plugin->assert_has_line(_plugin_re('Dist+Zilla+Util+ConfigDumper'));
+  for my $plugin (@plugins) {
+    $plugin->assert_has_line( _plugin_re('Dist+Zilla+Util+ConfigDumper') );
+  }
+  return unless $self->tdir;
+  return unless @{ $self->tfiles };
+find_dztest: {
+    for my $tfile ( @{ $self->tfiles } ) {
+      if ( $tfile->has_line(qr/dztest/) ) {
+        last find_dztest;
+      }
+    }
+    $self->log('A test should probably use dztest (Dist::Zilla::Util::Test::KENTNL)');
   }
 }
 
@@ -272,7 +297,8 @@ no Moose;
   use Moose;
   use overload q[""] => sub { $_[0]->stringify };
 
-  has 'path' => ( isa => 'Path::Tiny', is => 'ro', handles => [ 'exists', 'lines_utf8', 'stringify','iterator' ], required => 1 );
+  has 'path' =>
+    ( isa => 'Path::Tiny', is => 'ro', handles => [ 'exists', 'lines_utf8', 'stringify', 'iterator' ], required => 1 );
   has 'logger'            => ( isa => 'CodeRef',  is => 'ro', required   => 1 );
   has '_lines_utf8_cache' => ( isa => 'ArrayRef', is => 'ro', lazy_build => 1 );
 
