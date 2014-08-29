@@ -25,4 +25,6 @@ $dz->has_messages(
   ]
 );
 
+note explain $dz->builder->log_messages;
+
 done_testing;

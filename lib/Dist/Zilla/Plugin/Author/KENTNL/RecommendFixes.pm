@@ -27,17 +27,17 @@ sub _meh    { my (@args) = @_; return colored( ['yellow'],  @args ) }
 
 sub _log_severe {
   my ( $self, @args ) = @_;
-  return $self->log( { prefix => _severe('severe ') }, _severe(@args) );
+  return $self->log( { prefix => _severe('<severe> ') }, _severe(@args) );
 }
 
 sub _log_bad {
   my ( $self, @args ) = @_;
-  return $self->log( { prefix => _bad('bad ') }, _bad(@args) );
+  return $self->log( { prefix => _bad('<bad> ') }, _bad(@args) );
 }
 
 sub _log_meh {
   my ( $self, @args ) = @_;
-  return $self->log( { prefix => _meh('meh ') }, _meh(@args) );
+  return $self->log( { prefix => _meh('<meh> ') }, _meh(@args) );
 }
 
 sub _relpath {
@@ -45,28 +45,43 @@ sub _relpath {
   return $self->root->child(@args)->relative( $self->root );
 }
 
+sub _cb_bad {
+  my ( $self, $message ) = @_;
+  return sub { my $context = shift; $self->_log_bad( $context . ' ' . $message ); return };
+}
+
+sub _cb_meh {
+  my ( $self, $message ) = @_;
+  return sub { my $context = shift; $self->_log_meh( $context . ' ' . $message ); return };
+}
+
+sub _path_or_callback {
+  my ( $self, $apath, $callback ) = @_;
+  my $path = $self->_relpath( @{$apath} );
+  return $path if $path->exists;
+  return $callback->($path);
+}
+
+sub _path_then_callback {
+  my ( $self, $apath, $callback ) = @_;
+  my $path = $self->_relpath( @{$apath} );
+  return 1 unless $path->exists;
+  return $callback->($path);
+}
+
 sub _assert_path_bad {
   my ( $self, @apath ) = @_;
-  my $path = $self->_relpath(@apath);
-  return $path if $path->exists;
-  $self->_log_bad( $path . ' does not exist' );
-  return;
+  return $self->_path_or_callback( \@apath, $self->_cb_bad('does not exist') );
 }
 
 sub _assert_path_meh {
   my ( $self, @apath ) = @_;
-  my $path = $self->_relpath(@apath);
-  return $path if $path->exists;
-  $self->_log_meh( $path . ' does not exist' );
-  return;
+  return $self->_path_or_callback( \@apath, $self->_cb_meh('does not exist') );
 }
 
 sub _assert_nonpath_meh {
   my ( $self, @apath ) = @_;
-  my $path = $self->_relpath(@apath);
-  return 1 unless $path->exists;
-  $self->_log_meh( $path . ' exists' );
-  return;
+  return $self->_path_then_callback( \@apath, $self->_cb_meh('exists') );
 }
 
 sub _assert_match_meh {
@@ -122,62 +137,22 @@ lsub root => sub {
   return path( $self->zilla->root );
 };
 
-lsub git => sub {
-  my ($self) = @_;
-  return $self->_assert_path_bad('.git');
-};
-
-lsub git_config => sub {
-  my ($self) = @_;
-  return unless $self->git;
-  return $self->_assert_path_bad( '.git', 'config' );
-};
-
-lsub dist_ini => sub {
-  my ($self) = @_;
-  return $self->_assert_path_bad('dist.ini');
-};
-
-lsub dist_ini_meta => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('dist.ini.meta');
-};
-
-lsub weaver_ini => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('weaver.ini');
-};
-
-lsub travis_yml => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('.travis.yml');
-};
-
-lsub perltidyrc => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('.perltidyrc');
-};
-
-lsub gitignore => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('.gitignore');
-};
-
-lsub changes => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('Changes');
-};
-
-lsub license => sub {
-  my ($self) = @_;
-  return $self->_assert_path_meh('LICENSE');
-};
+lsub git => sub { $_[0]->_path_or_callback( ['.git'], $_[0]->_cb_bad('does not exist') ) };
+lsub git_config => sub { $_[0]->_path_or_callback( [ '.git', 'config' ], $_[0]->_cb_bad('does not exist') ) };
+lsub dist_ini      => sub { $_[0]->_path_or_callback( ['dist.ini'],      $_[0]->_cb_bad('does not exist') ) };
+lsub dist_ini_meta => sub { $_[0]->_path_or_callback( ['dist.ini.meta'], $_[0]->_cb_meh('does not exist') ) };
+lsub weaver_ini    => sub { $_[0]->_path_or_callback( ['weaver.ini'],    $_[0]->_cb_meh('does not exist') ) };
+lsub travis_yml    => sub { $_[0]->_path_or_callback( ['.travis.yml'],   $_[0]->_cb_meh('does not exist') ) };
+lsub perltidyrc    => sub { $_[0]->_path_or_callback( ['.perltidyrc'],   $_[0]->_cb_meh('does not exist') ) };
+lsub gitignore     => sub { $_[0]->_path_or_callback( ['.gitignore'],    $_[0]->_cb_meh('does not exist') ) };
+lsub changes       => sub { $_[0]->_path_or_callback( ['Changes'],       $_[0]->_cb_meh('does not exist') ) };
+lsub license       => sub { $_[0]->_path_or_callback( ['LICENSE'],       $_[0]->_cb_meh('does not exist') ) };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
 lsub perlcritic_gen => sub {
   my ($self) = @_;
-  return $self->_assert_path_meh( 'maint', 'perlcritic.rc.gen.pl' );
+  return $self->_path_or_callback([ 'maint', 'perlcritic.rc.gen.pl' ], $_[0]->_cb_meh('does not exist'));
 };
 
 lsub travis_conf => sub {
@@ -196,8 +171,16 @@ sub has_new_changes_deps {
   my ($self) = @_;
   my $ok = 1;
   for my $file ( @{ $self->changes_deps_files } ) {
-    undef $ok unless $self->_assert_path_meh( 'misc', $file );
-    undef $ok unless $self->_assert_nonpath_meh($file);
+    $self->_path_or_callback( ['misc', $file ] => sub {
+      my ($path) = shift;
+      undef $ok;
+      $self->_log_meh($path . ' does not exist');
+    });
+    $self->_path_then_callback( [ $file ] => sub { 
+      my ($path) = shift;
+      undef $ok;
+      $self->_log_meh($path . ' exists');
+    });
   }
   return $ok;
 }
@@ -270,9 +253,10 @@ sub dist_ini_ok {
   return unless my $ini = $self->dist_ini;
   my (@lines) = $ini->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/dzil bakeini/,             $ini . ' not baked' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/normal_form\s*=\s*numify/, $ini . ' should set numify as normal form' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/mantissa\s*=\s*6/,         $ini . ' should set mantissa = 6' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/dzil bakeini/, $ini . ' not baked' );
+  undef $ok
+    unless $self->_assert_match_meh( \@lines, qr/normal_form\s*=\s*numify/, $ini . ' should set numify as normal form' );
+  undef $ok unless $self->_assert_match_meh( \@lines, qr/mantissa\s*=\s*6/, $ini . ' should set mantissa = 6' );
   return $ok;
 }
 
@@ -287,12 +271,19 @@ sub dist_ini_meta_ok {
   my ($self) = @_;
   return unless my $dmeta = $self->dist_ini_meta;
   my (@lines) = $dmeta->lines_utf8( { chomp => 1 } );
+  my (@tests) = (
+    [ qr/author\.*=.*kentfredric/,     'should not author=kentfredric' ],
+    [ qr/bumpversions\s*=\s*1/,        'should use bumpversions' ],
+    [ qr/toolkit\s*=\s*eumm/,          'should use eumm' ],
+    [ qr/toolkit_hardness\s*=\s*soft/, 'should use soft dependencies' ],
+    [ qr/copyfiles\s*=.*LICENSE/,      'should copyfiles = LICENSE' ],
+    [ qr/srcreadme\s*=.*/,             'should set srcreadme =' ],
+  );
   my $ok = 1;
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/bumpversions\s*=\s*1/,        $dmeta . ' should use bumpversions' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/toolkit\s*=\s*eumm/,          $dmeta . ' should use eumm' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/toolkit_hardness\s*=\s*soft/, $dmeta . ' should use soft dependencies' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/copyfiles\s*=.*LICENSE/,      $dmeta . ' should copyfiles = LICENSE' );
-  undef $ok unless $self->_assert_match_meh( \@lines, qr/srcreadme\s*=.*/,             $dmeta . ' should set srcreadme =' );
+  for my $test (@tests) {
+    my ( $re, $message ) = @{$test};
+    undef $ok unless $self->_assert_match_meh( \@lines, $re, $dmeta . ' ' . $message );
+  }
   return $ok;
 }
 
