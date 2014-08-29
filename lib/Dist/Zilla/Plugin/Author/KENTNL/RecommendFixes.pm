@@ -255,7 +255,7 @@ sub dzil_plugin_check {
   return unless @{ $self->tfiles };
 find_dztest: {
     for my $tfile ( @{ $self->tfiles } ) {
-      if ( $tfile->has_line(qr/dztest/) ) {
+      if ( $tfile->has_line(qr/dzpest/) ) {
         last find_dztest;
       }
     }
