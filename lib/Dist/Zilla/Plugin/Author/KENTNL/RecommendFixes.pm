@@ -102,7 +102,7 @@ lsub libfiles => sub {
     push @out, $self->_cast_path($thing);
   }
   if ( not @out ) {
-    _is_bad { $self->log( "Should have modules in " . $self->libdir ) };
+    _is_bad { $self->log( 'Should have modules in ' . $self->libdir ) };
   }
 
   return \@out;
@@ -118,7 +118,7 @@ lsub tfiles => sub {
     push @out, $self->_cast_path($thing);
   }
   if ( not @out ) {
-    $self->log( "Should have tests in " . $self->tdir );
+    $self->log( 'Should have tests in ' . $self->tdir );
   }
   return \@out;
 
@@ -163,7 +163,7 @@ sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq
 sub travis_conf_ok {
   my ($self) = @_;
   return unless my $conf = $self->travis_conf;
-  my $data = $self->_data( $self->travis_conf, $self->travis_yml . '' );
+  my $data = $self->_data( $self->travis_conf, $self->travis_yml . q[] );
 
   my $ok = 1;
 
@@ -259,7 +259,7 @@ sub avoid_old_modules {
 sub mailmap_check {
   my ($self) = @_;
   return unless my $mailmap = $self->mailmap;
-  $mailmap->assert_has_line(qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/);
+  return $mailmap->assert_has_line(qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/);
 }
 
 # Hack to avoid matching ourselves.
@@ -280,10 +280,10 @@ sub dzil_plugin_check {
   }
   return unless $self->tdir;
   return unless @{ $self->tfiles };
-find_dztest: {
+FIND_DZTEST: {
     for my $tfile ( @{ $self->tfiles } ) {
       if ( $tfile->has_line(qr/dztest/) ) {
-        last find_dztest;
+        last FIND_DZTEST;
       }
     }
     $self->log('A test should probably use dztest (Dist::Zilla::Util::Test::KENTNL)');
@@ -318,6 +318,8 @@ sub setup_installer {
 
 __PACKAGE__->meta->make_immutable;
 no Moose;
+
+## no critic (Modules::ProhibitMultiplePackages)
 {
 
   package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path;
