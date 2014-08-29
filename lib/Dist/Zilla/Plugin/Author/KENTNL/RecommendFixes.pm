@@ -81,11 +81,22 @@ with 'Dist::Zilla::Role::InstallTool';
   has 'logger' => ( isa => 'CodeRef', is => 'ro', required => 1 );
   has 'path'   => ( isa => 'Str',     is => 'ro', required => 1 );
 
+  sub dpath_match {
+    my ( $self, $path ) = @_;
+    return dpath($path)->match( $self->data );
+  }
+
   sub assert_dpath {
     my ( $self, $path ) = @_;
-    my $dpath = dpath($path);
-    return 1 if $dpath->match( $self->data );
+    return 1 if $self->dpath_match($path);
     $self->logger->( $self, $self->path . ' should match ' . $path );
+    return;
+  }
+
+  sub assert_not_dpath {
+    my ( $self, $path ) = @_;
+    return 1 unless $self->dpath_match($path);
+    $self->logger->( $self, $self->path . ' should not match ' . $path );
     return;
   }
 
@@ -195,41 +206,35 @@ sub git_repo_notkentfredric {
   return $config->assert_not_has_line(qr/kentfredric/);
 }
 
-sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' }
-sub _matrix_include_perl         { my ($perl) = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
-sub _branch_only                 { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
-sub _clone_scripts               { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
+sub _matrix_include_perl { my ($perl)   = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
+sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
+sub _clone_scripts { return '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' }
 
 sub travis_conf_ok {
   my ($self) = @_;
   return unless my $conf = $self->travis_conf;
-  my $path = $self->travis_yml;
 
   my $data = $self->_data( $self->travis_conf, $self->travis_yml . '' );
 
   my $ok = 1;
 
-  undef $ok unless $data->assert_dpath( _matrix_include_env_coverage() );
+  undef $ok unless $data->assert_dpath('/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/');
 
   for my $perl (qw( 5.21 5.20 5.10 )) {
-    undef $ok
-      unless $self->_assert_dpath( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
+    undef $ok unless $data->assert_dpath( _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.8 )) {
-    undef $ok
-      unless $self->_assert_dpath( $conf, _matrix_include_perl($perl), $path . ' should test on this version of perl' );
+    undef $ok unless $data->assert_dpath( _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.19 )) {
-    undef $ok
-      unless $self->_assert_not_dpath( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
+    undef $ok unless $data->assert_not_dpath( _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.18 )) {
-    undef $ok
-      unless $self->_assert_not_dpath( $conf, _matrix_include_perl($perl), $path . ' should not test on this version of perl' );
+    undef $ok unless $data->assert_not_dpath( _matrix_include_perl($perl) );
   }
-  undef $ok unless $self->_assert_dpath( $conf, _clone_scripts(), $path . ' should clone travis ci module' );
+  undef $ok unless $data->assert_dpath( _clone_scripts() );
   for my $branch (qw( master build/master releases )) {
-    undef $ok unless $self->_assert_dpath( $conf, _branch_only($branch), $path . ' should test this branch ' );
+    undef $ok unless $data->assert_dpath( _branch_only($branch) );
   }
   return $ok;
 }
@@ -254,6 +259,7 @@ sub weaver_ini_ok {
 sub dist_ini_meta_ok {
   my ($self) = @_;
   return unless my $dmeta = $self->dist_ini_meta;
+
   my (@tests) = (
     qr/bumpversions\s*=\s*1/, qr/toolkit\s*=\s*eumm/, qr/toolkit_hardness\s*=\s*soft/, qr/copyfiles\s*=.*LICENSE/,
     qr/srcreadme\s*=.*/,
@@ -283,9 +289,11 @@ lsub unrecommend => sub {
 sub avoid_old_modules {
   my ($self) = @_;
   return unless my $distmeta = $self->zilla->distmeta;
+  my $data = $self->_data( $distmeta, 'distmeta' );
+
   my $ok = 1;
   for my $bad ( @{ $self->unrecommend } ) {
-    undef $ok unless $self->_assert_not_dpath( $distmeta, '/prereqs/*/*/' . $bad, 'Try avoid ' . $bad );
+    undef $ok unless $data->assert_not_dpath('/prereqs/*/*/' . $bad );
   }
   return $ok;
 }
