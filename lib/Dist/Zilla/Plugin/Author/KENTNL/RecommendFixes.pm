@@ -26,7 +26,13 @@ around 'log' => sub {
   my ( $orig, $self, @args ) = @_;
   return $self->$orig( map { ref $_ ? $_ : colored( [$LOG_COLOR], $_ ) } @args );
 };
+
 sub _is_bad(&) { local $LOG_COLOR = 'red'; return $_[0]->() }
+
+sub _badly(&) {
+  my $code = shift;
+  return sub { local $LOG_COLOR = 'red'; return $code->(@_); };
+}
 
 sub _cast_path {
   my ( $self, $path ) = @_;
@@ -52,17 +58,11 @@ sub _data {
 
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
-lsub git => sub {
-  my $self = shift;
-  _is_bad { $self->_relpath('.git')->assert_exists() };
-};
-lsub libdir => sub {
-  my $self = shift;
-  _is_bad { $self->_relpath('lib')->assert_exists() };
-};
+lsub git      => _badly { $_[0]->_relpath('.git')->assert_exists() };
+lsub libdir   => _badly { $_[0]->_relpath('lib')->assert_exists() };
+lsub dist_ini => _badly { $_[0]->_relpath('dist.ini')->assert_exists() };
 
 lsub git_config => sub { $_[0]->_relpath( '.git', 'config' )->assert_exists() };
-lsub dist_ini => sub { $_[0]->_relpath('dist.ini')->assert_exists() };
 lsub dist_ini_meta  => sub { $_[0]->_relpath('dist.ini.meta')->assert_exists() };
 lsub weaver_ini     => sub { $_[0]->_relpath('weaver.ini')->assert_exists() };
 lsub travis_yml     => sub { $_[0]->_relpath('.travis.yml')->assert_exists() };
@@ -96,11 +96,13 @@ lsub libfiles => sub {
   my $it = $self->libdir->iterator( { recurse => 1 } );
   while ( my $thing = $it->() ) {
     next if -d $thing;
-    next unless $thing->basename =~ /\.pm\z/msx;
+    next unless $thing->basename =~ /\.pmc\z/msx;
     push @out, $self->_cast_path($thing);
   }
   if ( not @out ) {
-    $self->log( "Should have modules in " . $self->libdir );
+    _is_bad { 
+      $self->log( "Should have modules in " . $self->libdir );
+    };
   }
 
   return \@out;
