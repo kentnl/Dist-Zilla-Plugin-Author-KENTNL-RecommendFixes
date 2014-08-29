@@ -20,18 +20,19 @@ use Data::DPath qw( dpath );
 with 'Dist::Zilla::Role::InstallTool';
 
 {
+
   package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path;
 
   use Moose;
   use overload q[""] => sub { $_[0]->stringify };
-  
-  has 'path' => ( isa => 'Path::Tiny', is => 'ro', handles => ['exists','lines_utf8','stringify'], required => 1 );
+
+  has 'path' => ( isa => 'Path::Tiny', is => 'ro', handles => [ 'exists', 'lines_utf8', 'stringify' ], required => 1 );
   has 'logger' => ( isa => 'CodeRef', is => 'ro', required => 1 );
 
   sub assert_exists {
     my ( $self, $cb ) = @_;
     return $self if $self->path->exists;
-    $cb->($self->path->stringify . ' does not exist');
+    $cb->( $self->path->stringify . ' does not exist' );
     return;
   }
 }
@@ -49,9 +50,9 @@ sub _cb_m {
 
 sub _relpath {
   my ( $self, @args ) = @_;
-  return  Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path->new( 
-    path =>  $self->root->child(@args)->relative( $self->root ),
-    logger => sub { my $self = shift; $self->log(@_)},
+  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path->new(
+    path   => $self->root->child(@args)->relative( $self->root ),
+    logger => sub { my $self = shift; $self->log(@_) },
   );
 }
 
@@ -116,16 +117,16 @@ lsub root => sub {
   return path( $self->zilla->root );
 };
 
-lsub git => sub { $_[0]->_relpath('.git')->assert_exists(); };
-lsub git_config => sub { $_[0]->_path_or_callback( [ '.git', 'config' ], 'does not exist' ) };
-lsub dist_ini      => sub { $_[0]->_path_or_callback( ['dist.ini'],      'does not exist' ) };
-lsub dist_ini_meta => sub { $_[0]->_path_or_callback( ['dist.ini.meta'], 'does not exist' ) };
-lsub weaver_ini    => sub { $_[0]->_path_or_callback( ['weaver.ini'],    'does not exist' ) };
-lsub travis_yml    => sub { $_[0]->_path_or_callback( ['.travis.yml'],   'does not exist' ) };
-lsub perltidyrc    => sub { $_[0]->_path_or_callback( ['.perltidyrc'],   'does not exist' ) };
-lsub gitignore     => sub { $_[0]->_path_or_callback( ['.gitignore'],    'does not exist' ) };
-lsub changes       => sub { $_[0]->_path_or_callback( ['Changes'],       'does not exist' ) };
-lsub license       => sub { $_[0]->_path_or_callback( ['LICENSE'],       'does not exist' ) };
+lsub git           => sub { $_[0]->_relpath('.git')->assert_exists(); };
+lsub git_config    => sub { $_[0]->_relpath( '.git', 'config' )->assert_exists() };
+lsub dist_ini      => sub { $_[0]->_relpath( 'dist.ini' )->assert_exists() };
+lsub dist_ini_meta => sub { $_[0]->_relpath( 'dist.ini.meta' )->assert_exists() };
+lsub weaver_ini    => sub { $_[0]->_path_or_callback( ['weaver.ini'], 'does not exist' ) };
+lsub travis_yml    => sub { $_[0]->_path_or_callback( ['.travis.yml'], 'does not exist' ) };
+lsub perltidyrc    => sub { $_[0]->_path_or_callback( ['.perltidyrc'], 'does not exist' ) };
+lsub gitignore     => sub { $_[0]->_path_or_callback( ['.gitignore'], 'does not exist' ) };
+lsub changes       => sub { $_[0]->_path_or_callback( ['Changes'], 'does not exist' ) };
+lsub license       => sub { $_[0]->_path_or_callback( ['LICENSE'], 'does not exist' ) };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
@@ -221,15 +222,15 @@ sub dist_ini_ok {
   my ($self) = @_;
   return unless my $ini = $self->dist_ini;
   my (@lines) = $ini->lines_utf8( { chomp => 1 } );
-  my $ok = 1;
+  my $ok      = 1;
   my (@tests) = (
     [ qr/dzil bakeini/,             'not baked' ],
-    [  qr/normal_form\s*=\s*numify/, 'should set numify as normal form' ],
-    [ qr/mantissa\s*=\s*6/,         'should set mantissa = 6'],
+    [ qr/normal_form\s*=\s*numify/, 'should set numify as normal form' ],
+    [ qr/mantissa\s*=\s*6/,         'should set mantissa = 6' ],
   );
-  for my $test( @tests ) {
+  for my $test (@tests) {
     my ( $re, $message ) = @{$test};
-    undef $ok unless $self->_assert_match(\@lines, $re, $ini . ' ' . $message );
+    undef $ok unless $self->_assert_match( \@lines, $re, $ini . ' ' . $message );
   }
   return $ok;
 }
