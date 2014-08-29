@@ -90,6 +90,39 @@ lsub travis_conf => sub {
   return $r;
 };
 
+lsub libfiles => sub {
+  my ($self) = @_;
+  return [] unless $self->libdir;
+  my @out;
+  my $it = $self->libdir->iterator( { recurse => 1 } );
+  while ( my $thing = $it->() ) {
+    next if -d $thing;
+    next unless $thing->basename =~ /\.pm\z/msx;
+    push @out, $self->_cast_path($thing);
+  }
+  if ( not @out ) {
+    _is_bad { $self->log( 'Should have modules in ' . $self->libdir ) };
+  }
+
+  return \@out;
+};
+lsub tfiles => sub {
+  my ($self) = @_;
+  return [] unless $self->tdir;
+  my @out;
+  my $it = $self->tdir->iterator( { recurse => 1 } );
+  while ( my $thing = $it->() ) {
+    next if -d $thing;
+    next unless $thing->basename =~ /\.t\z/msx;
+    push @out, $self->_cast_path($thing);
+  }
+  if ( not @out ) {
+    $self->log( 'Should have tests in ' . $self->tdir );
+  }
+  return \@out;
+
+};
+
 sub has_new_changes_deps {
   my ($self) = @_;
   my $ok = 1;
@@ -210,6 +243,36 @@ sub avoid_old_modules {
   return $ok;
 }
 
+
+# Hack to avoid matching ourselves.
+sub _plugin_re {
+  my $inpn = shift;
+  my $pn = join q[::], split qr/\+/, $inpn;
+  return qr/$pn/;
+}
+
+sub dzil_plugin_check {
+  my ($self) = @_;
+  return unless $self->libdir;
+  return unless @{ $self->libfiles };
+  my (@plugins) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\//msx } @{ $self->libfiles };
+  return unless @plugins;
+  for my $plugin (@plugins) {
+    $plugin->assert_has_line( _plugin_re('Dist+Zilla+Util+ConfigDumper') );
+  }
+  return unless $self->tdir;
+  return unless @{ $self->tfiles };
+FIND_DZTEST: {
+    for my $tfile ( @{ $self->tfiles } ) {
+      if ( $tfile->has_line(qr/dztest/) ) {
+        last FIND_DZTEST;
+      }
+    }
+    $self->log('A test should probably use dztest (Dist::Zilla::Util::Test::KENTNL)');
+  }
+  return;
+}
+
 sub setup_installer {
   my ($self) = @_;
   $self->git;
@@ -230,6 +293,7 @@ sub setup_installer {
   $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
   $self->avoid_old_modules;
+  $self->dzil_plugin_check;
   return;
 }
 
@@ -338,6 +402,7 @@ setup_installer dist_ini_meta_ok dist_ini_ok
 git_repo_notkentfredric has_new_changes_deps
 has_new_perlcritic_deps has_new_perlcritic_gen
 travis_conf_ok weaver_ini_ok avoid_old_modules
+dzil_plugin_check
 
 =end Pod::Coverage
 

@@ -3,6 +3,10 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 {{$NEXT}}
  [00 Major]
  - Interals overhauled again
+ - new checks
+
+ [Checks]
+ - Now scrapes lib/ and t/ and recommends various things for DZil plugin work.
 
  [Dependencies::Stats]
  - Dependencies changed since 0.002003, see misc/*.deps* for details
