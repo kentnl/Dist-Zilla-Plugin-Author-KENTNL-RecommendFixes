@@ -259,19 +259,17 @@ sub weaver_ini_ok {
 sub dist_ini_meta_ok {
   my ($self) = @_;
   return unless my $dmeta = $self->dist_ini_meta;
-  my (@lines) = $dmeta->lines_utf8( { chomp => 1 } );
   my (@tests) = (
-    [ qr/author\.*=.*kentfredric/,     'should not author=kentfredric' ],
-    [ qr/bumpversions\s*=\s*1/,        'should use bumpversions' ],
-    [ qr/toolkit\s*=\s*eumm/,          'should use eumm' ],
-    [ qr/toolkit_hardness\s*=\s*soft/, 'should use soft dependencies' ],
-    [ qr/copyfiles\s*=.*LICENSE/,      'should copyfiles = LICENSE' ],
-    [ qr/srcreadme\s*=.*/,             'should set srcreadme =' ],
+     qr/author\.*=.*kentfredric/,    
+     qr/bumpversions\s*=\s*1/,        
+     qr/toolkit\s*=\s*eumm/,          
+     qr/toolkit_hardness\s*=\s*soft/, 
+     qr/copyfiles\s*=.*LICENSE/,     
+     qr/srcreadme\s*=.*/,            
   );
   my $ok = 1;
   for my $test (@tests) {
-    my ( $re, $message ) = @{$test};
-    undef $ok unless $self->_assert_match( \@lines, $re, $dmeta . ' ' . $message );
+    undef $ok unless $dmeta->assert_has_line($test);
   }
   return $ok;
 }
