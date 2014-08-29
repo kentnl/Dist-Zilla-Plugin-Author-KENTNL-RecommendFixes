@@ -27,6 +27,7 @@ around 'log' => sub {
   return $self->$orig( map { ref $_ ? $_ : colored( [$LOG_COLOR], $_ ) } @args );
 };
 
+## no critic (Subroutines::ProhibitSubroutinePrototypes,Subroutines::RequireArgUnpacking,Variables::ProhibitLocalVars)
 sub _is_bad(&) { local $LOG_COLOR = 'red'; return $_[0]->() }
 
 sub _badly(&) {
@@ -41,6 +42,7 @@ sub _cast_path {
     logger => sub { shift; $self->log(@_) },
   );
 }
+## use critic
 
 sub _relpath {
   my ( $self, @args ) = @_;
