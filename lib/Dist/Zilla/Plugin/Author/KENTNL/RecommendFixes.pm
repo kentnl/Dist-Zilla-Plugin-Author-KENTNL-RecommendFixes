@@ -227,7 +227,7 @@ sub dzil_plugin_check {
   for my $libfile ( @{ $self->libfiles }) {
     $self->log( $libfile->stringify );
   }
-  my ( @plugins ) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\// } @{ $self->libfiles };
+  my ( @plugins ) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\//msx } @{ $self->libfiles };
   return unless @plugins;
   for my $plugin ( @plugins ) {
     $plugin->assert_has_line(qr/Dist::Zilla::Util::ConfigDumper/);
