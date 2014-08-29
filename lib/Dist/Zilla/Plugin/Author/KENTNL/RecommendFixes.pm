@@ -64,12 +64,22 @@ with 'Dist::Zilla::Role::InstallTool';
   }
   sub assert_has_line {
     my ( $self, $regex, $cb ) = @_;
+    return if $self->has_line( $regex );
+    if ( $cb ) {
+      $cb->( $self, $self->path->stringify, $regex );
+      return;
+    }
+    $self->logger->( $self, $self->path->stringify . ' should match ' . $regex );
+    return;
+  }
+  sub assert_not_has_line {
+    my ( $self, $regex, $cb ) = @_;
     return 1 unless $self->has_line( $regex );
     if ( $cb ) {
       $cb->( $self, $self->path->stringify, $regex );
       return;
     }
-    $self->logger->( $self, $self->path->stringify . ' matches ' . $regex );
+    $self->logger->( $self, $self->path->stringify . ' should not match ' . $regex );
     return;
   }
 
