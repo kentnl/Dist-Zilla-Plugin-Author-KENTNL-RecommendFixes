@@ -108,28 +108,6 @@ sub _relpath {
   );
 }
 
-sub _path_or_callback {
-  my ( $self, $apath, $callback ) = @_;
-  my $path = $self->_relpath( @{$apath} );
-  return $path if $path->exists;
-  if ( not ref $callback ) {
-    $self->log( $path . ' ' . $callback );
-    return;
-  }
-  return $callback->($path);
-}
-
-sub _path_then_callback {
-  my ( $self, $apath, $callback ) = @_;
-  my $path = $self->_relpath( @{$apath} );
-  return 1 unless $path->exists;
-  if ( not ref $callback ) {
-    $self->log( $path . ' ' . $callback );
-    return;
-  }
-  return $callback->($path);
-}
-
 sub _assert_match {
   my ( $self, $list, $match, $reason ) = @_;
   for my $line ( @{$list} ) {
@@ -222,7 +200,7 @@ sub has_new_perlcritic_gen {
 sub git_repo_notkentfredric {
   my ($self) = @_;
   return unless my $config = $self->git_config;
-  return $config->assert_not_has_line( qr/kentfredric/ );
+  return $config->assert_not_has_line(qr/kentfredric/);
 }
 
 sub _matrix_include_env_coverage { return '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' }
@@ -264,16 +242,10 @@ sub travis_conf_ok {
 sub dist_ini_ok {
   my ($self) = @_;
   return unless my $ini = $self->dist_ini;
-  my (@lines) = $ini->lines_utf8( { chomp => 1 } );
-  my $ok      = 1;
-  my (@tests) = (
-    [ qr/dzil bakeini/,             'not baked' ],
-    [ qr/normal_form\s*=\s*numify/, 'should set numify as normal form' ],
-    [ qr/mantissa\s*=\s*6/,         'should set mantissa = 6' ],
-  );
+  my $ok = 1;
+  my (@tests) = ( qr/dzil bakeini/, qr/normal_form\s*=\s*numify/, qr/mantissa\s*=\s*6/, );
   for my $test (@tests) {
-    my ( $re, $message ) = @{$test};
-    undef $ok unless $self->_assert_match( \@lines, $re, $ini . ' ' . $message );
+    $ini->assert_has_line($test);
   }
   return $ok;
 }
@@ -281,8 +253,7 @@ sub dist_ini_ok {
 sub weaver_ini_ok {
   my ($self) = @_;
   return unless my $weave = $self->weaver_ini;
-  my (@lines) = $weave->lines_utf8( { chomp => 1 } );
-  return $self->_assert_match( \@lines, qr/-SingleEncoding/, $weave . ' should set -SingleEncoding' );
+  return $weave->assert_has_line( qr/-SingleEncoding/, );
 }
 
 sub dist_ini_meta_ok {
