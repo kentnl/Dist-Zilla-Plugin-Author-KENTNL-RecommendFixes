@@ -260,7 +260,6 @@ sub dist_ini_meta_ok {
   my ($self) = @_;
   return unless my $dmeta = $self->dist_ini_meta;
   my (@tests) = (
-     qr/author\.*=.*kentfredric/,    
      qr/bumpversions\s*=\s*1/,        
      qr/toolkit\s*=\s*eumm/,          
      qr/toolkit_hardness\s*=\s*soft/, 
@@ -271,6 +270,10 @@ sub dist_ini_meta_ok {
   for my $test (@tests) {
     undef $ok unless $dmeta->assert_has_line($test);
   }
+  for my $test ( qr/author.*=.*kentfredric/ ) {
+    undef $ok unless $dmeta->assert_not_has_line($test);
+  }
+
   return $ok;
 }
 
