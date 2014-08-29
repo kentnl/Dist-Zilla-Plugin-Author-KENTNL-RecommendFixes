@@ -28,13 +28,51 @@ with 'Dist::Zilla::Role::InstallTool';
 
   has 'path' => ( isa => 'Path::Tiny', is => 'ro', handles => [ 'exists', 'lines_utf8', 'stringify' ], required => 1 );
   has 'logger' => ( isa => 'CodeRef', is => 'ro', required => 1 );
+  has '_lines_utf8_cache' => ( isa => 'ArrayRef', is => 'ro', lazy_build => 1 );
+
+  sub _build__lines_utf8_cache {
+    my ( $self ) = @_;
+    return [ $self->path->lines_utf8 ];
+  }
+  sub has_line {
+    my ( $self, $regex ) = @_;
+    for my $line ( @{ $self->_lines_utf8_cache }) {
+      return 1 if $line =~ $regex;
+    }
+    return;
+  }
 
   sub assert_exists {
     my ( $self, $cb ) = @_;
     return $self if $self->path->exists;
-    $cb->( $self->path->stringify . ' does not exist' );
+    if ($cb) {
+      $cb->( $self, $self->path->stringify );
+      return;
+    }
+    $self->logger->( $self, $self->path->stringify . ' does not exist' );
     return;
   }
+  sub assert_not_exists {
+    my ( $self, $cb ) = @_;
+    return 1 unless $self->path->exists;
+    if ($cb) {
+      $cb->( $self, $self->path->stringify );
+      return;
+    }
+    $self->logger->( $self, $self->path->stringify . ' exists' );
+    return;
+  }
+  sub assert_has_line {
+    my ( $self, $regex, $cb ) = @_;
+    return 1 unless $self->has_line( $regex );
+    if ( $cb ) {
+      $cb->( $self, $self->path->stringify, $regex );
+      return;
+    }
+    $self->logger->( $self, $self->path->stringify . ' matches ' . $regex );
+    return;
+  }
+
 }
 use Term::ANSIColor qw( colored );
 
@@ -52,7 +90,7 @@ sub _relpath {
   my ( $self, @args ) = @_;
   return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Path->new(
     path   => $self->root->child(@args)->relative( $self->root ),
-    logger => sub { my $self = shift; $self->log(@_) },
+    logger => sub { shift; $self->log(@_) },
   );
 }
 
@@ -112,28 +150,21 @@ sub _assert_not_dpath {
   return;
 }
 
-lsub root => sub {
-  my ($self) = @_;
-  return path( $self->zilla->root );
-};
+lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
-lsub git           => sub { $_[0]->_relpath('.git')->assert_exists(); };
-lsub git_config    => sub { $_[0]->_relpath( '.git', 'config' )->assert_exists() };
-lsub dist_ini      => sub { $_[0]->_relpath( 'dist.ini' )->assert_exists() };
-lsub dist_ini_meta => sub { $_[0]->_relpath( 'dist.ini.meta' )->assert_exists() };
-lsub weaver_ini    => sub { $_[0]->_path_or_callback( ['weaver.ini'], 'does not exist' ) };
-lsub travis_yml    => sub { $_[0]->_path_or_callback( ['.travis.yml'], 'does not exist' ) };
-lsub perltidyrc    => sub { $_[0]->_path_or_callback( ['.perltidyrc'], 'does not exist' ) };
-lsub gitignore     => sub { $_[0]->_path_or_callback( ['.gitignore'], 'does not exist' ) };
-lsub changes       => sub { $_[0]->_path_or_callback( ['Changes'], 'does not exist' ) };
-lsub license       => sub { $_[0]->_path_or_callback( ['LICENSE'], 'does not exist' ) };
+lsub git            => sub { $_[0]->_relpath('.git')->assert_exists(); };
+lsub git_config     => sub { $_[0]->_relpath( '.git', 'config' )->assert_exists() };
+lsub dist_ini       => sub { $_[0]->_relpath('dist.ini')->assert_exists() };
+lsub dist_ini_meta  => sub { $_[0]->_relpath('dist.ini.meta')->assert_exists() };
+lsub weaver_ini     => sub { $_[0]->_relpath('weaver.ini')->assert_exists() };
+lsub travis_yml     => sub { $_[0]->_relpath('.travis.yml')->assert_exists() };
+lsub perltidyrc     => sub { $_[0]->_relpath('.perltidyrc')->assert_exists() };
+lsub gitignore      => sub { $_[0]->_relpath('.gitignore')->assert_exists() };
+lsub changes        => sub { $_[0]->_relpath('Changes')->assert_exists() };
+lsub license        => sub { $_[0]->_relpath('LICENSE')->assert_exists() };
+lsub perlcritic_gen => sub { $_[0]->_relpath( 'maint', 'perlcritic.rc.gen.pl' )->assert_exists() };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
-
-lsub perlcritic_gen => sub {
-  my ($self) = @_;
-  return $self->_path_or_callback( [ 'maint', 'perlcritic.rc.gen.pl' ], 'does not exist' );
-};
 
 lsub travis_conf => sub {
   my ($self) = @_;
@@ -151,8 +182,8 @@ sub has_new_changes_deps {
   my ($self) = @_;
   my $ok = 1;
   for my $file ( @{ $self->changes_deps_files } ) {
-    undef $ok unless $self->_path_or_callback( [ 'misc', $file ] => 'does not exist' );
-    undef $ok unless $self->_path_then_callback( [$file] => 'exists' );
+    undef $ok unless $self->_relpath( 'misc', $file )->assert_exists;
+    undef $ok unless $self->_relpath($file)->assert_not_exists;
   }
   return $ok;
 }
@@ -160,18 +191,17 @@ sub has_new_changes_deps {
 sub has_new_perlcritic_deps {
   my ($self) = @_;
   my $ok = 1;
-  undef $ok unless $self->_path_or_callback( [ 'misc', 'perlcritic.deps' ] => 'does not exist' );
-  undef $ok unless $self->_path_then_callback( ['perlcritic.deps'] => 'exists' );
+  undef $ok unless $self->_relpath( 'misc', 'perlcritic.deps' )->assert_exists;
+  undef $ok unless $self->_relpath('perlcritic.deps' )->assert_not_exists;
   return $ok;
 }
 
 sub has_new_perlcritic_gen {
   my ($self) = @_;
   return unless my $file = $self->perlcritic_gen;
-  my @lines = $file->lines_utf8( { chomp => 1 } );
   my $ok = 1;
-  undef $ok unless $self->_assert_match( \@lines, qr/Path::Tiny/, $file . ' Should use Path::Tiny' );
-  undef $ok unless $self->_assert_match( \@lines, qr/\.\/misc/,   $file . ' should write to misc/' );
+  undef $ok unless $file->assert_has_line(qr/Path::Tiny/);
+  undef $ok unless $file->assert_has_line(qr/\.\/misc/);
   return $ok;
 }
 
