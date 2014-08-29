@@ -220,6 +220,13 @@ sub mailmap_check {
   return unless my $mailmap = $self->mailmap;
   $mailmap->assert_has_line(qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/);
 }
+
+# Hack to avoid matching ourselves.
+sub _plugin_re { 
+  my $inpn = shift;
+  my $pn = join q[::], split qr/\+/, $inpn;
+  return qr/$pn/;
+}
 sub dzil_plugin_check {
   my ( $self ) = @_;
   return unless $self->libdir;
@@ -228,7 +235,7 @@ sub dzil_plugin_check {
   return unless @plugins;
   for my $plugin ( @plugins ) {
     $self->log($plugin->stringify);
-    $plugin->assert_has_line(qr/Dist::Zilla::Util::ConfigDumper/);
+    $plugin->assert_has_line(_plugin_re('Dist+Zilla+Util+ConfigDumper'));
   }
 }
 
