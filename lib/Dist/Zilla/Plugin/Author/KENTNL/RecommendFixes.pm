@@ -44,50 +44,53 @@ with 'Dist::Zilla::Role::InstallTool';
   }
 
   sub assert_exists {
-    my ( $self, $cb ) = @_;
+    my ( $self, ) = @_;
     return $self if $self->path->exists;
-    if ($cb) {
-      $cb->( $self, $self->path->stringify );
-      return;
-    }
     $self->logger->( $self, $self->path->stringify . ' does not exist' );
     return;
   }
 
   sub assert_not_exists {
-    my ( $self, $cb ) = @_;
+    my ( $self, ) = @_;
     return 1 unless $self->path->exists;
-    if ($cb) {
-      $cb->( $self, $self->path->stringify );
-      return;
-    }
     $self->logger->( $self, $self->path->stringify . ' exists' );
     return;
   }
 
   sub assert_has_line {
-    my ( $self, $regex, $cb ) = @_;
+    my ( $self, $regex, ) = @_;
     return if $self->has_line($regex);
-    if ($cb) {
-      $cb->( $self, $self->path->stringify, $regex );
-      return;
-    }
     $self->logger->( $self, $self->path->stringify . ' should match ' . $regex );
     return;
   }
 
   sub assert_not_has_line {
-    my ( $self, $regex, $cb ) = @_;
+    my ( $self, $regex, ) = @_;
     return 1 unless $self->has_line($regex);
-    if ($cb) {
-      $cb->( $self, $self->path->stringify, $regex );
-      return;
-    }
     $self->logger->( $self, $self->path->stringify . ' should not match ' . $regex );
+    return;
+  }
+  __PACKAGE__->meta->make_immutable;
+}
+{
+
+  package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Data;
+  use Moose qw( has );
+  use Data::DPath qw( dpath );
+  has 'data'   => ( isa => 'HashRef', is => 'ro', required => 1 );
+  has 'logger' => ( isa => 'CodeRef', is => 'ro', required => 1 );
+  has 'path'   => ( isa => 'Str',     is => 'ro', required => 1 );
+
+  sub assert_dpath {
+    my ( $self, $path ) = @_;
+    my $dpath = dpath($path);
+    return 1 if $dpath->match( $self->data );
+    $self->logger->( $self, $self->path . ' should match ' . $path );
     return;
   }
 
 }
+
 use Term::ANSIColor qw( colored );
 
 around 'log' => sub {
@@ -108,24 +111,13 @@ sub _relpath {
   );
 }
 
-sub _assert_match {
-  my ( $self, $list, $match, $reason ) = @_;
-  for my $line ( @{$list} ) {
-    return 1 if $line =~ $match;
-  }
-  $self->log("does not match $match, $reason");
-  return;
-}
-
-sub _assert_nonmatch {
-  my ( $self, $list, $match, $reason ) = @_;
-  for my $line ( @{$list} ) {
-    if ( $line =~ $match ) {
-      $self->log("does match $match, $reason");
-      return;
-    }
-  }
-  return 1;
+sub _data {
+  my ( $self, $data, $path ) = @_;
+  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Data->new(
+    path   => $path,
+    data   => $data,
+    logger => sub { shift; $self->log(@_) },
+  );
 }
 
 sub _assert_dpath {
@@ -212,9 +204,12 @@ sub travis_conf_ok {
   my ($self) = @_;
   return unless my $conf = $self->travis_conf;
   my $path = $self->travis_yml;
-  my $ok   = 1;
 
-  undef $ok unless $self->_assert_dpath( $conf, _matrix_include_env_coverage(), $path . ' should do coverage testing' );
+  my $data = $self->_data( $self->travis_conf, $self->travis_yml . '' );
+
+  my $ok = 1;
+
+  undef $ok unless $data->assert_dpath( _matrix_include_env_coverage() );
 
   for my $perl (qw( 5.21 5.20 5.10 )) {
     undef $ok
@@ -260,11 +255,8 @@ sub dist_ini_meta_ok {
   my ($self) = @_;
   return unless my $dmeta = $self->dist_ini_meta;
   my (@tests) = (
-     qr/bumpversions\s*=\s*1/,        
-     qr/toolkit\s*=\s*eumm/,          
-     qr/toolkit_hardness\s*=\s*soft/, 
-     qr/copyfiles\s*=.*LICENSE/,     
-     qr/srcreadme\s*=.*/,            
+    qr/bumpversions\s*=\s*1/, qr/toolkit\s*=\s*eumm/, qr/toolkit_hardness\s*=\s*soft/, qr/copyfiles\s*=.*LICENSE/,
+    qr/srcreadme\s*=.*/,
   );
   my $ok = 1;
   for my $test (@tests) {
