@@ -224,6 +224,9 @@ sub dzil_plugin_check {
   my ( $self ) = @_;
   return unless $self->libdir;
   return unless @{ $self->libfiles };
+  for my $libfile ( @{ $self->libfiles }) {
+    $self->log( $libfile );
+  }
   my ( @plugins ) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\// } @{ $self->libfiles };
   return unless @plugins;
   for my $plugin ( @plugins ) {
