@@ -96,13 +96,11 @@ lsub libfiles => sub {
   my $it = $self->libdir->iterator( { recurse => 1 } );
   while ( my $thing = $it->() ) {
     next if -d $thing;
-    next unless $thing->basename =~ /\.pmc\z/msx;
+    next unless $thing->basename =~ /\.pm\z/msx;
     push @out, $self->_cast_path($thing);
   }
   if ( not @out ) {
-    _is_bad { 
-      $self->log( "Should have modules in " . $self->libdir );
-    };
+    _is_bad { $self->log( "Should have modules in " . $self->libdir ) };
   }
 
   return \@out;
@@ -176,12 +174,12 @@ sub travis_conf_ok {
     undef $ok unless $data->assert_dpath( _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.19 )) {
-    undef $ok unless $data->assert_not_dpath( _matrix_include_perl($perl) );
+    undef $ok unless _is_bad{ $data->assert_not_dpath( _matrix_include_perl($perl) ) };
   }
   for my $perl (qw( 5.18 )) {
     undef $ok unless $data->assert_not_dpath( _matrix_include_perl($perl) );
   }
-  undef $ok unless $data->assert_dpath('/before_install/*[ value =~/git clone.*maint-travis-ci/ ]');
+  undef $ok unless _is_bad { $data->assert_dpath('/before_install/*[ value =~/git clone.*maint-travis-ci/ ]') };
   for my $branch (qw( master build/master releases )) {
     undef $ok unless $data->assert_dpath( _branch_only($branch) );
   }
