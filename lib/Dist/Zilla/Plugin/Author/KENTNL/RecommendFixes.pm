@@ -152,7 +152,7 @@ lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Chang
 
 lsub perlcritic_gen => sub {
   my ($self) = @_;
-  return $self->_path_or_callback([ 'maint', 'perlcritic.rc.gen.pl' ], $_[0]->_cb_meh('does not exist'));
+  return $self->_path_or_callback( [ 'maint', 'perlcritic.rc.gen.pl' ], $_[0]->_cb_meh('does not exist') );
 };
 
 lsub travis_conf => sub {
@@ -171,16 +171,20 @@ sub has_new_changes_deps {
   my ($self) = @_;
   my $ok = 1;
   for my $file ( @{ $self->changes_deps_files } ) {
-    $self->_path_or_callback( ['misc', $file ] => sub {
-      my ($path) = shift;
-      undef $ok;
-      $self->_log_meh($path . ' does not exist');
-    });
-    $self->_path_then_callback( [ $file ] => sub { 
-      my ($path) = shift;
-      undef $ok;
-      $self->_log_meh($path . ' exists');
-    });
+    $self->_path_or_callback(
+      [ 'misc', $file ] => sub {
+        my ($path) = shift;
+        undef $ok;
+        $self->_log_meh( $path . ' does not exist' );
+      }
+    );
+    $self->_path_then_callback(
+      [$file] => sub {
+        my ($path) = shift;
+        undef $ok;
+        $self->_log_meh( $path . ' exists' );
+      }
+    );
   }
   return $ok;
 }
@@ -188,8 +192,20 @@ sub has_new_changes_deps {
 sub has_new_perlcritic_deps {
   my ($self) = @_;
   my $ok = 1;
-  undef $ok unless $self->_assert_path_meh( 'misc', 'perlcritic.deps' );
-  undef $ok unless $self->_assert_nonpath_meh('perlcritic.deps');
+  $self->_path_or_callback(
+    [ 'misc', 'perlcritic.deps' ] => sub {
+      my ($path) = shift;
+      undef $ok;
+      $self->_log_meh( $path . ' does not exist' );
+    }
+  );
+  $self->_path_then_callback(
+    ['perlcritic.deps'] => sub {
+      my ($path) = shift;
+      undef $ok;
+      $self->_log_meh( $path . ' exists' );
+    }
+  );
   return $ok;
 }
 
