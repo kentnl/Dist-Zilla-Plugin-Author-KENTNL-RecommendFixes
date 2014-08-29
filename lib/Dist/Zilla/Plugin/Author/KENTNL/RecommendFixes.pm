@@ -234,7 +234,6 @@ sub dzil_plugin_check {
   my ( @plugins ) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\//msx } @{ $self->libfiles };
   return unless @plugins;
   for my $plugin ( @plugins ) {
-    $self->log($plugin->stringify);
     $plugin->assert_has_line(_plugin_re('Dist+Zilla+Util+ConfigDumper'));
   }
 }
