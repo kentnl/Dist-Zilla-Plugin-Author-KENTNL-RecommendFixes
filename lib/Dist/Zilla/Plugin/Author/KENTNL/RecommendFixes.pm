@@ -25,7 +25,7 @@ with 'Dist::Zilla::Role::InstallTool';
   use Moose;
   use overload q[""] => sub { $_[0]->stringify };
   
-  has 'path' => ( isa => 'Path::Tiny', handles => ['exists','lines_utf8','stringify'], required => 1 );
+  has 'path' => ( isa => 'Path::Tiny', is => 'ro', handles => ['exists','lines_utf8','stringify'], required => 1 );
   has 'logger' => ( isa => 'CodeRef', is => 'ro', required => 1 );
 
   sub assert_exists {
@@ -116,7 +116,7 @@ lsub root => sub {
   return path( $self->zilla->root );
 };
 
-lsub git => sub { $_[0]->_path_or_callback( ['.git'], 'does not exist' ) };
+lsub git => sub { $_[0]->_relpath('.git')->assert_exists(); };
 lsub git_config => sub { $_[0]->_path_or_callback( [ '.git', 'config' ], 'does not exist' ) };
 lsub dist_ini      => sub { $_[0]->_path_or_callback( ['dist.ini'],      'does not exist' ) };
 lsub dist_ini_meta => sub { $_[0]->_path_or_callback( ['dist.ini.meta'], 'does not exist' ) };
