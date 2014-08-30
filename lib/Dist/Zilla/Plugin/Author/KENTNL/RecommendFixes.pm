@@ -241,6 +241,7 @@ lsub unrecommend => sub {
     qw( File::Find File::Find::Rule ),                       # Path::Iterator::Rule is much better
     qw( Class::Load ),                                       # Module::Runtime preferred
     qw( Readonly ),                                          # use Const::Fast
+    qw( Sub::Name ),                                         # use Sub::Util
   ];
 };
 
