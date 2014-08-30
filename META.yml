@@ -93,7 +93,7 @@ x_BuiltWith:
     Dist::Zilla::Util::Test::KENTNL: '1.003001'
     ExtUtils::MakeMaker: '6.98'
     File::Spec: '3.49'
-    MooX::Lsub: '0.001003'
+    MooX::Lsub: '0.002000'
     Moose: '2.1211'
     Path::Tiny: '0.056'
     Pod::Coverage::TrustPod: '0.100003'
