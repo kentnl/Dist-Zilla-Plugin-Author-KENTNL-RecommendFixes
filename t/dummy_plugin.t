@@ -21,10 +21,10 @@ $dz->add_file( '.mailmap',                         q[] );
 $dz->build_ok;
 $dz->has_messages(
   [
-    [ qr/perltidyrc does not exist/,      'No perltidy' ],
-    [ qr/Changes does not exist/,         'No Changes' ],
-    [ qr/LICENSE does not exist/,         'No LICENSE' ],
-    [ qr/Changes\.deps does not exist/,   'Diff changes' ],
+    [ qr/perltidyrc does not exist/,    'No perltidy' ],
+    [ qr/Changes does not exist/,       'No Changes' ],
+    [ qr/LICENSE does not exist/,       'No LICENSE' ],
+    [ qr/Changes\.deps does not exist/, 'Diff changes' ],
   ]
 );
 

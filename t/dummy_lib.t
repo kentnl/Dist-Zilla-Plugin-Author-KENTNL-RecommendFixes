@@ -10,8 +10,8 @@ use Test::DZil qw( simple_ini );
 my $ini = simple_ini( ['Author::KENTNL::RecommendFixes'] );
 my $dz = dztest();
 
-$dz->add_file( 'dist.ini', $ini );
-$dz->add_file( 'lib/.keep' , q[]);
+$dz->add_file( 'dist.ini',  $ini );
+$dz->add_file( 'lib/.keep', q[] );
 $dz->build_ok;
 $dz->has_messages(
   [
