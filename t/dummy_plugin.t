@@ -15,6 +15,9 @@ $dz->add_file( 'lib/Dist/Zilla/Plugin/Example.pm', q[] );
 $dz->add_file( 't/basic.t',                        q[] );
 $dz->add_file( 'maint/perlcritic.rc.gen.pl',       q[] );
 $dz->add_file( '.git/config',                      q[] );
+$dz->add_file( 'weaver.ini',                       q[] );
+$dz->add_file( 'dist.ini.meta',                    q[] );
+$dz->add_file( '.mailmap',                         q[] );
 $dz->build_ok;
 $dz->has_messages(
   [
