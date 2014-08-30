@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 0.003001 2014-08-30T00:22:33Z
+ [00 Trivial]
+ - Prefer Sub::Util over Sub::Name
 
 0.003000 2014-08-30T00:17:44Z
  [00 Major]
