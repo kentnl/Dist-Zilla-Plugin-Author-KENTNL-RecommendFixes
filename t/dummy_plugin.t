@@ -21,8 +21,6 @@ $dz->add_file( '.mailmap',                         q[] );
 $dz->build_ok;
 $dz->has_messages(
   [
-    [ qr/dist\.ini\.meta does not exist/, 'Unbaked dist' ],
-    [ qr/weaver\.ini does not exist/,     'Ancient Pod::Weaver' ],
     [ qr/perltidyrc does not exist/,      'No perltidy' ],
     [ qr/Changes does not exist/,         'No Changes' ],
     [ qr/LICENSE does not exist/,         'No LICENSE' ],
