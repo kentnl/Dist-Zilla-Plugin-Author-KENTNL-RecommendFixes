@@ -10,13 +10,14 @@ use Test::DZil qw( simple_ini );
 my $ini = simple_ini( ['Author::KENTNL::RecommendFixes'] );
 my $dz = dztest();
 
-$dz->add_file( 'dist.ini', $ini );
-$dz->add_file( 'lib/Dist/Zilla/Plugin/Example.pm' , q[]);
-$dz->add_file( 't/basic.t', q[]);
+$dz->add_file( 'dist.ini',                         $ini );
+$dz->add_file( 'lib/Dist/Zilla/Plugin/Example.pm', q[] );
+$dz->add_file( 't/basic.t',                        q[] );
+$dz->add_file( 'main/perlcritic.rc.gen.pl',        q[] );
+$dz->add_file( '.git/config',                      q[] );
 $dz->build_ok;
 $dz->has_messages(
   [
-    [ qr/\.git does not exist/,           'Uninitialized git' ],
     [ qr/dist\.ini\.meta does not exist/, 'Unbaked dist' ],
     [ qr/weaver\.ini does not exist/,     'Ancient Pod::Weaver' ],
     [ qr/perltidyrc does not exist/,      'No perltidy' ],
