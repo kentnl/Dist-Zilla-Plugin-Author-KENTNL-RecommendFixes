@@ -25,6 +25,7 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t
 t/dummy_lib.t
+t/dummy_pm.t
 t/dummy_travis.t
 weaver.ini
 xt/author/critic.t
