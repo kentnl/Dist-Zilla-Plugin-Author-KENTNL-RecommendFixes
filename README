@@ -3,7 +3,7 @@ NAME
     changes to the dist.
 
 VERSION
-    version 0.002003
+    version 0.003000
 
 DESCRIPTION
     Nothing interesting to see here.
@@ -15,7 +15,7 @@ DESCRIPTION
     It does this by spewing colored output.
 
 AUTHOR
-    Kent Fredric <kentfredric@gmail.com>
+    Kent Fredric <kentnl@cpan.org>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2014 by Kent Fredric

@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker ;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Recommend generic changes to the dist.",
-  "AUTHOR" => "Kent Fredric <kentfredric\@gmail.com>",
+  "AUTHOR" => "Kent Fredric <kentnl\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Term::ANSIColor" => 0,
     "YAML::Tiny" => 0,
+    "overload" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::DZil" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.002003",
+  "VERSION" => "0.003000",
   "test" => {
     "TESTS" => "t/*.t t/00-compile/*.t"
   }
@@ -58,6 +59,7 @@ my %FallbackPrereqs = (
   "Test::DZil" => 0,
   "Test::More" => "0.89",
   "YAML::Tiny" => 0,
+  "overload" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0
