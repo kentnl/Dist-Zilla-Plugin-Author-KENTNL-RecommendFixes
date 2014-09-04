@@ -1,6 +1,8 @@
 This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
 
 0.003002
+ [Changed / test recommends]
+ - Test::More 1.001003 → 1.001006
 
 0.003001 2014-08-30T11:09:05Z
 

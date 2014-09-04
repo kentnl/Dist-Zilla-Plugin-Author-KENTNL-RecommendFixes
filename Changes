@@ -1,6 +1,12 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.003002 2014-08-30T11:09:42Z
+0.003002 2014-09-04T19:08:43Z
+ [00 Trivial]
+ - Dislike copyrights without an email address
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003001, see misc/*.deps* for details
+ - test: (recommends: ↑1)
 
 0.003001 2014-08-30T11:09:05Z
  [00 Trivial]
