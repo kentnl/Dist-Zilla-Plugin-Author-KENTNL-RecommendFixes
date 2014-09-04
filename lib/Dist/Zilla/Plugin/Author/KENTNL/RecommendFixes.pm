@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -215,8 +215,9 @@ sub dist_ini_meta_ok {
   return unless my $dmeta = $self->dist_ini_meta;
 
   my (@tests) = (
-    qr/bumpversions\s*=\s*1/, qr/toolkit\s*=\s*eumm/, qr/toolkit_hardness\s*=\s*soft/, qr/copyfiles\s*=.*LICENSE/,
-    qr/srcreadme\s*=.*/,
+    qr/bumpversions\s*=\s*1/,        qr/toolkit\s*=\s*eumm/,
+    qr/toolkit_hardness\s*=\s*soft/, qr/copyfiles\s*=.*LICENSE/,
+    qr/srcreadme\s*=.*/,             qr/copyright_holder\s*=.*<[^@]+@[^>]+>/,
   );
   my $ok = 1;
   for my $test (@tests) {
@@ -225,6 +226,7 @@ sub dist_ini_meta_ok {
   for my $test ( qr/author.*=.*kentfredric/, qr/git_versions/ ) {
     undef $ok unless $dmeta->assert_not_has_line($test);
   }
+
   if ( ( not $dmeta->has_line(qr/bumpversions\s*=\s*1/) ) and ( not $dmeta->has_line(qr/git_versions/) ) ) {
     _is_bad { $self->log( $dmeta->stringify . ' has Neither bumpversions=1 or git_versions' ) };
   }
@@ -418,7 +420,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 DESCRIPTION
 
