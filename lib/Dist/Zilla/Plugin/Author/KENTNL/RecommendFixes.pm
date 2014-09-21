@@ -432,7 +432,7 @@ no Moose;
       must => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         croak "Assertion < must $name > failed: $message" unless $status;
-        return @slurpy[0];
+        return $slurpy[0];
       },
       must_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
