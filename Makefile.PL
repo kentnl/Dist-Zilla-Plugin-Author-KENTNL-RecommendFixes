@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Data::DPath" => 0,
     "Dist::Zilla::Role::InstallTool" => 0,
     "MooX::Lsub" => 0,
@@ -27,7 +28,6 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Term::ANSIColor" => 0,
     "YAML::Tiny" => 0,
-    "overload" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::DZil" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.003002",
+  "VERSION" => "0.003003",
   "test" => {
     "TESTS" => "t/*.t t/00-compile/*.t"
   }
@@ -47,6 +47,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Data::DPath" => 0,
   "Dist::Zilla::Role::InstallTool" => 0,
   "Dist::Zilla::Util::Test::KENTNL" => "1.0001002",
@@ -59,7 +60,6 @@ my %FallbackPrereqs = (
   "Test::DZil" => 0,
   "Test::More" => "0.89",
   "YAML::Tiny" => 0,
-  "overload" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

@@ -62,11 +62,12 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Dist::Zilla::App::Command::bakeini' => '0.001002',
-                                      'Dist::Zilla::PluginBundle::Author::KENTNL' => '2.020000'
+                                      'Dist::Zilla::PluginBundle::Author::KENTNL' => '2.020001'
                                     }
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'Data::DPath' => '0',
                                       'Dist::Zilla::Role::InstallTool' => '0',
                                       'MooX::Lsub' => '0',
@@ -74,7 +75,6 @@ do { my $x = {
                                       'Path::Tiny' => '0',
                                       'Term::ANSIColor' => '0',
                                       'YAML::Tiny' => '0',
-                                      'overload' => '0',
                                       'perl' => '5.008',
                                       'strict' => '0',
                                       'utf8' => '0',
