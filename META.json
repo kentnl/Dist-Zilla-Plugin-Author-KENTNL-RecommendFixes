@@ -114,7 +114,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm",
-         "version" : "0.003003"
+         "version" : "0.003004"
       }
    },
    "release_status" : "stable",
@@ -129,14 +129,14 @@
          "web" : "https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes"
       }
    },
-   "version" : "0.003003",
+   "version" : "0.003004",
    "x_BuiltWith" : {
       "modules" : {
          "CPAN::Meta" : "2.142060",
          "Carp" : "1.34",
          "Data::DPath" : "0.50",
          "Dist::Zilla::App::Command::bakeini" : "0.001002",
-         "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes" : "0.003003",
+         "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes" : "0.003004",
          "Dist::Zilla::Plugin::Authority" : "1.006",
          "Dist::Zilla::Plugin::AutoPrereqs" : "5.020",
          "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0.002",
@@ -566,7 +566,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes",
             "name" : "@Author::KENTNL/Author::KENTNL::RecommendFixes",
-            "version" : "0.003003"
+            "version" : "0.003004"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeFromPod",
@@ -653,7 +653,7 @@
                "Dist::Zilla::Plugin::Git::Tag" : {
                   "branch" : null,
                   "signed" : 0,
-                  "tag" : "0.003003-source",
+                  "tag" : "0.003004-source",
                   "tag_format" : "%v-source",
                   "tag_message" : "v%v",
                   "time_zone" : "local"
@@ -724,7 +724,7 @@
                "Dist::Zilla::Plugin::Git::Tag" : {
                   "branch" : "releases",
                   "signed" : 0,
-                  "tag" : "0.003003",
+                  "tag" : "0.003004",
                   "tag_format" : "%v",
                   "tag_message" : "v%v",
                   "time_zone" : "local"
