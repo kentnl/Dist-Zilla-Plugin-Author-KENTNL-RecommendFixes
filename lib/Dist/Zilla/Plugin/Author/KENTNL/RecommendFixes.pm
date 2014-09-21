@@ -122,10 +122,7 @@ sub _build__dc {
   return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
     have_dpath => sub {
       my ( $label, $data, $expression ) = @_;
-      if ( not exists $data_cache->{$data} ) {
-        $data_cache->{$label} = dpath($data);
-      }
-      if ( $data_cache->{$label}->match($expression) ) {
+      if ( dpath($data)->match($expression) ) {
         return ( 1, "$label matches $expression" );
       }
       return ( 0, "$label does not match $expression" );
@@ -142,13 +139,13 @@ sub _build__dc {
           }
           )
         {
-          $yaml_cache->{$yaml_path} = dpath($r);
+          $yaml_cache->{$yaml_path} = $r;
         }
         else {
           return ( 0, "Could not load $yaml_path" );
         }
       }
-      if ( $yaml_cache->{$yaml_path}->match($expression) ) {
+      if ( dpath($yaml_cache->{$yaml_path})->match($expression) ) {
         return ( 1, "$yaml_path matches $expression" );
       }
       return ( 0, "$yaml_path does not match $expression" );
