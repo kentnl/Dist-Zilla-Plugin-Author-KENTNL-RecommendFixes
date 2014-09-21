@@ -15,6 +15,7 @@ use Moose qw( with has around );
 use MooX::Lsub qw( lsub );
 use Path::Tiny qw( path );
 use YAML::Tiny;
+use Data::DPath qw( dpath );
 
 with 'Dist::Zilla::Role::InstallTool';
 
@@ -50,6 +51,37 @@ sub _data {
   );
 }
 
+sub _dzhandlers {
+  my ($self) = @_;
+  return {
+    should => sub {
+      my ( $status, $message, $name, @slurpy ) = @_;
+      if ( not $status ) {
+        $self->log("$name: $message");
+        return;
+      }
+      return $slurpy[0];
+    },
+    should_not => sub {
+      my ( $status, $message, $name, @slurpy ) = @_;
+      if ($status) {
+        $self->log("$name: $message");
+        return;
+      }
+      return $slurpy[0];
+    },
+    must => sub {
+      my ( $status, $message, $name, @slurpy ) = @_;
+      $self->log_fatal("$name: $message") unless $status;
+      return $slurpy[0];
+    },
+    must_not => sub {
+      my ( $status, $message, $name, @slurpy ) = @_;
+      $self->log_fatal("$name: $message") if $status;
+      return $slurpy[0];
+    },
+  };
+}
 has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
 
 sub _build__pc {
@@ -74,34 +106,55 @@ sub _build__pc {
       }
       return ( 0, "Does not have line matching $regex" );
     },
-    '-handlers' => {
-      should => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        if ( not $status ) {
-          $self->log("$name: $message");
-          return;
-        }
-        return $slurpy[0];
-      },
-      should_not => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        if ($status) {
-          $self->log("$name: $message");
-          return;
-        }
-        return $slurpy[0];
-      },
-      must => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        $self->log_fatal("$name: $message") unless $status;
-        return $slurpy[0];
-      },
-      must_not => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        $self->log_fatal("$name: $message") if $status;
-        return $slurpy[0];
-      },
+    '-handlers' => $self->_dzhandlers,
+  );
+
+}
+
+has _dc => ( is => ro =>, lazy => 1, builder => '_build__dc' );
+
+sub _build__dc {
+  my ($self) = @_;
+
+  my $yaml_cache = {};
+  my $data_cache = {};
+
+  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+    have_dpath => sub {
+      my ( $label, $data, $expression ) = @_;
+      if ( not exists $data_cache->{$data} ) {
+        $data_cache->{$label} = dpath($data);
+      }
+      if ( $data_cache->{$label}->match($expression) ) {
+        return ( 1, "$label matches $expression" );
+      }
+      return ( 0, "$label does not match $expression" );
+
     },
+    yaml_have_dpath => sub {
+      my ( $yaml_path, $expression ) = @_;
+      if ( not exists $yaml_cache->{$yaml_path} ) {
+        my ( $r, $ok );
+        if (
+          eval {
+            $r  = YAML::Tiny->read( path($yaml_path)->stringify )->[0];
+            $ok = 1;
+          }
+          )
+        {
+          $yaml_cache->{$yaml_path} = dpath($r);
+        }
+        else {
+          return ( 0, "Could not load $yaml_path" );
+        }
+      }
+      if ( $yaml_cache->{$yaml_path}->match($expression) ) {
+        return ( 1, "$yaml_path matches $expression" );
+      }
+      return ( 0, "$yaml_path does not match $expression" );
+
+    },
+    '-handlers' => $self->_dzhandlers,
   );
 
 }
@@ -136,18 +189,6 @@ for my $key ( keys %amap ) {
 lsub tdir => sub { $_[0]->_pc->should( exist => $_[0]->_rel('t') ) };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
-
-lsub travis_conf => sub {
-  my ($self) = @_;
-  return unless my $file = $self->travis_yml;
-  my ( $r, $ok );
-  return unless eval {
-    $r  = YAML::Tiny->read( $file->stringify )->[0];
-    $ok = 1;
-  };
-  return unless $ok;
-  return $r;
-};
 
 lsub libfiles => sub {
   my ($self) = @_;
@@ -223,28 +264,29 @@ sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq
 
 sub travis_conf_ok {
   my ($self) = @_;
-  return unless my $conf = $self->travis_conf;
-  my $data = $self->_data( $self->travis_conf, $self->travis_yml . q[] );
+  return unless my $yaml = $self->travis_yml;
+  my $assert = $self->_dc;
 
   my $ok = 1;
 
-  undef $ok unless $data->assert_dpath('/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/');
+  undef $ok unless $assert->should( yaml_have_dpath => $yaml, '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' );
 
   for my $perl (qw( 5.21 5.20 5.10 )) {
-    undef $ok unless $data->assert_dpath( _matrix_include_perl($perl) );
+    undef $ok unless $assert->should( yaml_have_dpath => $yaml, _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.8 )) {
-    undef $ok unless $data->assert_dpath( _matrix_include_perl($perl) );
+    undef $ok unless $assert->should( yaml_have_dpath => $yaml, _matrix_include_perl($perl) );
   }
   for my $perl (qw( 5.19 )) {
-    undef $ok unless _is_bad { $data->assert_not_dpath( _matrix_include_perl($perl) ) };
+    undef $ok unless _is_bad { $assert->should_not( yaml_have_dpath => $yaml, _matrix_include_perl($perl) ) };
   }
   for my $perl (qw( 5.18 )) {
-    undef $ok unless $data->assert_not_dpath( _matrix_include_perl($perl) );
+    undef $ok unless $assert->should_not( yaml_have_dpath => $yaml, _matrix_include_perl($perl) );
   }
-  undef $ok unless _is_bad { $data->assert_dpath('/before_install/*[ value =~/git clone.*maint-travis-ci/ ]') };
+  undef $ok
+    unless _is_bad { $assert->should( yaml_have_dpath => $yaml, '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' ) };
   for my $branch (qw( master build/master releases )) {
-    undef $ok unless $data->assert_dpath( _branch_only($branch) );
+    undef $ok unless $assert->should( yaml_have_dpath => $yaml, _branch_only($branch) );
   }
   return $ok;
 }
@@ -316,11 +358,11 @@ lsub unrecommend => sub {
 sub avoid_old_modules {
   my ($self) = @_;
   return unless my $distmeta = $self->zilla->distmeta;
-  my $data = $self->_data( $distmeta, 'distmeta' );
+  my $assert = $self->_dc;
 
   my $ok = 1;
   for my $bad ( @{ $self->unrecommend } ) {
-    undef $ok unless $data->assert_not_dpath( '/prereqs/*/*/' . $bad );
+    undef $ok unless $assert->should_not( have_dpath => 'distmeta', $distmeta, '/prereqs/*/*/' . $bad );
   }
   return $ok;
 }
