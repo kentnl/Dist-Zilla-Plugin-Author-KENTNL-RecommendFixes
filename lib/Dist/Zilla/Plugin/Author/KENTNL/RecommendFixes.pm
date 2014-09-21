@@ -430,7 +430,7 @@ no Moose;
     my $code = sub {
       my ( $self, $name, @slurpy ) = @_;
       if ( not exists $self->{'-tests'}->{$name} ) {
-        croak "INVALID ASSERTION $name ( avail: " . ( join q[,], keys %{$self->{'-tests'}} ) . ")";
+        croak sprintf q[INVALID ASSERTION %s ( avail: %s )], $name, ( join q[,], keys %{ $self->{'-tests'} } );
       }
       my ( $status, $message ) = $self->{'-tests'}->{$name}->(@slurpy);
       return $self->{'-handlers'}->{$handler}->( $status, $message, $name, @slurpy );
