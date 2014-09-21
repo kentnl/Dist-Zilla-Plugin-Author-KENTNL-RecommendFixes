@@ -123,10 +123,12 @@ my %amap = (
 );
 
 for my $key (qw( git libdir dist_ini )) {
-  lsub $key => _badly { $_[0]->_pc->should( exist => $_[0]->_rel( delete $amap{$key} ) ) };
+  my $value = delete $amap{$key};
+  lsub $key => _badly { $_[0]->_pc->should( exist => $_[0]->_rel($value) ) };
 }
 for my $key ( keys %amap ) {
-  lsub $key => sub { $_[0]->_pc->should( exist => $_[0]->_rel( delete $amap{$key} ) ) };
+  my $value = $amap{$key};
+  lsub $key => sub { $_[0]->_pc->should( exist => $_[0]->_rel($value) ) };
 }
 
 lsub tdir => sub { $_[0]->_pc->should( exist => $_[0]->_rel('t') ) };
