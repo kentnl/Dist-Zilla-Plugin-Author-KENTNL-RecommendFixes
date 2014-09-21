@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Data::DPath" => 0,
     "Dist::Zilla::Role::InstallTool" => 0,
     "MooX::Lsub" => 0,
@@ -46,6 +47,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Data::DPath" => 0,
   "Dist::Zilla::Role::InstallTool" => 0,
   "Dist::Zilla::Util::Test::KENTNL" => "1.0001002",

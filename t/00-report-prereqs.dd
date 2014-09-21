@@ -67,6 +67,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'Data::DPath' => '0',
                                       'Dist::Zilla::Role::InstallTool' => '0',
                                       'MooX::Lsub' => '0',

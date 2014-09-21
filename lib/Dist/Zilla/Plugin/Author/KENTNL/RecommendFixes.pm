@@ -83,7 +83,7 @@ lsub _pc => sub {
       },
       should_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        if ( $status ) {
+        if ($status) {
           $self->log("$name: $message");
           return;
         }
@@ -382,11 +382,13 @@ no Moose;
   package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions;
   ## no critic (Moose::ProhibitNewMethod)
 
+  use Carp qw( croak carp );
+
   sub new {
     my ( $class, @args ) = @_;
     my $arg_hash = { ( ref $args[0] ? %{ $args[0] } : @args ) };
     my $tests = {};
-    for my $key ( grep { $_ !~ /^-/ } keys %{$arg_hash} ) {
+    for my $key ( grep { !/^-/ } keys %{$arg_hash} ) {
       $tests->{$key} = delete $arg_hash->{$key};
     }
     $arg_hash->{'-handlers'} = { %{ $class->_handler_defaults }, %{ $arg_hash->{'-handlers'} || {} } };
@@ -403,22 +405,22 @@ no Moose;
       },
       should => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        warn "Assertion < should $name > failed: $message\n" unless $status;
+        carp "Assertion < should $name > failed: $message" unless $status;
         return @slurpy;
       },
       should_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        warn "Assertion < should_not $name > failed: $message\n" if $status;
+        carp "Assertion < should_not $name > failed: $message" if $status;
         return @slurpy;
       },
       must => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        die "Assertion < must $name > failed: $message\n" unless $status;
+        croak "Assertion < must $name > failed: $message" unless $status;
         return @slurpy;
       },
       must_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        die "Assertion < must_not $name > failed: $message\n" if $status;
+        croak "Assertion < must_not $name > failed: $message" if $status;
         return @slurpy;
       },
     };
@@ -428,7 +430,7 @@ no Moose;
     my $code = sub {
       my ( $self, $name, @slurpy ) = @_;
       if ( not exists $self->{'-tests'}->{$name} ) {
-        die "INVALID ASSERTION $name\n";
+        croak "INVALID ASSERTION $name ( avail: " . ( join q[,], keys %{$self->{'-tests'}} ) . ")";
       }
       my ( $status, $message ) = $self->{'-tests'}->{$name}->(@slurpy);
       return $self->{'-handlers'}->{$handler}->( $status, $message, $name, @slurpy );
