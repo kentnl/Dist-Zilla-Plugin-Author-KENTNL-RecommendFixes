@@ -50,7 +50,9 @@ sub _data {
   );
 }
 
-lsub _pc => sub {
+has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
+
+sub _build__pc {
   my ($self) = @_;
 
   my $cache = {};
@@ -102,7 +104,7 @@ lsub _pc => sub {
     },
   );
 
-};
+}
 
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
