@@ -108,14 +108,12 @@ sub _build__dc {
   my ($self) = @_;
 
   my $yaml_cache = {};
-  my $data_cache = {};
 
   return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
     have_dpath => sub {
       my ( $label, $data, $expression ) = @_;
-      if ( my $match = dpath($expression)->match($data) ) {
+      if ( dpath($expression)->match($data) ) {
         return ( 1, "$label matches $expression" );
-
       }
       return ( 0, "$label does not match $expression" );
 
