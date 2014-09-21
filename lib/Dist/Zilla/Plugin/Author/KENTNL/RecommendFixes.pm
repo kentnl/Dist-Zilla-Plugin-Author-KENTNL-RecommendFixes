@@ -386,7 +386,7 @@ no Moose;
     my ( $class, @args ) = @_;
     my $arg_hash = { ( ref $args[0] ? %{ $args[0] } : @args ) };
     my $tests = {};
-    for my $key ( grep { !/^-/ } keys %{$arg_hash} ) {
+    for my $key ( grep { $_ !~ /^-/ } keys %{$arg_hash} ) {
       $tests->{$key} = delete $arg_hash->{$key};
     }
     $arg_hash->{'-handlers'} = { %{ $class->_handler_defaults }, %{ $arg_hash->{'-handlers'} || {} } };
