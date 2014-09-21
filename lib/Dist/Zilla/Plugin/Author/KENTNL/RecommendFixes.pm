@@ -83,7 +83,7 @@ lsub _pc => sub {
       },
       should_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        if ( not $status ) {
+        if ( $status ) {
           $self->log("$name: $message");
           return;
         }
