@@ -75,7 +75,7 @@ lsub _pc => sub {
     '-handlers' => {
       should => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        unless ($status) {
+        if ( not $status ) {
           $self->log("$name: $message");
           return;
         }
@@ -83,7 +83,7 @@ lsub _pc => sub {
       },
       should_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        if ($status) {
+        if ( not $status ) {
           $self->log("$name: $message");
           return;
         }
@@ -101,6 +101,7 @@ lsub _pc => sub {
       },
     },
   );
+
 };
 
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
@@ -379,12 +380,13 @@ no Moose;
 {
 
   package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions;
+  ## no critic (Moose::ProhibitNewMethod)
 
   sub new {
     my ( $class, @args ) = @_;
     my $arg_hash = { ( ref $args[0] ? %{ $args[0] } : @args ) };
     my $tests = {};
-    for my $key ( grep { $_ !~ /^-/ } keys %{$arg_hash} ) {
+    for my $key ( grep { !/^-/ } keys %{$arg_hash} ) {
       $tests->{$key} = delete $arg_hash->{$key};
     }
     $arg_hash->{'-handlers'} = { %{ $class->_handler_defaults }, %{ $arg_hash->{'-handlers'} || {} } };
@@ -396,7 +398,7 @@ no Moose;
   sub _handler_defaults {
     return {
       test => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
+        my ($status) = @_;
         return $status;
       },
       should => sub {
