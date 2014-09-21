@@ -112,6 +112,7 @@ sub _build__pc {
 }
 
 has _dc => ( is => ro =>, lazy => 1, builder => '_build__dc' );
+use Data::Dump qw(pp);
 
 sub _build__dc {
   my ($self) = @_;
@@ -122,8 +123,9 @@ sub _build__dc {
   return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
     have_dpath => sub {
       my ( $label, $data, $expression ) = @_;
-      if ( dpath($data)->match($expression) ) {
+      if ( my $match = dpath($expression)->match($data) ) {
         return ( 1, "$label matches $expression" );
+
       }
       return ( 0, "$label does not match $expression" );
 
@@ -145,7 +147,7 @@ sub _build__dc {
           return ( 0, "Could not load $yaml_path" );
         }
       }
-      if ( dpath($yaml_cache->{$yaml_path})->match($expression) ) {
+      if ( dpath($expression)->match( $yaml_cache->{$yaml_path} ) ) {
         return ( 1, "$yaml_path matches $expression" );
       }
       return ( 0, "$yaml_path does not match $expression" );
