@@ -106,19 +106,28 @@ lsub _pc => sub {
 
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
-lsub git      => _badly { $_[0]->_pc->should( exist => $_[0]->_rel('.git') ) };
-lsub libdir   => _badly { $_[0]->_pc->should( exist => $_[0]->_rel('lib') ) };
-lsub dist_ini => _badly { $_[0]->_pc->should( exist => $_[0]->_rel('dist.ini') ) };
-lsub git_config     => sub { $_[0]->_pc->should( exist => $_[0]->_rel('.git/config') ) };
-lsub dist_ini_meta  => sub { $_[0]->_pc->should( exist => $_[0]->_rel('dist.ini.meta') ) };
-lsub weaver_ini     => sub { $_[0]->_pc->should( exist => $_[0]->_rel('weaver.ini') ) };
-lsub travis_yml     => sub { $_[0]->_pc->should( exist => $_[0]->_rel('.travis.yml') ) };
-lsub perltidyrc     => sub { $_[0]->_pc->should( exist => $_[0]->_rel('.perltidyrc') ) };
-lsub gitignore      => sub { $_[0]->_pc->should( exist => $_[0]->_rel('.gitignore') ) };
-lsub changes        => sub { $_[0]->_pc->should( exist => $_[0]->_rel('Changes') ) };
-lsub license        => sub { $_[0]->_pc->should( exist => $_[0]->_rel('LICENSE') ) };
-lsub mailmap        => sub { $_[0]->_pc->should( exist => $_[0]->_rel('.mailmap') ) };
-lsub perlcritic_gen => sub { $_[0]->_pc->should( exist => $_[0]->_rel('maint/perlcritic.rc.gen.pl') ) };
+my %amap = (
+  git            => '.git',
+  libdir         => 'lib',
+  dist_ini       => 'dist.ini',
+  git_config     => '.git/config',
+  dist_ini_meta  => 'dist.ini.meta',
+  weaver_ini     => 'weaver.ini',
+  travis_yml     => 'travis.yml',
+  perltidyrc     => '.perltidyrc',
+  gitignore      => '.gitignore',
+  changes        => 'Changes',
+  license        => 'LICENSE',
+  mailmap        => '.mailmap',
+  perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
+);
+
+for my $key (qw( git libdir dist_ini )) {
+  lsub $key => _badly { $_[0]->_pc->should( exist => $_[0]->_rel( delete $amap{$key} ) ) };
+}
+for my $key ( keys %amap ) {
+  lsub $key => sub { $_[0]->_pc->should( exist => $_[0]->_rel( delete $amap{$key} ) ) };
+}
 
 lsub tdir => sub { $_[0]->_pc->should( exist => $_[0]->_rel('t') ) };
 
@@ -403,30 +412,35 @@ no Moose;
         my ($status) = @_;
         return $status;
       },
+      log => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        carp sprintf 'Assertion < log %s > = %s : %s', $name, ( $status || '0' ), $message;
+        return $slurpy[0];
+      },
       should => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         carp "Assertion < should $name > failed: $message" unless $status;
-        return @slurpy;
+        return $slurpy[0];
       },
       should_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         carp "Assertion < should_not $name > failed: $message" if $status;
-        return @slurpy;
+        return $slurpy[0];
       },
       must => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         croak "Assertion < must $name > failed: $message" unless $status;
-        return @slurpy;
+        return @slurpy[0];
       },
       must_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         croak "Assertion < must_not $name > failed: $message" if $status;
-        return @slurpy;
+        return $slurpy[0];
       },
     };
   }
 
-  for my $handler (qw( should must should_not must_not test )) {
+  for my $handler (qw( should must should_not must_not test log )) {
     my $code = sub {
       my ( $self, $name, @slurpy ) = @_;
       if ( not exists $self->{'-tests'}->{$name} ) {
@@ -436,8 +450,9 @@ no Moose;
       return $self->{'-handlers'}->{$handler}->( $status, $message, $name, @slurpy );
     };
     {
+      ## no critic (TestingAndDebugging::ProhibitNoStrict])
       no strict 'refs';
-      *{ __PACKAGE__ . '::' . $handler } = $code;
+      *{ __PACKAGE__ . q[::] . $handler } = $code;
     }
   }
 
