@@ -36,7 +36,8 @@ $bundle->remove_policy('RegularExpressions::ProhibitEscapedMetacharacters');
 #$bundle->add_or_append_policy_field(
 #  'Subroutines::ProhibitCallsToUndeclaredSubs' => ( 'exempt_subs' => 'String::Formatter::str_rf' ), );
 
-#$bundle->remove_policy('ErrorHandling::RequireUseOfExceptions');
+$bundle->remove_policy('ErrorHandling::RequireUseOfExceptions');
+
 #$bundle->remove_policy('CodeLayout::RequireUseUTF8');
 #$bundle->remove_policy('ErrorHandling::RequireCarping');
 #$bundle->remove_policy('NamingConventions::Capitalization');

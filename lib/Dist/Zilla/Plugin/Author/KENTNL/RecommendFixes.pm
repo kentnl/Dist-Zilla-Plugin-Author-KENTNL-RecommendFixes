@@ -57,7 +57,7 @@ sub _build__pc {
 
   my $cache = {};
 
-  Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
     exist => sub {
       if ( path(@_)->exists ) {
         return ( 1, "@_ exists" );
