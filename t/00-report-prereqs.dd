@@ -69,7 +69,6 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Data::DPath' => '0',
-                                      'Data::Dump' => '0',
                                       'Dist::Zilla::Role::InstallTool' => '0',
                                       'MooX::Lsub' => '0',
                                       'Moose' => '0',

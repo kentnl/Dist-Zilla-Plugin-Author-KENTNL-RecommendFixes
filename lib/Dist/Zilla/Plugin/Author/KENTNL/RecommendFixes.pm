@@ -42,15 +42,6 @@ sub _rel {
   return $self->root->child(@args)->relative( $self->root );
 }
 
-sub _data {
-  my ( $self, $data, $path ) = @_;
-  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Data->new(
-    path   => $path,
-    data   => $data,
-    logger => sub { shift; $self->log(@_) },
-  );
-}
-
 sub _dzhandlers {
   my ($self) = @_;
   return {
@@ -112,7 +103,6 @@ sub _build__pc {
 }
 
 has _dc => ( is => ro =>, lazy => 1, builder => '_build__dc' );
-use Data::Dump qw(pp);
 
 sub _build__dc {
   my ($self) = @_;
@@ -501,35 +491,6 @@ no Moose;
     }
   }
 
-}
-{
-
-  package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Data;
-  use Moose qw( has );
-  use Data::DPath qw( dpath );
-  has 'data'   => ( isa => 'HashRef', is => 'ro', required => 1 );
-  has 'logger' => ( isa => 'CodeRef', is => 'ro', required => 1 );
-  has 'path'   => ( isa => 'Str',     is => 'ro', required => 1 );
-
-  sub dpath_match {
-    my ( $self, $path ) = @_;
-    return dpath($path)->match( $self->data );
-  }
-
-  sub assert_dpath {
-    my ( $self, $path ) = @_;
-    return 1 if $self->dpath_match($path);
-    $self->logger->( $self, $self->path . ' should match ' . $path );
-    return;
-  }
-
-  sub assert_not_dpath {
-    my ( $self, $path ) = @_;
-    return 1 unless $self->dpath_match($path);
-    $self->logger->( $self, $self->path . ' should not match ' . $path );
-    return;
-  }
-  __PACKAGE__->meta->make_immutable;
 }
 1;
 

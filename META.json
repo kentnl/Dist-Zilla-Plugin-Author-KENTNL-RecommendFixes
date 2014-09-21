@@ -84,7 +84,6 @@
          "requires" : {
             "Carp" : "0",
             "Data::DPath" : "0",
-            "Data::Dump" : "0",
             "Dist::Zilla::Role::InstallTool" : "0",
             "MooX::Lsub" : "0",
             "Moose" : "0",
@@ -136,7 +135,6 @@
          "CPAN::Meta" : "2.142060",
          "Carp" : "1.34",
          "Data::DPath" : "0.50",
-         "Data::Dump" : "1.22",
          "Dist::Zilla::App::Command::bakeini" : "0.001002",
          "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes" : "0.003003",
          "Dist::Zilla::Plugin::Authority" : "1.006",
