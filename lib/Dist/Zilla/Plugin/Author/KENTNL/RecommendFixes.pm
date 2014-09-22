@@ -336,16 +336,21 @@ sub dist_ini_meta_ok {
   my ($self) = @_;
   return unless my $dmeta = $self->dist_ini_meta;
   my $assert = $self->_pc;
-  my (@tests) = (
+  my (@wanted_regex) = (
     qr/bumpversions\s*=\s*1/,        qr/toolkit\s*=\s*eumm/,
     qr/toolkit_hardness\s*=\s*soft/, qr/copyfiles\s*=.*LICENSE/,
     qr/srcreadme\s*=.*/,             qr/copyright_holder\s*=.*<[^@]+@[^>]+>/,
+    qr/twitter_extra_hash_tags\s*=\s*#/,
+  );
+  my (@unwanted_regex) = (
+      qr/author.*=.*kentfredric/, qr/git_versions/, 
+      qr/twitter_hash_tags\s*=\s*=\s*#perl\s+#cpan\s*/,
   );
   my $ok = 1;
-  for my $test (@tests) {
+  for my $test (@wanted_regex) {
     undef $ok unless $assert->should( have_line => $dmeta, $test );
   }
-  for my $test ( qr/author.*=.*kentfredric/, qr/git_versions/ ) {
+  for my $test (@unwanted_regex) {
     undef $ok unless $assert->should_not( have_line => $dmeta, $test );
   }
 
