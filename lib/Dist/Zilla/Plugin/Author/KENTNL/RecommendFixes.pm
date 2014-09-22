@@ -51,7 +51,7 @@ sub _mk_assertions {
       should => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         if ( not $status ) {
-          $self->log("$name: $message");
+          $self->log("should $name: $message");
           return;
         }
         return $slurpy[0];
@@ -59,19 +59,19 @@ sub _mk_assertions {
       should_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         if ($status) {
-          $self->log("$name: $message");
+          $self->log("should_not $name: $message");
           return;
         }
         return $slurpy[0];
       },
       must => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        $self->log_fatal("$name: $message") unless $status;
+        $self->log_fatal("must $name: $message") unless $status;
         return $slurpy[0];
       },
       must_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        $self->log_fatal("$name: $message") if $status;
+        $self->log_fatal("must_not $name: $message") if $status;
         return $slurpy[0];
       },
     },
