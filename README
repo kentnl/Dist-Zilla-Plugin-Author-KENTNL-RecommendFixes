@@ -1,0 +1,26 @@
+NAME
+    Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic
+    changes to the dist.
+
+VERSION
+    version 0.003004
+
+DESCRIPTION
+    Nothing interesting to see here.
+
+    This module just informs me during "dzil build" that a bunch of changes
+    that I intend to make to multiple modules have not been applied to the
+    current distribution.
+
+    It does this by spewing colored output.
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
