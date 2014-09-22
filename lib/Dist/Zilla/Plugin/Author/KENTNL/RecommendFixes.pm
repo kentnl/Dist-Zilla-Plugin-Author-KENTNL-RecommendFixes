@@ -155,7 +155,7 @@ sub _build__dc {
           $ok = 1;
         };
         return $r;
-      }
+      },
     );
   };
 
