@@ -83,6 +83,7 @@ has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
 sub _mk_cache {
   my %cache;
   if (_CAN_VARIABLE_MAGIC) {
+    ## no critic (Miscellanea::ProhibitTies)
     tie %cache, 'Tie::RefHash::Weak';
   }
   return sub {
@@ -117,7 +118,6 @@ sub _build__pc {
     },
     have_one_of_line => sub {
       my ( $path, @regexs ) = @_;
-      my $matches = 0;
       my (@rematches);
       for my $line ( @{ $get_lines->($path) } ) {
         for my $re (@regexs) {
