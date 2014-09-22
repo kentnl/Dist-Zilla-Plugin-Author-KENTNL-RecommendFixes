@@ -342,7 +342,11 @@ sub dist_ini_meta_ok {
     qr/srcreadme\s*=.*/,             qr/copyright_holder\s*=.*<[^@]+@[^>]+>/,
     qr/twitter_extra_hash_tags\s*=\s*#/,
   );
-  my (@unwanted_regex) = ( qr/author.*=.*kentfredric/, qr/git_versions/, qr/twitter_hash_tags\s*=\s*=\s*#perl\s+#cpan\s*/, );
+  my (@unwanted_regex) = (
+    #
+    qr/author.*=.*kentfredric/, qr/git_versions/,    #
+    qr/twitter_hash_tags\s*=\s*#perl\s+#cpan\s*/,    #
+  );
   my $ok = 1;
   for my $test (@wanted_regex) {
     undef $ok unless $assert->should( have_line => $dmeta, $test );
