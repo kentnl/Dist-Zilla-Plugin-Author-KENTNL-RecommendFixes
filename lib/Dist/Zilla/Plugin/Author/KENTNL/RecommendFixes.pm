@@ -16,6 +16,7 @@ use MooX::Lsub qw( lsub );
 use Path::Tiny qw( path );
 use YAML::Tiny;
 use Data::DPath qw( dpath );
+use constant _CAN_VARIABLE_MAGIC => eval 'require Variable::Magic; require Tie::RefHash::Weak; 1';
 
 with 'Dist::Zilla::Role::InstallTool';
 
@@ -42,45 +43,65 @@ sub _rel {
   return $self->root->child(@args)->relative( $self->root );
 }
 
-sub _dzhandlers {
-  my ($self) = @_;
-  return {
-    should => sub {
-      my ( $status, $message, $name, @slurpy ) = @_;
-      if ( not $status ) {
-        $self->log("$name: $message");
-        return;
-      }
-      return $slurpy[0];
+sub _mk_assertions {
+  my ( $self, @args ) = @_;
+  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+    @args,
+    '-handlers' => {
+      should => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        if ( not $status ) {
+          $self->log("$name: $message");
+          return;
+        }
+        return $slurpy[0];
+      },
+      should_not => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        if ($status) {
+          $self->log("$name: $message");
+          return;
+        }
+        return $slurpy[0];
+      },
+      must => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        $self->log_fatal("$name: $message") unless $status;
+        return $slurpy[0];
+      },
+      must_not => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        $self->log_fatal("$name: $message") if $status;
+        return $slurpy[0];
+      },
     },
-    should_not => sub {
-      my ( $status, $message, $name, @slurpy ) = @_;
-      if ($status) {
-        $self->log("$name: $message");
-        return;
-      }
-      return $slurpy[0];
-    },
-    must => sub {
-      my ( $status, $message, $name, @slurpy ) = @_;
-      $self->log_fatal("$name: $message") unless $status;
-      return $slurpy[0];
-    },
-    must_not => sub {
-      my ( $status, $message, $name, @slurpy ) = @_;
-      $self->log_fatal("$name: $message") if $status;
-      return $slurpy[0];
-    },
+  );
+}
+
+has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
+
+sub _mk_cache {
+  my %cache;
+  if (_CAN_VARIABLE_MAGIC) {
+    tie %cache, 'Tie::RefHash::Weak';
+  }
+  return sub {
+    return $cache{ \$_[0] } if exists $cache{ \$_[0] };
+    return ( $cache{ \$_[0] } = $_[1]->() );
   };
 }
-has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
 
 sub _build__pc {
   my ($self) = @_;
 
-  my $cache = {};
+  my $line_cache = _mk_cache;
 
-  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+  my $get_lines = sub {
+    my ($path) = @_;
+    return $line_cache->( $path => sub { [ path($path)->lines_raw( { chomp => 1 } ) ] } );
+  };
+
+  $self->_mk_assertions(
     exist => sub {
       if ( path(@_)->exists ) {
         return ( 1, "@_ exists" );
@@ -89,17 +110,31 @@ sub _build__pc {
     },
     have_line => sub {
       my ( $path, $regex ) = @_;
-      $cache->{$path} ||= do {
-        [ path($path)->lines_raw( { chomp => 1 } ) ];
-      };
-      for my $line ( @{ $cache->{$path} } ) {
+      for my $line ( @{ $get_lines->($path) } ) {
         return ( 1, "Has line matching $regex" ) if $line =~ $regex;
       }
       return ( 0, "Does not have line matching $regex" );
     },
-    '-handlers' => $self->_dzhandlers,
+    have_one_of_line => sub {
+      my ( $path, @regexs ) = @_;
+      my $matches = 0;
+      my (@rematches);
+      for my $line ( @{ $get_lines->($path) } ) {
+        for my $re (@regexs) {
+          if ( $line =~ $re ) {
+            push @rematches, "Has line matching $re";
+          }
+        }
+      }
+      if ( not @rematches ) {
+        return ( 0, "Does not match at least one of ( @regexs )" );
+      }
+      if ( @rematches > 1 ) {
+        return ( 0, "Matches more than one of ( @rematches )" );
+      }
+      return ( 1, "Matches only @rematches" );
+    },
   );
-
 }
 
 has _dc => ( is => ro =>, lazy => 1, builder => '_build__dc' );
@@ -107,9 +142,23 @@ has _dc => ( is => ro =>, lazy => 1, builder => '_build__dc' );
 sub _build__dc {
   my ($self) = @_;
 
-  my $yaml_cache = {};
+  my $yaml_cache = _mk_cache;
 
-  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+  my $get_yaml = sub {
+    my ($path) = @_;
+    return $yaml_cache->(
+      $path => sub {
+        my ( $r, $ok );
+        eval {
+          $r  = YAML::Tiny->read( path($path)->stringify )->[0];
+          $ok = 1;
+        };
+        return $r;
+      }
+    );
+  };
+
+  $self->_mk_assertions(
     have_dpath => sub {
       my ( $label, $data, $expression ) = @_;
       if ( dpath($expression)->match($data) ) {
@@ -120,28 +169,12 @@ sub _build__dc {
     },
     yaml_have_dpath => sub {
       my ( $yaml_path, $expression ) = @_;
-      if ( not exists $yaml_cache->{$yaml_path} ) {
-        my ( $r, $ok );
-        if (
-          eval {
-            $r  = YAML::Tiny->read( path($yaml_path)->stringify )->[0];
-            $ok = 1;
-          }
-          )
-        {
-          $yaml_cache->{$yaml_path} = $r;
-        }
-        else {
-          return ( 0, "Could not load $yaml_path" );
-        }
-      }
-      if ( dpath($expression)->match( $yaml_cache->{$yaml_path} ) ) {
+      if ( dpath($expression)->match( $get_yaml->($yaml_path) ) ) {
         return ( 1, "$yaml_path matches $expression" );
       }
       return ( 0, "$yaml_path does not match $expression" );
 
     },
-    '-handlers' => $self->_dzhandlers,
   );
 
 }
@@ -288,11 +321,7 @@ sub dist_ini_ok {
     $assert->should( have_line => $ini, $test );
   }
   if ( not $assert->test( have_line => $ini, qr/dzil bakeini/ ) ) {
-    if (  ( not $assert->test( have_line => $ini, qr/bumpversions\s*=\s*1/ ) )
-      and ( not $assert->test( have_line => $ini, qr/git_versions/ ) ) )
-    {
-      _is_bad { $self->log( $ini->stringify . ' is unbaked and has Neither bumpversions=1 or git_versions' ) };
-    }
+    _is_bad { $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
   }
   return $ok;
 }
@@ -320,11 +349,7 @@ sub dist_ini_meta_ok {
     undef $ok unless $assert->should_not( have_line => $dmeta, $test );
   }
 
-  if ( not $assert->test( have_line => $dmeta, qr/bumpversions\s*=\s*1/ )
-    and ( not $assert->test( have_line => $dmeta, qr/git_versions/ ) ) )
-  {
-    _is_bad { $self->log( $dmeta->stringify . ' has Neither bumpversions=1 or git_versions' ) };
-  }
+  _is_bad { $assert->should( have_one_of_line => $dmeta, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
 
   return $ok;
 }
