@@ -1,6 +1,6 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.003004 2014-09-22T18:15:30Z
+0.003004 2014-09-22T18:45:58Z
  [Checks]
  - Warn about bad hashtags.
 
