@@ -43,37 +43,41 @@ sub _rel {
   return $self->root->child(@args)->relative( $self->root );
 }
 
-sub _dzhandlers {
-  my ($self) = @_;
-  return {
-    should => sub {
-      my ( $status, $message, $name, @slurpy ) = @_;
-      if ( not $status ) {
-        $self->log("$name: $message");
-        return;
-      }
-      return $slurpy[0];
+sub _mk_assertions {
+  my ( $self, @args ) = @_;
+  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+    @args,
+    '-handlers' => {
+      should => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        if ( not $status ) {
+          $self->log("$name: $message");
+          return;
+        }
+        return $slurpy[0];
+      },
+      should_not => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        if ($status) {
+          $self->log("$name: $message");
+          return;
+        }
+        return $slurpy[0];
+      },
+      must => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        $self->log_fatal("$name: $message") unless $status;
+        return $slurpy[0];
+      },
+      must_not => sub {
+        my ( $status, $message, $name, @slurpy ) = @_;
+        $self->log_fatal("$name: $message") if $status;
+        return $slurpy[0];
+      },
     },
-    should_not => sub {
-      my ( $status, $message, $name, @slurpy ) = @_;
-      if ($status) {
-        $self->log("$name: $message");
-        return;
-      }
-      return $slurpy[0];
-    },
-    must => sub {
-      my ( $status, $message, $name, @slurpy ) = @_;
-      $self->log_fatal("$name: $message") unless $status;
-      return $slurpy[0];
-    },
-    must_not => sub {
-      my ( $status, $message, $name, @slurpy ) = @_;
-      $self->log_fatal("$name: $message") if $status;
-      return $slurpy[0];
-    },
-  };
+  );
 }
+
 has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
 
 sub _mk_cache {
@@ -98,7 +102,7 @@ sub _build__pc {
     return $line_cache->( $path => sub { [ path($path)->lines_raw( { chomp => 1 } ) ] } );
   };
 
-  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+  $self->_mk_assertions(
     exist => sub {
       if ( path(@_)->exists ) {
         return ( 1, "@_ exists" );
@@ -112,9 +116,7 @@ sub _build__pc {
       }
       return ( 0, "Does not have line matching $regex" );
     },
-    '-handlers' => $self->_dzhandlers,
   );
-
 }
 
 has _dc => ( is => ro =>, lazy => 1, builder => '_build__dc' );
@@ -139,7 +141,7 @@ sub _build__dc {
     );
   };
 
-  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+  $self->_mk_assertions(
     have_dpath => sub {
       my ( $label, $data, $expression ) = @_;
       if ( dpath($expression)->match($data) ) {
@@ -156,7 +158,6 @@ sub _build__dc {
       return ( 0, "$yaml_path does not match $expression" );
 
     },
-    '-handlers' => $self->_dzhandlers,
   );
 
 }
