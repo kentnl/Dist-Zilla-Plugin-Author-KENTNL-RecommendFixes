@@ -102,7 +102,7 @@ sub _build__pc {
     return $line_cache->( $path => sub { [ path($path)->lines_raw( { chomp => 1 } ) ] } );
   };
 
-  $self->_mk_assertions(
+  return $self->_mk_assertions(
     exist => sub {
       if ( path(@_)->exists ) {
         return ( 1, "@_ exists" );
@@ -115,6 +115,25 @@ sub _build__pc {
         return ( 1, "Has line matching $regex" ) if $line =~ $regex;
       }
       return ( 0, "Does not have line matching $regex" );
+    },
+    have_one_of_line => sub {
+      my ( $path, @regexs ) = @_;
+      my $matches = 0;
+      my (@rematches);
+      for my $line ( @{ $get_lines->($path) } ) {
+        for my $re (@regexs) {
+          if ( $line =~ $re ) {
+            push @rematches, "Has line matching $re";
+          }
+        }
+      }
+      if ( not @rematches ) {
+        return ( 0, "Does not match at least one of ( @regexs )" );
+      }
+      if ( @rematches > 1 ) {
+        return ( 0, "Matches more than one of ( @rematches )" );
+      }
+      return ( 1, "Matches only @rematches" );
     },
   );
 }
@@ -141,7 +160,7 @@ sub _build__dc {
     );
   };
 
-  $self->_mk_assertions(
+  return $self->_mk_assertions(
     have_dpath => sub {
       my ( $label, $data, $expression ) = @_;
       if ( dpath($expression)->match($data) ) {
@@ -304,11 +323,7 @@ sub dist_ini_ok {
     $assert->should( have_line => $ini, $test );
   }
   if ( not $assert->test( have_line => $ini, qr/dzil bakeini/ ) ) {
-    if (  ( not $assert->test( have_line => $ini, qr/bumpversions\s*=\s*1/ ) )
-      and ( not $assert->test( have_line => $ini, qr/git_versions/ ) ) )
-    {
-      _is_bad { $self->log( $ini->stringify . ' is unbaked and has Neither bumpversions=1 or git_versions' ) };
-    }
+    _is_bad { $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
   }
   return $ok;
 }
@@ -336,11 +351,7 @@ sub dist_ini_meta_ok {
     undef $ok unless $assert->should_not( have_line => $dmeta, $test );
   }
 
-  if ( not $assert->test( have_line => $dmeta, qr/bumpversions\s*=\s*1/ )
-    and ( not $assert->test( have_line => $dmeta, qr/git_versions/ ) ) )
-  {
-    _is_bad { $self->log( $dmeta->stringify . ' has Neither bumpversions=1 or git_versions' ) };
-  }
+  _is_bad { $assert->should( have_one_of_line => $dmeta, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
 
   return $ok;
 }
