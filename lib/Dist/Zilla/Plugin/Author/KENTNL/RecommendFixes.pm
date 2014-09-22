@@ -51,7 +51,7 @@ sub _mk_assertions {
       should => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         if ( not $status ) {
-          $self->log("$name: $message");
+          $self->log("should $name: $message");
           return;
         }
         return $slurpy[0];
@@ -59,19 +59,19 @@ sub _mk_assertions {
       should_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         if ($status) {
-          $self->log("$name: $message");
+          $self->log("should_not $name: $message");
           return;
         }
         return $slurpy[0];
       },
       must => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        $self->log_fatal("$name: $message") unless $status;
+        $self->log_fatal("must $name: $message") unless $status;
         return $slurpy[0];
       },
       must_not => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
-        $self->log_fatal("$name: $message") if $status;
+        $self->log_fatal("must_not $name: $message") if $status;
         return $slurpy[0];
       },
     },
@@ -112,9 +112,9 @@ sub _build__pc {
     have_line => sub {
       my ( $path, $regex ) = @_;
       for my $line ( @{ $get_lines->($path) } ) {
-        return ( 1, "Has line matching $regex" ) if $line =~ $regex;
+        return ( 1, "$path Has line matching $regex" ) if $line =~ $regex;
       }
-      return ( 0, "Does not have line matching $regex" );
+      return ( 0, "$path Does not have line matching $regex" );
     },
     have_one_of_line => sub {
       my ( $path, @regexs ) = @_;
