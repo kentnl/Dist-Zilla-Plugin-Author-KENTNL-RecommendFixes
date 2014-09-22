@@ -1,6 +1,9 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+ [Checks]
+ - Warn about bad hashtags.
+
  [Dependencies::Stats]
  - Dependencies changed since 0.003003, see misc/*.deps* for details
  - runtime: +1
