@@ -79,6 +79,7 @@ has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
 sub _mk_cache {
   my %cache;
   if (_CAN_VARIABLE_MAGIC) {
+    ## no critic (Miscellanea::ProhibitTies)
     tie %cache, 'Tie::RefHash::Weak';
   }
   return sub {
