@@ -33,8 +33,7 @@ verbose = 9
 
 [BuiltinFunctions::ProhibitSleepViaSelect]
 
-[BuiltinFunctions::ProhibitStringyEval]
-allow_includes = 1
+[-BuiltinFunctions::ProhibitStringyEval]
 
 [BuiltinFunctions::ProhibitStringySplit]
 
@@ -167,7 +166,7 @@ spell_command = aspell list --lang en_US
 
 [ErrorHandling::RequireCarping]
 
-[ErrorHandling::RequireCheckingReturnValueOfEval]
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
 
 [-ErrorHandling::RequireUseOfExceptions]
 
@@ -205,7 +204,7 @@ spell_command = aspell list --lang en_US
 
 [Lax::ProhibitLeadingZeros::ExceptChmod]
 
-[Lax::ProhibitStringyEval::ExceptForRequire]
+[-Lax::ProhibitStringyEval::ExceptForRequire]
 
 [Lax::RequireEndWithTrueConst]
 
@@ -372,7 +371,7 @@ base_max = 130
 
 [ValuesAndExpressions::ProhibitComplexVersion]
 
-[ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitConstantPragma]
 
 [ValuesAndExpressions::ProhibitDuplicateHashKeys]
 

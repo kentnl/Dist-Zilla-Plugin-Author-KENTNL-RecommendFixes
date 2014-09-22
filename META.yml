@@ -20,7 +20,7 @@ name: Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 provides:
   Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes:
     file: lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm
-    version: '0.003003'
+    version: '0.003004'
 requires:
   Carp: '0'
   Data::DPath: '0'
@@ -30,6 +30,7 @@ requires:
   Path::Tiny: '0'
   Term::ANSIColor: '0'
   YAML::Tiny: '0'
+  constant: '0'
   perl: '5.008'
   strict: '0'
   utf8: '0'
@@ -38,14 +39,14 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes.git
-version: '0.003003'
+version: '0.003004'
 x_BuiltWith:
   modules:
     CPAN::Meta: '2.142060'
     Carp: '1.34'
     Data::DPath: '0.50'
     Dist::Zilla::App::Command::bakeini: '0.001002'
-    Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes: '0.003004'
+    Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes: '0.003005'
     Dist::Zilla::Plugin::Authority: '1.006'
     Dist::Zilla::Plugin::AutoPrereqs: '5.020'
     Dist::Zilla::Plugin::BumpVersionAfterRelease: '0.002'
@@ -107,6 +108,7 @@ x_BuiltWith:
     Test::Pod: '1.48'
     Test::Pod::Coverage: '1.10'
     YAML::Tiny: '1.63'
+    constant: '1.31'
     strict: '1.08'
     utf8: '1.14'
     warnings: '1.26'
@@ -391,7 +393,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes
       name: '@Author::KENTNL/Author::KENTNL::RecommendFixes'
-      version: '0.003003'
+      version: '0.003004'
     -
       class: Dist::Zilla::Plugin::ReadmeFromPod
       name: '@Author::KENTNL/ReadmeFromPod'
@@ -457,7 +459,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           signed: '0'
-          tag: 0.003003-source
+          tag: 0.003004-source
           tag_format: '%v-source'
           tag_message: v%v
           time_zone: local
@@ -511,7 +513,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: releases
           signed: '0'
-          tag: '0.003003'
+          tag: '0.003004'
           tag_format: '%v'
           tag_message: v%v
           time_zone: local

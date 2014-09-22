@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Term::ANSIColor" => 0,
     "YAML::Tiny" => 0,
+    "constant" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::DZil" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.003003",
+  "VERSION" => "0.003004",
   "test" => {
     "TESTS" => "t/*.t t/00-compile/*.t"
   }
@@ -60,6 +61,7 @@ my %FallbackPrereqs = (
   "Test::DZil" => 0,
   "Test::More" => "0.89",
   "YAML::Tiny" => 0,
+  "constant" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0
