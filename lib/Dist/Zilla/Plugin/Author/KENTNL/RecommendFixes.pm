@@ -16,6 +16,7 @@ use MooX::Lsub qw( lsub );
 use Path::Tiny qw( path );
 use YAML::Tiny;
 use Data::DPath qw( dpath );
+use constant _CAN_VARIABLE_MAGIC => eval 'require Variable::Magic; require Tie::RefHash::Weak; 1';
 
 with 'Dist::Zilla::Role::InstallTool';
 
@@ -75,10 +76,27 @@ sub _dzhandlers {
 }
 has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
 
+sub _mk_cache {
+  my %cache;
+  if (_CAN_VARIABLE_MAGIC) {
+    ## no critic (Miscellanea::ProhibitTies)
+    tie %cache, 'Tie::RefHash::Weak';
+  }
+  return sub {
+    return $cache{ \$_[0] } if exists $cache{ \$_[0] };
+    return ( $cache{ \$_[0] } = $_[1]->() );
+  };
+}
+
 sub _build__pc {
   my ($self) = @_;
 
-  my $cache = {};
+  my $line_cache = _mk_cache;
+
+  my $get_lines = sub {
+    my ($path) = @_;
+    return $line_cache->( $path => sub { [ path($path)->lines_raw( { chomp => 1 } ) ] } );
+  };
 
   return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
     exist => sub {
@@ -89,10 +107,7 @@ sub _build__pc {
     },
     have_line => sub {
       my ( $path, $regex ) = @_;
-      $cache->{$path} ||= do {
-        [ path($path)->lines_raw( { chomp => 1 } ) ];
-      };
-      for my $line ( @{ $cache->{$path} } ) {
+      for my $line ( @{ $get_lines->($path) } ) {
         return ( 1, "Has line matching $regex" ) if $line =~ $regex;
       }
       return ( 0, "Does not have line matching $regex" );
@@ -107,7 +122,22 @@ has _dc => ( is => ro =>, lazy => 1, builder => '_build__dc' );
 sub _build__dc {
   my ($self) = @_;
 
-  my $yaml_cache = {};
+  my $yaml_cache = _mk_cache;
+
+  my $get_yaml = sub {
+    my ($path) = @_;
+    return $yaml_cache->(
+      $path => sub {
+        my ( $r, $ok );
+        ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+        eval {
+          $r  = YAML::Tiny->read( path($path)->stringify )->[0];
+          $ok = 1;
+        };
+        return $r;
+      },
+    );
+  };
 
   return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
     have_dpath => sub {
@@ -120,22 +150,7 @@ sub _build__dc {
     },
     yaml_have_dpath => sub {
       my ( $yaml_path, $expression ) = @_;
-      if ( not exists $yaml_cache->{$yaml_path} ) {
-        my ( $r, $ok );
-        if (
-          eval {
-            $r  = YAML::Tiny->read( path($yaml_path)->stringify )->[0];
-            $ok = 1;
-          }
-          )
-        {
-          $yaml_cache->{$yaml_path} = $r;
-        }
-        else {
-          return ( 0, "Could not load $yaml_path" );
-        }
-      }
-      if ( dpath($expression)->match( $yaml_cache->{$yaml_path} ) ) {
+      if ( dpath($expression)->match( $get_yaml->($yaml_path) ) ) {
         return ( 1, "$yaml_path matches $expression" );
       }
       return ( 0, "$yaml_path does not match $expression" );
