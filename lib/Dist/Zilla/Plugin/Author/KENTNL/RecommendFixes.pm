@@ -111,9 +111,9 @@ sub _build__pc {
     have_line => sub {
       my ( $path, $regex ) = @_;
       for my $line ( @{ $get_lines->($path) } ) {
-        return ( 1, "Has line matching $regex" ) if $line =~ $regex;
+        return ( 1, "$path Has line matching $regex" ) if $line =~ $regex;
       }
-      return ( 0, "Does not have line matching $regex" );
+      return ( 0, "$path Does not have line matching $regex" );
     },
     have_one_of_line => sub {
       my ( $path, @regexs ) = @_;
@@ -342,10 +342,7 @@ sub dist_ini_meta_ok {
     qr/srcreadme\s*=.*/,             qr/copyright_holder\s*=.*<[^@]+@[^>]+>/,
     qr/twitter_extra_hash_tags\s*=\s*#/,
   );
-  my (@unwanted_regex) = (
-      qr/author.*=.*kentfredric/, qr/git_versions/, 
-      qr/twitter_hash_tags\s*=\s*=\s*#perl\s+#cpan\s*/,
-  );
+  my (@unwanted_regex) = ( qr/author.*=.*kentfredric/, qr/git_versions/, qr/twitter_hash_tags\s*=\s*=\s*#perl\s+#cpan\s*/, );
   my $ok = 1;
   for my $test (@wanted_regex) {
     undef $ok unless $assert->should( have_line => $dmeta, $test );
