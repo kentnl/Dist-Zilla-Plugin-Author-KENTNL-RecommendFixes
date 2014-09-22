@@ -37,6 +37,11 @@ $bundle->remove_policy('RegularExpressions::ProhibitEscapedMetacharacters');
 #  'Subroutines::ProhibitCallsToUndeclaredSubs' => ( 'exempt_subs' => 'String::Formatter::str_rf' ), );
 
 $bundle->remove_policy('ErrorHandling::RequireUseOfExceptions');
+$bundle->remove_policy('ValuesAndExpressions::ProhibitConstantPragma');
+$bundle->remove_policy('BuiltinFunctions::ProhibitStringyEval');
+$bundle->remove_policy('Lax::ProhibitStringyEval::ExceptForRequire');
+$bundle->remove_policy('ErrorHandling::RequireCheckingReturnValueOfEval');
+
 
 #$bundle->remove_policy('CodeLayout::RequireUseUTF8');
 #$bundle->remove_policy('ErrorHandling::RequireCarping');

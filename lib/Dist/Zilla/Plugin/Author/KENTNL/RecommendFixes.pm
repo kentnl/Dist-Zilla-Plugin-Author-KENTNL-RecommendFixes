@@ -101,7 +101,7 @@ sub _build__pc {
     return $line_cache->( $path => sub { [ path($path)->lines_raw( { chomp => 1 } ) ] } );
   };
 
-  $self->_mk_assertions(
+  return $self->_mk_assertions(
     exist => sub {
       if ( path(@_)->exists ) {
         return ( 1, "@_ exists" );
@@ -149,6 +149,7 @@ sub _build__dc {
     return $yaml_cache->(
       $path => sub {
         my ( $r, $ok );
+        ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         eval {
           $r  = YAML::Tiny->read( path($path)->stringify )->[0];
           $ok = 1;
@@ -158,7 +159,7 @@ sub _build__dc {
     );
   };
 
-  $self->_mk_assertions(
+  return $self->_mk_assertions(
     have_dpath => sub {
       my ( $label, $data, $expression ) = @_;
       if ( dpath($expression)->match($data) ) {
