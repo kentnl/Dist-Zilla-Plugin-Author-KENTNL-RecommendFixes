@@ -129,12 +129,13 @@ sub _build__dc {
     return $yaml_cache->(
       $path => sub {
         my ( $r, $ok );
+        ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         eval {
           $r  = YAML::Tiny->read( path($path)->stringify )->[0];
           $ok = 1;
         };
         return $r;
-      }
+      },
     );
   };
 
