@@ -99,15 +99,20 @@ sub _build__pc {
 
   my $get_lines = sub {
     my ($path) = @_;
-    return $line_cache->( $path => sub { [ path($path)->lines_raw( { chomp => 1 } ) ] } );
+    return $line_cache->( $path => sub { [ $path->lines_raw( { chomp => 1 } ) ] } );
   };
 
   return $self->_mk_assertions(
+    '-transform' => sub {
+      my ( $name, @bits ) = @_;
+      my $path = shift @bits;
+      return ( $self->_rel($path), @bits );
+    },
     exist => sub {
-      if ( path(@_)->exists ) {
-        return ( 1, "@_ exists" );
+      if ( $_[0]->exists ) {
+        return ( 1, "$_[0] exists" );
       }
-      return ( 0, "@_ does not exist" );
+      return ( 0, "$_[0] does not exist" );
     },
     have_line => sub {
       my ( $path, $regex ) = @_;
@@ -200,14 +205,14 @@ my %amap = (
 
 for my $key (qw( git libdir dist_ini )) {
   my $value = delete $amap{$key};
-  lsub $key => _badly { $_[0]->_pc->should( exist => $_[0]->_rel($value) ) };
+  lsub $key => _badly { $_[0]->_pc->should( exist => $value ) };
 }
 for my $key ( keys %amap ) {
   my $value = $amap{$key};
-  lsub $key => sub { $_[0]->_pc->should( exist => $_[0]->_rel($value) ) };
+  lsub $key => sub { $_[0]->_pc->should( exist => $value ) };
 }
 
-lsub tdir => sub { $_[0]->_pc->should( exist => $_[0]->_rel('t') ) };
+lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
@@ -249,8 +254,8 @@ sub has_new_changes_deps {
   my $ok     = 1;
   my $assert = $self->_pc;
   for my $file ( @{ $self->changes_deps_files } ) {
-    undef $ok unless $assert->should( exist => $self->_rel( 'misc', $file ) );
-    undef $ok unless $assert->should_not( exist => $self->_rel($file) );
+    undef $ok unless $assert->should( exist => 'misc/' . $file );
+    undef $ok unless $assert->should_not( exist => $file );
   }
   return $ok;
 }
@@ -259,8 +264,8 @@ sub has_new_perlcritic_deps {
   my ($self) = @_;
   my $ok     = 1;
   my $assert = $self->_pc;
-  undef $ok unless $assert->should( exist => $self->_rel( 'misc', 'perlcritic.deps' ) );
-  undef $ok unless $assert->should_not( exist => $self->_rel('perlcritic.deps') );
+  undef $ok unless $assert->should( exist => 'misc/perlcritic.deps' );
+  undef $ok unless $assert->should_not( exist => 'perlcritic.deps' );
   return $ok;
 }
 
@@ -471,6 +476,17 @@ no Moose;
     return bless $arg_hash, $class;
   }
 
+  sub _input_transform {
+    my ($self) = @_;
+    return $self->{'-transform'} if exists $self->{'-transform'};
+    return ( $self->{'-transform'} = sub { shift; return @_ } );
+  }
+
+  sub input_transform {
+    my ( $self, $name, @input ) = @_;
+    return $self->_input_transform->( $name, @input );
+  }
+
   sub _handler_defaults {
     return {
       test => sub {
@@ -511,8 +527,9 @@ no Moose;
       if ( not exists $self->{'-tests'}->{$name} ) {
         croak sprintf q[INVALID ASSERTION %s ( avail: %s )], $name, ( join q[,], keys %{ $self->{'-tests'} } );
       }
-      my ( $status, $message ) = $self->{'-tests'}->{$name}->(@slurpy);
-      return $self->{'-handlers'}->{$handler}->( $status, $message, $name, @slurpy );
+      my (@input) = $self->input_transform( $name, @slurpy );
+      my ( $status, $message ) = $self->{'-tests'}->{$name}->(@input);
+      return $self->{'-handlers'}->{$handler}->( $status, $message, $name, @input );
     };
     {
       ## no critic (TestingAndDebugging::ProhibitNoStrict])
