@@ -1,6 +1,10 @@
 This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
 
-0.003004
+0.003005
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.020001 → 2.020003
+
+0.003004 2014-09-22T19:06:39Z
  [Added / runtime requires]
  - constant
 
