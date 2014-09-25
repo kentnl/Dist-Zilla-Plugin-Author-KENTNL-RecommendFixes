@@ -104,7 +104,7 @@ sub _build__pc {
 
   return $self->_mk_assertions(
     '-transform' => sub {
-      my ( $name, @bits ) = @_;
+      my ( undef, @bits ) = @_;
       my $path = shift @bits;
       return ( $self->_rel($path), @bits );
     },
