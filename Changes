@@ -1,6 +1,12 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003004, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+ [Internals]
+ - Prototype the input_transform feature discussed.
 
 0.003004 2014-09-22T19:06:39Z
  [Checks]
