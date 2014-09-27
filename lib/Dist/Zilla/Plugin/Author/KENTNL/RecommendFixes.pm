@@ -454,6 +454,7 @@ sub setup_installer {
   $self->avoid_old_modules;
   $self->mailmap_check;
   $self->dzil_plugin_check;
+  $self->weaver_ini_ok;
   return;
 }
 
