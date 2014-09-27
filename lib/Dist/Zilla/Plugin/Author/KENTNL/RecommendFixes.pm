@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.003006';
+our $VERSION = '0.003007';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -559,7 +559,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.003006
+version 0.003007
 
 =head1 DESCRIPTION
 
