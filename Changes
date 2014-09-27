@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+
+0.003006 2014-09-27T07:03:04Z
  [Checks]
  - Make sure weaver_ini_ok runs
  - Double-check that -Encoding is not specified.
