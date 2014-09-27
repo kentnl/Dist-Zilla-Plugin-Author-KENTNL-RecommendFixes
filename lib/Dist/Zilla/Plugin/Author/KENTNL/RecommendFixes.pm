@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.003005';
+our $VERSION = '0.003006';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -335,7 +335,12 @@ sub dist_ini_ok {
 sub weaver_ini_ok {
   my ($self) = @_;
   return unless my $weave = $self->weaver_ini;
-  return $self->_pc->should( have_line => $weave, qr/-SingleEncoding/, );
+  my $assert = $self->_pc;
+
+  my $ok = 1;
+  undef $ok unless $assert->should( have_line => $weave, qr/-SingleEncoding/, );
+  undef $ok unless $assert->should_not( have_line => $weave, qr/-Encoding/, );
+  return $ok;
 }
 
 sub dist_ini_meta_ok {
@@ -449,6 +454,7 @@ sub setup_installer {
   $self->avoid_old_modules;
   $self->mailmap_check;
   $self->dzil_plugin_check;
+  $self->weaver_ini_ok;
   return;
 }
 
@@ -553,7 +559,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.003005
+version 0.003006
 
 =head1 DESCRIPTION
 

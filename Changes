@@ -1,5 +1,10 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.003006 2014-09-27T07:03:04Z
+ [Checks]
+ - Make sure weaver_ini_ok runs
+ - Double-check that -Encoding is not specified.
+
 0.003005 2014-09-25T16:09:00Z
  [Dependencies::Stats]
  - Dependencies changed since 0.003004, see misc/*.deps* for details
