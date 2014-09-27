@@ -335,7 +335,12 @@ sub dist_ini_ok {
 sub weaver_ini_ok {
   my ($self) = @_;
   return unless my $weave = $self->weaver_ini;
-  return $self->_pc->should( have_line => $weave, qr/-SingleEncoding/, );
+  my $assert = $self->_pc;
+
+  my $ok = 1;
+  undef $ok unless $assert->should( have_line => $weave, qr/-SingleEncoding/, );
+  undef $ok unless $assert->should_not( have_line => $weave, qr/-Encoding/, );
+  return $ok;
 }
 
 sub dist_ini_meta_ok {
