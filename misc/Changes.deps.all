@@ -15,6 +15,9 @@ This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL depen
  - Test::EOL
  - Test::More
 
+ [Added / runtime requires]
+ - Generic::Assertions
+
  [Added / test requires]
  - perl 5.008
 
@@ -34,6 +37,9 @@ This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL depen
 
  [Removed / develop requires]
  - Dist::Zilla::Plugin::EOLTests
+
+ [Removed / runtime requires]
+ - Carp
 
 0.003006 2014-09-27T07:03:04Z
 
