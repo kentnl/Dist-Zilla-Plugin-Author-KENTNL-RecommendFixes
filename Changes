@@ -1,13 +1,15 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.003007 2014-10-23T13:44:07Z 1872dcb
+0.003007 2014-10-30T10:18:37Z 81844aa
  [Checks]
  - Test dist.ini.meta has a syntax vim statement, because vim doesn't autodetect that filetype.
 
  [Dependencies::Stats]
  - Dependencies changed since 0.003006, see misc/*.deps* for details
- - develop: +5 ↑1 (recommends: +1, suggests: ↑2)
- - test: (recommends: ↑1)
+ - configure: +1 (recommends: ↑1)
+ - develop: +6 ↑1 -1 (recommends: +1, suggests: ↑2)
+ - runtime: +1 -1
+ - test: +1 (recommends: ↑2)
 
 0.003006 2014-09-27T07:03:04Z
  [Checks]
