@@ -1,6 +1,6 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.004000 2014-10-30T10:19:56Z 4651143
+0.004000 2014-10-30T12:33:06Z 66bb186
  [Checks]
  - Test dist.ini.meta has a syntax vim statement, because vim doesn't autodetect that filetype.
 
