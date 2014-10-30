@@ -1,6 +1,6 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.003007 2014-10-30T10:18:37Z 81844aa
+0.003007 2014-10-30T10:19:56Z 4651143
  [Checks]
  - Test dist.ini.meta has a syntax vim statement, because vim doesn't autodetect that filetype.
 
@@ -10,6 +10,9 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
  - develop: +6 ↑1 -1 (recommends: +1, suggests: ↑2)
  - runtime: +1 -1
  - test: +1 (recommends: ↑2)
+
+ [Internals]
+ - Inline package _Assertions now replaced with externalised Generic::Assertions
 
 0.003006 2014-09-27T07:03:04Z
  [Checks]
