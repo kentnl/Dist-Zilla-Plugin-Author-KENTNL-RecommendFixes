@@ -17,6 +17,7 @@ use Path::Tiny qw( path );
 use YAML::Tiny;
 use Data::DPath qw( dpath );
 use constant _CAN_VARIABLE_MAGIC => eval 'require Variable::Magic; require Tie::RefHash::Weak; 1';
+use Generic::Assertions;
 
 with 'Dist::Zilla::Role::InstallTool';
 
@@ -45,7 +46,7 @@ sub _rel {
 
 sub _mk_assertions {
   my ( $self, @args ) = @_;
-  return Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions->new(
+  return Generic::Assertions->new(
     @args,
     '-handlers' => {
       should => sub {
@@ -103,7 +104,7 @@ sub _build__pc {
   };
 
   return $self->_mk_assertions(
-    '-transform' => sub {
+    '-input_transformer' => sub {
       my ( undef, @bits ) = @_;
       my $path = shift @bits;
       return ( $self->_rel($path), @bits );
@@ -461,90 +462,6 @@ sub setup_installer {
 __PACKAGE__->meta->make_immutable;
 no Moose;
 
-## no critic (Modules::ProhibitMultiplePackages)
-{
-
-  package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes::_Assertions;
-  ## no critic (Moose::ProhibitNewMethod)
-
-  use Carp qw( croak carp );
-
-  sub new {
-    my ( $class, @args ) = @_;
-    my $arg_hash = { ( ref $args[0] ? %{ $args[0] } : @args ) };
-    my $tests = {};
-    for my $key ( grep { !/^-/ } keys %{$arg_hash} ) {
-      $tests->{$key} = delete $arg_hash->{$key};
-    }
-    $arg_hash->{'-handlers'} = { %{ $class->_handler_defaults }, %{ $arg_hash->{'-handlers'} || {} } };
-    $arg_hash->{'-tests'} = { %{$tests}, %{ $arg_hash->{'-tests'} || {} } };
-
-    return bless $arg_hash, $class;
-  }
-
-  sub _input_transform {
-    my ($self) = @_;
-    return $self->{'-transform'} if exists $self->{'-transform'};
-    return ( $self->{'-transform'} = sub { shift; return @_ } );
-  }
-
-  sub input_transform {
-    my ( $self, $name, @input ) = @_;
-    return $self->_input_transform->( $name, @input );
-  }
-
-  sub _handler_defaults {
-    return {
-      test => sub {
-        my ($status) = @_;
-        return $status;
-      },
-      log => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        carp sprintf 'Assertion < log %s > = %s : %s', $name, ( $status || '0' ), $message;
-        return $slurpy[0];
-      },
-      should => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        carp "Assertion < should $name > failed: $message" unless $status;
-        return $slurpy[0];
-      },
-      should_not => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        carp "Assertion < should_not $name > failed: $message" if $status;
-        return $slurpy[0];
-      },
-      must => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        croak "Assertion < must $name > failed: $message" unless $status;
-        return $slurpy[0];
-      },
-      must_not => sub {
-        my ( $status, $message, $name, @slurpy ) = @_;
-        croak "Assertion < must_not $name > failed: $message" if $status;
-        return $slurpy[0];
-      },
-    };
-  }
-
-  for my $handler (qw( should must should_not must_not test log )) {
-    my $code = sub {
-      my ( $self, $name, @slurpy ) = @_;
-      if ( not exists $self->{'-tests'}->{$name} ) {
-        croak sprintf q[INVALID ASSERTION %s ( avail: %s )], $name, ( join q[,], keys %{ $self->{'-tests'} } );
-      }
-      my (@input) = $self->input_transform( $name, @slurpy );
-      my ( $status, $message ) = $self->{'-tests'}->{$name}->(@input);
-      return $self->{'-handlers'}->{$handler}->( $status, $message, $name, @input );
-    };
-    {
-      ## no critic (TestingAndDebugging::ProhibitNoStrict])
-      no strict 'refs';
-      *{ __PACKAGE__ . q[::] . $handler } = $code;
-    }
-  }
-
-}
 1;
 
 __END__

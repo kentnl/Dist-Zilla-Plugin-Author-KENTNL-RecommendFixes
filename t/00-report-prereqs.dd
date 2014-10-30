@@ -1,10 +1,11 @@
 do { my $x = {
        'configure' => {
                         'recommends' => {
-                                          'ExtUtils::MakeMaker' => '6.98'
+                                          'ExtUtils::MakeMaker' => '7.00'
                                         },
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.008'
                                       }
                       },
        'develop' => {
@@ -20,7 +21,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
                                       'Dist::Zilla::Plugin::ConfirmRelease' => '0',
                                       'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0',
-                                      'Dist::Zilla::Plugin::EOLTests' => '0',
                                       'Dist::Zilla::Plugin::Git::Check' => '0',
                                       'Dist::Zilla::Plugin::Git::Commit' => '0',
                                       'Dist::Zilla::Plugin::Git::CommitBuild' => '0',
@@ -52,6 +52,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::RunExtraTests' => '0',
                                       'Dist::Zilla::Plugin::Test::CPAN::Changes' => '0',
                                       'Dist::Zilla::Plugin::Test::Compile::PerFile' => '0',
+                                      'Dist::Zilla::Plugin::Test::EOL' => '0',
                                       'Dist::Zilla::Plugin::Test::Kwalitee' => '0',
                                       'Dist::Zilla::Plugin::Test::MinimumVersion' => '0',
                                       'Dist::Zilla::Plugin::Test::Perl::Critic' => '0',
@@ -70,14 +71,14 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Dist::Zilla::App::Command::bakeini' => '0.001003',
-                                      'Dist::Zilla::PluginBundle::Author::KENTNL' => '2.021000'
+                                      'Dist::Zilla::PluginBundle::Author::KENTNL' => '2.022000'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
                                       'Data::DPath' => '0',
                                       'Dist::Zilla::Role::InstallTool' => '0',
+                                      'Generic::Assertions' => '0',
                                       'MooX::Lsub' => '0',
                                       'Moose' => '0',
                                       'Path::Tiny' => '0',
@@ -93,7 +94,7 @@ do { my $x = {
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900',
-                                     'ExtUtils::MakeMaker' => '6.98',
+                                     'ExtUtils::MakeMaker' => '7.00',
                                      'Test::More' => '1.001008'
                                    },
                    'requires' => {
@@ -101,7 +102,8 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::DZil' => '0',
-                                   'Test::More' => '0.89'
+                                   'Test::More' => '0.89',
+                                   'perl' => '5.008'
                                  }
                  }
      };
