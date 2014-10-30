@@ -1,6 +1,19 @@
 This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
 
-0.003006
+0.004000
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / runtime requires]
+ - Generic::Assertions
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Removed / runtime requires]
+ - Carp
+
+0.003006 2014-09-27T07:03:04Z
 
 0.003005 2014-09-25T16:09:00Z
 

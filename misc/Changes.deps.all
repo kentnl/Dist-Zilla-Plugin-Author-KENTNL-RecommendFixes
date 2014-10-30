@@ -1,6 +1,47 @@
 This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
 
-0.003006
+0.004000
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / develop recommends]
+ - Test::More 1.001008
+
+ [Added / develop requires]
+ - Dist::Zilla 5
+ - Dist::Zilla::Plugin::Bootstrap::lib
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps
+ - Dist::Zilla::Plugin::Test::EOL
+ - Test::EOL
+ - Test::More
+
+ [Added / runtime requires]
+ - Generic::Assertions
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Git::NextRelease 0 → 0.004000
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001002 → 0.001003
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.020003 → 2.022000
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+ - Test::More 1.001006 → 1.001008
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::EOLTests
+
+ [Removed / runtime requires]
+ - Carp
+
+0.003006 2014-09-27T07:03:04Z
 
 0.003005 2014-09-25T16:09:00Z
  [Changed / develop suggests]

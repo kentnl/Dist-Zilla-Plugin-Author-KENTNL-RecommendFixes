@@ -1,5 +1,19 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.004000 2014-10-30T12:33:06Z 66bb186
+ [Checks]
+ - Test dist.ini.meta has a syntax vim statement, because vim doesn't autodetect that filetype.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003006, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +6 ↑1 -1 (recommends: +1, suggests: ↑2)
+ - runtime: +1 -1
+ - test: +1 (recommends: ↑2)
+
+ [Internals]
+ - Inline package _Assertions now replaced with externalised Generic::Assertions
+
 0.003006 2014-09-27T07:03:04Z
  [Checks]
  - Make sure weaver_ini_ok runs
