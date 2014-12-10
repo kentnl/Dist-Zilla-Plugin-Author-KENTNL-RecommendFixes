@@ -1,6 +1,9 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.004001 2014-10-30T12:33:46Z 6226309
+0.004001 2014-12-10T09:10:57Z 98438cd
+ [Checks]
+ - Cry about autobox and friends.
+
  [Dependencies::Stats]
  - Dependencies changed since 0.004000, see misc/*.deps* for details
  - configure: (recommends: ↑1)

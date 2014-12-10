@@ -382,6 +382,8 @@ lsub unrecommend => sub {
     qw( Class::Load ),                                       # Module::Runtime preferred
     qw( Readonly ),                                          # use Const::Fast
     qw( Sub::Name ),                                         # use Sub::Util
+    qw( autobox ),                                           # Rewrite it
+    qw( Moose::Autobox ),                                    # Rewrite it
   ];
 };
 
