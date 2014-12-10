@@ -6,6 +6,10 @@ This file contains changes to DEVELOPMENT dependencies only ( both REQUIRED and 
 
  [Changed / develop suggests]
  - Dist::Zilla::App::Command::bakeini 0.001003 → 0.002000
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.022000 → 2.022001
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::ReadmeFromPod
 
 0.004000 2014-10-30T12:33:06Z
  [Added / develop recommends]
