@@ -1,6 +1,22 @@
 This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
 
 0.004001
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 7.00 → 7.04
+
+ [Changed / develop recommends]
+ - Test::More 1.001008 → 1.001009
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001003 → 0.002000
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.022000 → 2.022001
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 7.00 → 7.04
+ - Test::More 1.001008 → 1.001009
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::ReadmeFromPod
 
 0.004000 2014-10-30T12:33:06Z
  [Added / configure requires]
