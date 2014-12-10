@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 # VERSION
 
-version 0.004001
+version 0.004002
 
 # DESCRIPTION
 
