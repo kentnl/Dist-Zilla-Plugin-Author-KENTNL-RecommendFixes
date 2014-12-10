@@ -22,7 +22,7 @@ name: Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 provides:
   Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes:
     file: lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm
-    version: '0.004001'
+    version: '0.004002'
 requires:
   Data::DPath: '0'
   Dist::Zilla::Role::InstallTool: '0'
@@ -41,14 +41,14 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes.git
-version: '0.004001'
+version: '0.004002'
 x_BuiltWith:
   modules:
     CPAN::Meta: '2.143240'
     Data::DPath: '0.50'
     Dist::Zilla: '5.027'
     Dist::Zilla::App::Command::bakeini: '0.002000'
-    Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes: '0.004001'
+    Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes: '0.004002'
     Dist::Zilla::Plugin::Authority: '1.009'
     Dist::Zilla::Plugin::AutoPrereqs: '5.027'
     Dist::Zilla::Plugin::Bootstrap::lib: '1.001000'
@@ -417,7 +417,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes
       name: '@Author::KENTNL/Author::KENTNL::RecommendFixes'
-      version: '0.004001'
+      version: '0.004002'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       name: '@Author::KENTNL/ShippedReadme'
@@ -483,7 +483,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           signed: '0'
-          tag: 0.004001-source
+          tag: 0.004002-source
           tag_format: '%v-source'
           tag_message: v%v
           time_zone: local
@@ -537,7 +537,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: releases
           signed: '0'
-          tag: '0.004001'
+          tag: '0.004002'
           tag_format: '%v'
           tag_message: v%v
           time_zone: local

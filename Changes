@@ -1,5 +1,7 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.004002 2014-12-10T10:07:35Z e68b1f4
+
 0.004001 2014-12-10T10:06:39Z bec44ae
  [Checks]
  - Cry about autobox and friends.
