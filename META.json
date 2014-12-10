@@ -62,7 +62,6 @@
             "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
             "Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
-            "Dist::Zilla::Plugin::ReadmeFromPod" : "0",
             "Dist::Zilla::Plugin::RewriteVersion::Sanitized" : "0",
             "Dist::Zilla::Plugin::RunExtraTests" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
@@ -86,7 +85,7 @@
          },
          "suggests" : {
             "Dist::Zilla::App::Command::bakeini" : "0.002000",
-            "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.022000"
+            "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.022001"
          }
       },
       "runtime" : {
@@ -180,7 +179,6 @@
          "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0.004",
          "Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled" : "0.003001",
          "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.142470",
-         "Dist::Zilla::Plugin::ReadmeFromPod" : "0.30",
          "Dist::Zilla::Plugin::RewriteVersion::Sanitized" : "0.001004",
          "Dist::Zilla::Plugin::RunExtraTests" : "0.025",
          "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0.008",
@@ -193,7 +191,7 @@
          "Dist::Zilla::Plugin::TestRelease" : "5.027",
          "Dist::Zilla::Plugin::Twitter" : "0.026",
          "Dist::Zilla::Plugin::UploadToCPAN" : "5.027",
-         "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.022000",
+         "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.022001",
          "Dist::Zilla::Role::InstallTool" : "5.027",
          "Dist::Zilla::Util::Test::KENTNL" : "1.005000",
          "ExtUtils::MakeMaker" : "7.04",
@@ -609,9 +607,9 @@
             "version" : "0.004001"
          },
          {
-            "class" : "Dist::Zilla::Plugin::ReadmeFromPod",
-            "name" : "@Author::KENTNL/ReadmeFromPod",
-            "version" : "0.30"
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "@Author::KENTNL/ShippedReadme",
+            "version" : "0.142470"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
