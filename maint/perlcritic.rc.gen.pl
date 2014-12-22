@@ -42,7 +42,7 @@ $bundle->remove_policy('BuiltinFunctions::ProhibitStringyEval');
 $bundle->remove_policy('Lax::ProhibitStringyEval::ExceptForRequire');
 $bundle->remove_policy('ErrorHandling::RequireCheckingReturnValueOfEval');
 
-#$bundle->remove_policy('CodeLayout::RequireUseUTF8');
+$bundle->remove_policy('CodeLayout::RequireUseUTF8');
 #$bundle->remove_policy('ErrorHandling::RequireCarping');
 #$bundle->remove_policy('NamingConventions::Capitalization');
 
