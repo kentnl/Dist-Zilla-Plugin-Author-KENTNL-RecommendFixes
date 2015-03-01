@@ -4,7 +4,7 @@
       "Data::DPath" : "0.52",
       "Dist::Zilla" : "5.032",
       "Dist::Zilla::App::Command::bakeini" : "0.002000",
-      "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes" : "0.004002",
+      "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes" : "0.004003",
       "Dist::Zilla::Plugin::Author::KENTNL::TravisCI" : "0.001001",
       "Dist::Zilla::Plugin::Authority" : "1.009",
       "Dist::Zilla::Plugin::AutoPrereqs" : "5.032",
