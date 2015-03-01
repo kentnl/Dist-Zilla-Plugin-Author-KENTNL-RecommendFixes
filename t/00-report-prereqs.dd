@@ -5,7 +5,7 @@ do { my $x = {
                                         },
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.008'
+                                        'perl' => '5.006'
                                       }
                       },
        'develop' => {
@@ -91,9 +91,8 @@ do { my $x = {
                                       'Term::ANSIColor' => '0',
                                       'YAML::Tiny' => '0',
                                       'constant' => '0',
-                                      'perl' => '5.008',
+                                      'perl' => '5.006',
                                       'strict' => '0',
-                                      'utf8' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -109,7 +108,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test::DZil' => '0',
                                    'Test::More' => '0.89',
-                                   'perl' => '5.008'
+                                   'perl' => '5.006'
                                  }
                  }
      };
