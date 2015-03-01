@@ -1,10 +1,16 @@
 This file contains changes to DEVELOPMENT dependencies only ( both REQUIRED and OPTIONAL )
 
 0.004002
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI
+ - Dist::Zilla::Plugin::Prereqs::Upgrade
+ - Dist::Zilla::Plugin::Readme::Brief
+
  [Changed / develop recommends]
- - Test::More 1.001009 → 1.301001_098
+ - Test::More 1.001009 → 0.99
 
  [Changed / develop requires]
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 0 → 1.004000
  - Test::More 0 → 0.88
 
  [Changed / develop suggests]
