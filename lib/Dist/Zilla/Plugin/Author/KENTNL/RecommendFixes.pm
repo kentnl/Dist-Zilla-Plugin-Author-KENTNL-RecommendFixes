@@ -1,11 +1,10 @@
-use 5.008;    # utf8
+use 5.006;
 use strict;
 use warnings;
-use utf8;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.004002';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -312,9 +311,13 @@ sub travis_conf_ok {
   }
   undef $ok
     unless _is_bad { $assert->should( yaml_have_dpath => $yaml, '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' ) };
-  for my $branch (qw( master build/master releases )) {
+  for my $branch (qw( master builds releases )) {
     undef $ok unless $assert->should( yaml_have_dpath => $yaml, _branch_only($branch) );
   }
+  for my $branch (qw( build/master )) {
+    undef $ok unless $assert->should_not( yaml_have_dpath => $yaml, _branch_only($branch) );
+  }
+
   return $ok;
 }
 
@@ -478,7 +481,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.004001
+version 0.004002
 
 =head1 DESCRIPTION
 
@@ -503,7 +506,7 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2015 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
