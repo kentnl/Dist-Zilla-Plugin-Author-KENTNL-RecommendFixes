@@ -1,4 +1,4 @@
 sub {
   my ($yaml) = @_;
-  @{ $yaml->{branches}->{only} } = map { ( $_ eq 'build/master' ) ? 'build' : $_ } @{ $yaml->{branches}->{only} };
+  @{ $yaml->{branches}->{only} } = map { ( $_ eq 'build/master' ) ? 'builds' : $_ } @{ $yaml->{branches}->{only} };
 };
