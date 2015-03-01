@@ -1,6 +1,9 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.004002 2015-03-01T08:06:12Z d175d44
+0.004002 2015-03-01T08:13:27Z fce9161
+ [Checks]
+ - recommend builds instead of build/master
+
  [Dependencies::Stats]
  - Dependencies changed since 0.004001, see misc/*.deps* for details
  - configure: ↓1 (recommends: ↓1)
