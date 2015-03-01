@@ -311,9 +311,13 @@ sub travis_conf_ok {
   }
   undef $ok
     unless _is_bad { $assert->should( yaml_have_dpath => $yaml, '/before_install/*[ value =~/git clone.*maint-travis-ci/ ]' ) };
-  for my $branch (qw( master build/master releases )) {
+  for my $branch (qw( master builds releases )) {
     undef $ok unless $assert->should( yaml_have_dpath => $yaml, _branch_only($branch) );
   }
+  for my $branch (qw( build/master )) {
+    undef $ok unless $assert->should_not( yaml_have_dpath => $yaml, _branch_only($branch) );
+  }
+
   return $ok;
 }
 
