@@ -22,7 +22,7 @@ name: Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 provides:
   Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes:
     file: lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm
-    version: '0.004003'
+    version: '0.004004'
 recommends:
   Moose: '2.000'
   Path::Tiny: '0.058'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes.git
-version: '0.004003'
+version: '0.004004'
 x_BuiltWith:
   external_file: misc/built_with.json
 x_Dist_Zilla:
@@ -337,7 +337,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes
       name: '@Author::KENTNL/Author::KENTNL::RecommendFixes'
-      version: '0.004003'
+      version: '0.004004'
     -
       class: Dist::Zilla::Plugin::Readme::Brief
       name: '@Author::KENTNL/ShippedReadme'
@@ -403,7 +403,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           signed: 0
-          tag: 0.004003-source
+          tag: 0.004004-source
           tag_format: '%v-source'
           tag_message: v%v
           time_zone: local
@@ -457,7 +457,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: releases
           signed: 0
-          tag: '0.004003'
+          tag: '0.004004'
           tag_format: '%v'
           tag_message: v%v
           time_zone: local
