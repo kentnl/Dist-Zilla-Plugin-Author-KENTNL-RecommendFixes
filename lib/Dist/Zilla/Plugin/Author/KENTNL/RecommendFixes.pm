@@ -387,6 +387,8 @@ lsub unrecommend => sub {
     qw( Sub::Name ),                                         # use Sub::Util
     qw( autobox ),                                           # Rewrite it
     qw( Moose::Autobox ),                                    # Rewrite it
+    qw( List::MoreUtils ),                                   # Some people want to avoid it,
+                                                             # consider avoiding if its easy to do so
   ];
 };
 

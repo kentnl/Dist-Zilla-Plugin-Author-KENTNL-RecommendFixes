@@ -1,6 +1,12 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+  [ Checks ]
+    - make LMU-using dists obvious so I can consider if avoiding it is warranted.
+    - This is not a certainty of removal, simply me acting as a proxy for other peoples concerns, for in cases where
+      I'm indifferent, I defer to the concerns of others.
+    - For instance, the closer my code is to the upstream of the river, the more likely I'll elect to avoid it.
+
   [ Dependencies::Stats ]
     - Dependencies changed since 0.004002, see misc/*.deps* for details
     - develop: ↑2 (suggests: ↑2)
