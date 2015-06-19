@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.004002';
+our $VERSION = '0.004003';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -387,6 +387,8 @@ lsub unrecommend => sub {
     qw( Sub::Name ),                                         # use Sub::Util
     qw( autobox ),                                           # Rewrite it
     qw( Moose::Autobox ),                                    # Rewrite it
+    qw( List::MoreUtils ),                                   # Some people want to avoid it,
+                                                             # consider avoiding if its easy to do so
   ];
 };
 
@@ -481,7 +483,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.004002
+version 0.004003
 
 =head1 DESCRIPTION
 
