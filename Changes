@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+
+0.004003 2015-06-19T04:15:00Z c32e093
   [ Checks ]
     - make LMU-using dists obvious so I can consider if avoiding it is warranted.
     - This is not a certainty of removal, simply me acting as a proxy for other peoples concerns, for in cases where
