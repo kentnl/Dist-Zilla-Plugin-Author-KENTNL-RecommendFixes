@@ -1,6 +1,9 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+ [Checks]
+ - Change recommended preference regarding copyfiles= setting.
+
  [Dependencies::Stats]
  - Dependencies changed since 0.004003, see misc/*.deps* for details
  - develop: +3 -1 (suggests: ↑1)

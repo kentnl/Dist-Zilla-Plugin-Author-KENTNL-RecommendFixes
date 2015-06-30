@@ -352,13 +352,14 @@ sub dist_ini_meta_ok {
   return unless my $dmeta = $self->dist_ini_meta;
   my $assert = $self->_pc;
   my (@wanted_regex) = (
-    qr/bumpversions\s*=\s*1/,            qr/toolkit\s*=\s*eumm/,
-    qr/toolkit_hardness\s*=\s*soft/,     qr/copyfiles\s*=.*LICENSE/,
-    qr/srcreadme\s*=.*/,                 qr/copyright_holder\s*=.*<[^@]+@[^>]+>/,
-    qr/twitter_extra_hash_tags\s*=\s*#/, qr/;\s*vim:\s+.*syntax=dosini/,
+    qr/bumpversions\s*=\s*1/,                qr/toolkit\s*=\s*eumm/,
+    qr/toolkit_hardness\s*=\s*soft/,         qr/srcreadme\s*=.*/,
+    qr/copyright_holder\s*=.*<[^@]+@[^>]+>/, qr/twitter_extra_hash_tags\s*=\s*#/,
+    qr/;\s*vim:\s+.*syntax=dosini/,
   );
   my (@unwanted_regex) = (
     #
+    qr/copyfiles\s*=.*LICENSE/,
     qr/author.*=.*kentfredric/, qr/git_versions/,    #
     qr/twitter_hash_tags\s*=\s*#perl\s+#cpan\s*/,    #
   );
