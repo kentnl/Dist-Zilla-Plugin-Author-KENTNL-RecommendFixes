@@ -38,6 +38,15 @@ sub _badly(&) {
 }
 ## use critic
 
+sub _after_true {
+  my ( $subname, $code ) = @_;
+  around $subname, sub {
+    my ( $orig, $self, @args ) = @_;
+    return unless $self->$orig(@args);
+    return $self->$code();
+  };
+}
+
 sub _rel {
   my ( $self, @args ) = @_;
   return $self->root->child(@args)->relative( $self->root );
@@ -188,21 +197,22 @@ sub _build__dc {
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
 my %amap = (
-  git            => '.git',
-  libdir         => 'lib',
-  dist_ini       => 'dist.ini',
-  git_config     => '.git/config',
-  dist_ini_meta  => 'dist.ini.meta',
-  weaver_ini     => 'weaver.ini',
-  travis_yml     => '.travis.yml',
-  perltidyrc     => '.perltidyrc',
-  gitignore      => '.gitignore',
-  changes        => 'Changes',
-  license        => 'LICENSE',
-  mailmap        => '.mailmap',
-  perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
+  git              => '.git',
+  libdir           => 'lib',
+  dist_ini         => 'dist.ini',
+  git_config       => '.git/config',
+  dist_ini_meta    => 'dist.ini.meta',
+  weaver_ini       => 'weaver.ini',
+  travis_yml       => '.travis.yml',
+  perltidyrc       => '.perltidyrc',
+  gitignore        => '.gitignore',
+  changes          => 'Changes',
+  license          => 'LICENSE',
+  mailmap          => '.mailmap',
+  perlcritic_gen   => 'maint/perlcritic.rc.gen.pl',
   contributing_pod => 'CONTRIBUTING.pod',
-  makefile_pl    => 'Makefile.PL',
+  makefile_pl      => 'Makefile.PL',
+  install_skip     => 'INSTALL.SKIP',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -213,6 +223,10 @@ for my $key ( keys %amap ) {
   my $value = $amap{$key};
   lsub $key => sub { $_[0]->_pc->should( exist => $value ) };
 }
+
+_after_true makefile_pl => sub {
+  return $_[0]->install_skip;
+};
 
 lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
 
