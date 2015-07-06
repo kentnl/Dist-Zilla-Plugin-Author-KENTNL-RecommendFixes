@@ -239,6 +239,17 @@ _after_true gitignore => sub {
   my $ok     = $rval;
   undef $ok unless $assert->should( have_line => $file, qr/\A\.build\z/ );
   undef $ok unless $assert->should( have_line => $file, qr/\Atmp\/\z/ );
+  if ( $self->_have_makefile_pl ) {
+    ## no critic ( RegularExpressions::ProhibitFixedStringMatches )
+    undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.json\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.json\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.yml\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.yml\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\.old\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\Ablib\/\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\Apm_to_blib\z/ );
+  }
   return $ok;
 };
 

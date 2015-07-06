@@ -7,6 +7,7 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
  - Recommend CONTRIBUTING.pod
  - Recommend INSTALL.SKIP when Makefile.PL exists
  - Recommend some basic rules for .gitignore
+ - Recommend EUMM cruft exclusions for .gitignore when Makefile.PL exists
 
  [Dependencies::Stats]
  - Dependencies changed since 0.004003, see misc/*.deps* for details
