@@ -223,6 +223,7 @@ for my $key (qw( git libdir dist_ini )) {
 for my $key ( keys %amap ) {
   my $value = $amap{$key};
   lsub $key => sub { $_[0]->_pc->should( exist => $value ) };
+  lsub "_have_$key" => sub { $_[0]->_pc->test( exist => $value ) };
 }
 
 _after_true makefile_pl => sub {
