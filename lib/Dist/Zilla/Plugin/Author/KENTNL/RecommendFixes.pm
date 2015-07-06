@@ -201,6 +201,7 @@ my %amap = (
   license        => 'LICENSE',
   mailmap        => '.mailmap',
   perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
+  makefile_pl    => 'Makefile.PL',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -449,6 +450,7 @@ sub setup_installer {
   $self->dist_ini_meta;
   $self->weaver_ini;
   $self->travis_yml;
+  $self->makefile_pl;
   $self->perltidyrc;
   $self->gitignore;
   $self->changes;
