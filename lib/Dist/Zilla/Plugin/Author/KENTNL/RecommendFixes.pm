@@ -326,15 +326,14 @@ sub has_new_perlcritic_deps {
   return $ok;
 }
 
-sub has_new_perlcritic_gen {
-  my ($self) = @_;
-  return unless my $file = $self->perlcritic_gen;
+_after_true 'perlcritic_gen' => sub {
+  my ($file, $self) = @_;
   my $assert = $self->_pc;
   my $ok     = 1;
   undef $ok unless $assert->should( have_line => $file, qr/Path::Tiny/ );
   undef $ok unless $assert->should( have_line => $file, qr/\.\/misc/ );
   return $ok;
-}
+};
 
 sub git_repo_notkentfredric {
   my ($self) = @_;
@@ -514,7 +513,6 @@ sub setup_installer {
   $self->license;
   $self->has_new_changes_deps;
   $self->has_new_perlcritic_deps;
-  $self->has_new_perlcritic_gen;
   $self->git_repo_notkentfredric;
   $self->travis_conf_ok;
   $self->dist_ini_ok;
