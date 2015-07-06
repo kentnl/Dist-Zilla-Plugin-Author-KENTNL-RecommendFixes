@@ -201,6 +201,10 @@ my %amap = (
   license        => 'LICENSE',
   mailmap        => '.mailmap',
   perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
+  contributing_pod   => 'CONTRIBUTING.pod',
+  makefile_pl    => 'Makefile.PL',
+  install_skip   => 'INSTALL.SKIP',
+  readme_pod     => 'README.pod',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -210,12 +214,13 @@ for my $key (qw( git libdir dist_ini )) {
 for my $key ( keys %amap ) {
   my $value = $amap{$key};
   lsub $key => sub { $_[0]->_pc->should( exist => $value ) };
+  lsub "have_$key" => sub { $_[0]->_pc->test( exist => $value ) };
 }
 
 after "gitignore" => sub {
   my ($self) = @_;
   my $file = $amap{'gitignore'};
-  return unless $_[0]->_pc->test( exist => $file );
+  return unless $_[0]->have_gitignore;
   $_[0]->_pc->should( have_line => $file, qr/\A\.build\z/ );
   $_[0]->_pc->should( have_line => $file, qr/\AMETA\.json\z/ );
   $_[0]->_pc->should( have_line => $file, qr/\AMYMETA\.json\z/ );
@@ -223,7 +228,7 @@ after "gitignore" => sub {
   $_[0]->_pc->should( have_line => $file, qr/\AMYMETA\.yml\z/ );
   $_[0]->_pc->should( have_line => $file, qr/\AMakefile\z/ );
   $_[0]->_pc->should( have_line => $file, qr/\AMakefile\.old\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\Ablib\*\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/\Ablib\/\z/ );
   $_[0]->_pc->should( have_line => $file, qr/\Apm_to_blib\z/ );
   $_[0]->_pc->should( have_line => $file, qr/\Atmp\/\z/ );
 };
@@ -263,6 +268,23 @@ lsub tfiles => sub {
   }
   return \@out;
 
+};
+
+
+after 'install_skip' => sub {
+  my ( $self ) = @_;
+  my $assert = $self->_pc;
+  my $skipfile = $amap{'install_skip'};
+  my @entries = qw( contributing_pod readme_pod );
+  return unless $self->have_install_skip;
+  my $ok = 1;
+  for my $entry (@entries) {
+    my $sub = $self->can("have_${entry}");
+    next unless $self->$sub();
+    my $re = qr/\Q$amap{$entry}\E\$//
+    undef $ok unless $assert->should( have_line => $skipfile, qr/\A\Q$amap{$entry}\E\$\z/ );
+  }
+  return $ok;
 };
 
 sub has_new_changes_deps {
