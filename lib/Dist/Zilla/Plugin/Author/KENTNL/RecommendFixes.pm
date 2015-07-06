@@ -350,12 +350,10 @@ _after_true 'git_config' => sub {
 sub _matrix_include_perl { my ($perl)   = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
 sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
 
-sub travis_conf_ok {
-  my ($self) = @_;
-  return unless my $yaml = $self->travis_yml;
+_after_true 'travis_yml' => sub {
+  my ( $yaml, $self ) = @_;
   my $assert = $self->_dc;
-
-  my $ok = 1;
+  my $ok     = $yaml;
 
   undef $ok unless $assert->should( yaml_have_dpath => $yaml, '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' );
 
@@ -381,7 +379,7 @@ sub travis_conf_ok {
   }
 
   return $ok;
-}
+};
 
 sub dist_ini_ok {
   my ($self) = @_;
@@ -519,7 +517,6 @@ sub setup_installer {
   $self->license;
   $self->has_new_changes_deps;
   $self->has_new_perlcritic_deps;
-  $self->travis_conf_ok;
   $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
   $self->avoid_old_modules;
@@ -549,7 +546,7 @@ It does this by spewing colored output.
 setup_installer dist_ini_meta_ok dist_ini_ok
 has_new_changes_deps
 has_new_perlcritic_deps
-travis_conf_ok weaver_ini_ok avoid_old_modules
+weaver_ini_ok avoid_old_modules
 dzil_plugin_check
 mailmap_check
 
