@@ -1,6 +1,6 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.004004 2015-07-06T04:47:20Z 6882140
+0.004004 2015-07-06T05:11:04Z 924145b
  [Checks]
  - Change recommended preference regarding copyfiles= setting.
  - Recommend Makefile.PL
@@ -8,6 +8,8 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
  - Recommend INSTALL.SKIP when Makefile.PL exists
  - Recommend some basic rules for .gitignore
  - Recommend EUMM cruft exclusions for .gitignore when Makefile.PL exists
+ - Recommend proliferating INSTALL.SKIP with *.pod where relevant.
+ - Derecommend CONTRIBUTING.mkdn when CONTRIBUTING.pod is present
 
  [Dependencies::Stats]
  - Dependencies changed since 0.004003, see misc/*.deps* for details

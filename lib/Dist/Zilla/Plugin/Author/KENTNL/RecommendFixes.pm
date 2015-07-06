@@ -42,8 +42,8 @@ sub _after_true {
   my ( $subname, $code ) = @_;
   around $subname, sub {
     my ( $orig, $self, @args ) = @_;
-    return unless $self->$orig(@args);
-    return $self->$code();
+    return unless my $rval = $self->$orig(@args);
+    return $code->( $rval, $self, @args );
   };
 }
 
@@ -197,23 +197,25 @@ sub _build__dc {
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
 my %amap = (
-  git              => '.git',
-  libdir           => 'lib',
-  dist_ini         => 'dist.ini',
-  git_config       => '.git/config',
-  dist_ini_meta    => 'dist.ini.meta',
-  weaver_ini       => 'weaver.ini',
-  travis_yml       => '.travis.yml',
-  perltidyrc       => '.perltidyrc',
-  gitignore        => '.gitignore',
-  changes          => 'Changes',
-  license          => 'LICENSE',
-  mailmap          => '.mailmap',
-  perlcritic_gen   => 'maint/perlcritic.rc.gen.pl',
-  contributing_pod => 'CONTRIBUTING.pod',
-  makefile_pl      => 'Makefile.PL',
-  install_skip     => 'INSTALL.SKIP',
-  readme_pod       => 'README.pod',
+  git               => '.git',
+  libdir            => 'lib',
+  dist_ini          => 'dist.ini',
+  git_config        => '.git/config',
+  dist_ini_meta     => 'dist.ini.meta',
+  weaver_ini        => 'weaver.ini',
+  travis_yml        => '.travis.yml',
+  perltidyrc        => '.perltidyrc',
+  gitignore         => '.gitignore',
+  changes           => 'Changes',
+  license           => 'LICENSE',
+  mailmap           => '.mailmap',
+  perlcritic_gen    => 'maint/perlcritic.rc.gen.pl',
+  contributing_pod  => 'CONTRIBUTING.pod',
+  contributing_mkdn => 'CONTRIBUTING.mkdn',
+  makefile_pl       => 'Makefile.PL',
+  install_skip      => 'INSTALL.SKIP',
+  readme_pod        => 'README.pod',
+  tdir              => 't',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -227,11 +229,15 @@ for my $key ( keys %amap ) {
 }
 
 _after_true makefile_pl => sub {
-  return $_[0]->install_skip;
+  return $_[1]->install_skip;
+};
+
+_after_true contributing_pod => sub {
+  return $_[1]->_pc->should_not( exist => $amap{contributing_mkdn} );
 };
 
 _after_true gitignore => sub {
-  my ( $self, @args ) = @_;
+  my ( $rval, $self, @args ) = @_;
   my $file   = $amap{'gitignore'};
   my $assert = $self->_pc;
   my $ok     = 1;
@@ -251,8 +257,8 @@ _after_true gitignore => sub {
 };
 
 _after_true install_skip => sub {
-  my ( $self, @args ) = @_;
-  my $skipfile      = $amap{'install_skip'};
+  my ( $rval, $self, @args ) = @_;
+  my $skipfile  = $amap{'install_skip'};
   my (@entries) = qw( contributing_pod readme_pod );
   my $assert    = $self->_pc;
   my $ok        = 1;
@@ -264,8 +270,6 @@ _after_true install_skip => sub {
   }
   return $ok;
 };
-
-lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
