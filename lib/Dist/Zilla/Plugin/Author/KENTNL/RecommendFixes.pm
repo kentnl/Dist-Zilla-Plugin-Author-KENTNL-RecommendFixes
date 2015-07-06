@@ -213,6 +213,7 @@ my %amap = (
   perlcritic_gen   => 'maint/perlcritic.rc.gen.pl',
   contributing_pod => 'CONTRIBUTING.pod',
   makefile_pl      => 'Makefile.PL',
+  install_skip     => 'INSTALL.SKIP',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -223,6 +224,12 @@ for my $key ( keys %amap ) {
   my $value = $amap{$key};
   lsub $key => sub { $_[0]->_pc->should( exist => $value ) };
 }
+
+_after_true makefile_pl => sub {
+  my ( $file, $self ) = @_;
+  undef $file if $self->install_skip;
+  return $file;
+};
 
 lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
 

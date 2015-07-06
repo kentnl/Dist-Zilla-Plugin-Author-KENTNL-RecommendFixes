@@ -5,6 +5,7 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
  - Change recommended preference regarding copyfiles= setting.
  - Recommend Makefile.PL
  - Recommend CONTRIBUTING.pod
+ - Recommend INSTALL.SKIP when Makefile.PL exists
 
  [Dependencies::Stats]
  - Dependencies changed since 0.004003, see misc/*.deps* for details
