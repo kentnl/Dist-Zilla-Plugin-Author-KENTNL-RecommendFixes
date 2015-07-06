@@ -232,6 +232,16 @@ _after_true makefile_pl => sub {
   return $file;
 };
 
+_after_true gitignore => sub {
+  my ( $rval, $self, ) = @_;
+  my $file   = $amap{'gitignore'};
+  my $assert = $self->_pc;
+  my $ok     = $rval;
+  undef $ok unless $assert->should( have_line => $file, qr/\A\.build\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\Atmp\/\z/ );
+  return $ok;
+};
+
 lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };

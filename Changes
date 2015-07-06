@@ -6,6 +6,7 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
  - Recommend Makefile.PL
  - Recommend CONTRIBUTING.pod
  - Recommend INSTALL.SKIP when Makefile.PL exists
+ - Recommend some basic rules for .gitignore
 
  [Dependencies::Stats]
  - Dependencies changed since 0.004003, see misc/*.deps* for details
