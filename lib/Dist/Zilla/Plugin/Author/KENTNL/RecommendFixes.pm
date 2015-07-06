@@ -188,23 +188,23 @@ sub _build__dc {
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
 my %amap = (
-  git            => '.git',
-  libdir         => 'lib',
-  dist_ini       => 'dist.ini',
-  git_config     => '.git/config',
-  dist_ini_meta  => 'dist.ini.meta',
-  weaver_ini     => 'weaver.ini',
-  travis_yml     => '.travis.yml',
-  perltidyrc     => '.perltidyrc',
-  gitignore      => '.gitignore',
-  changes        => 'Changes',
-  license        => 'LICENSE',
-  mailmap        => '.mailmap',
-  perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
-  contributing_pod   => 'CONTRIBUTING.pod',
-  makefile_pl    => 'Makefile.PL',
-  install_skip   => 'INSTALL.SKIP',
-  readme_pod     => 'README.pod',
+  git              => '.git',
+  libdir           => 'lib',
+  dist_ini         => 'dist.ini',
+  git_config       => '.git/config',
+  dist_ini_meta    => 'dist.ini.meta',
+  weaver_ini       => 'weaver.ini',
+  travis_yml       => '.travis.yml',
+  perltidyrc       => '.perltidyrc',
+  gitignore        => '.gitignore',
+  changes          => 'Changes',
+  license          => 'LICENSE',
+  mailmap          => '.mailmap',
+  perlcritic_gen   => 'maint/perlcritic.rc.gen.pl',
+  contributing_pod => 'CONTRIBUTING.pod',
+  makefile_pl      => 'Makefile.PL',
+  install_skip     => 'INSTALL.SKIP',
+  readme_pod       => 'README.pod',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -270,18 +270,17 @@ lsub tfiles => sub {
 
 };
 
-
 after 'install_skip' => sub {
-  my ( $self ) = @_;
-  my $assert = $self->_pc;
+  my ($self)   = @_;
+  my $assert   = $self->_pc;
   my $skipfile = $amap{'install_skip'};
-  my @entries = qw( contributing_pod readme_pod );
+  my @entries  = qw( contributing_pod readme_pod );
   return unless $self->have_install_skip;
   my $ok = 1;
   for my $entry (@entries) {
     my $sub = $self->can("have_${entry}");
     next unless $self->$sub();
-    my $entry_re = quotemeta($amap{$entry});
+    my $entry_re = quotemeta( $amap{$entry} );
     undef $ok unless $assert->should( have_line => $skipfile, qr/\A\Q$entry_re\E\$\z/ );
   }
   return $ok;
