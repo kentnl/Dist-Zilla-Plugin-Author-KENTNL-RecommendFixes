@@ -341,11 +341,11 @@ _after_true 'perlcritic_gen' => sub {
   return $ok;
 };
 
-sub git_repo_notkentfredric {
-  my ($self) = @_;
-  return unless my $config = $self->git_config;
-  return $self->_pc->should_not( have_line => $config, qr/kentfredric/ );
-}
+_after_true 'git_config' => sub {
+  my ( $rval, $self ) = @_;
+  undef $rval unless $self->_pc->should_not( have_line => $config, qr/kentfredric/ );
+  return $rval;
+};
 
 sub _matrix_include_perl { my ($perl)   = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
 sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
@@ -519,7 +519,6 @@ sub setup_installer {
   $self->license;
   $self->has_new_changes_deps;
   $self->has_new_perlcritic_deps;
-  $self->git_repo_notkentfredric;
   $self->travis_conf_ok;
   $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
@@ -548,7 +547,7 @@ It does this by spewing colored output.
 =begin Pod::Coverage
 
 setup_installer dist_ini_meta_ok dist_ini_ok
-git_repo_notkentfredric has_new_changes_deps
+has_new_changes_deps
 has_new_perlcritic_deps
 travis_conf_ok weaver_ini_ok avoid_old_modules
 dzil_plugin_check
