@@ -216,6 +216,7 @@ my %amap = (
   makefile_pl       => 'Makefile.PL',
   install_skip      => 'INSTALL.SKIP',
   readme_pod        => 'README.pod',
+  tdir              => 't',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -275,8 +276,6 @@ _after_true install_skip => sub {
   }
   return $ok;
 };
-
-lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
