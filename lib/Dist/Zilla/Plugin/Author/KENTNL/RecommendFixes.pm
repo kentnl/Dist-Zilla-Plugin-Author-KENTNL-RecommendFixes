@@ -10,7 +10,7 @@ our $VERSION = '0.004004';
 
 our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 
-use Moose qw( with has around );
+use Moose qw( with has around after );
 use MooX::Lsub qw( lsub );
 use Path::Tiny qw( path );
 use YAML::Tiny;
@@ -211,6 +211,21 @@ for my $key ( keys %amap ) {
   my $value = $amap{$key};
   lsub $key => sub { $_[0]->_pc->should( exist => $value ) };
 }
+
+after "gitignore" => sub {
+  my ($self) = @_;
+  my $file = $amap{'gitignore'};
+  return unless $_[0]->_pc->test( exist => $file );
+  $_[0]->_pc->should( have_line => $file, qr/\AMETA\.json\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/\AMYMETA\.json\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/AMETA\.yml\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/\AMYMETA\.yml\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/\AMakefile\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/\AMakefile\.old\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/\Ablib\*\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/\Apm_to_blib\z/ );
+  $_[0]->_pc->should( have_line => $file, qr/\Atmp\/\z/ );
+};
 
 lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
 

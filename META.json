@@ -90,7 +90,7 @@
          },
          "suggests" : {
             "Dist::Zilla::App::Command::bakeini" : "0.002005",
-            "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.025000"
+            "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.025001"
          }
       },
       "runtime" : {
@@ -295,13 +295,20 @@
             "class" : "Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING",
             "config" : {
                "Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING" : {
-                  "document_version" : "0.1",
-                  "filename" : "CONTRIBUTING.mkdn",
-                  "format" : "mkdn"
+                  "document_version" : "0.1"
+               },
+               "Dist::Zilla::Plugin::GenerateFile::ShareDir" : {
+                  "destination_filename" : "CONTRIBUTING.pod",
+                  "dist" : "Dist-Zilla-Plugin-Author-KENTNL-CONTRIBUTING",
+                  "encoding" : "UTF-8",
+                  "format" : "mkdn",
+                  "location" : "root",
+                  "phase" : "build",
+                  "source_filename" : "contributing-0.1.pod"
                }
             },
             "name" : "@Author::KENTNL/Author::KENTNL::CONTRIBUTING",
-            "version" : "0.001002"
+            "version" : "0.001004"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
