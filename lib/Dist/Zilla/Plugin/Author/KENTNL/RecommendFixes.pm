@@ -402,9 +402,8 @@ _after_true 'weaver_ini' => sub {
   return $ok;
 };
 
-sub dist_ini_meta_ok {
-  my ($self) = @_;
-  return unless my $dmeta = $self->dist_ini_meta;
+_after_true 'dist_ini_meta' => sub {
+  my ( $file, $self ) = @_;
   my $assert = $self->_pc;
   my (@wanted_regex) = (
     qr/bumpversions\s*=\s*1/,                qr/toolkit\s*=\s*eumm/,
@@ -418,18 +417,20 @@ sub dist_ini_meta_ok {
     qr/author.*=.*kentfredric/, qr/git_versions/,    #
     qr/twitter_hash_tags\s*=\s*#perl\s+#cpan\s*/,    #
   );
-  my $ok = 1;
+  my $ok = $file;
   for my $test (@wanted_regex) {
-    undef $ok unless $assert->should( have_line => $dmeta, $test );
+    undef $ok unless $assert->should( have_line => $file, $test );
   }
   for my $test (@unwanted_regex) {
-    undef $ok unless $assert->should_not( have_line => $dmeta, $test );
+    undef $ok unless $assert->should_not( have_line => $file, $test );
   }
 
-  _is_bad { $assert->should( have_one_of_line => $dmeta, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
+  _is_bad {
+    undef $ok unless $assert->should( have_one_of_line => $file, qr/bumpversions\s*=\s*1/, qr/git_versions/ );
+  };
 
   return $ok;
-}
+};
 
 lsub unrecommend => sub {
   [
@@ -512,7 +513,6 @@ sub setup_installer {
   $self->license;
   $self->has_new_changes_deps;
   $self->perlcritic_deps;
-  $self->dist_ini_meta_ok;
   $self->avoid_old_modules;
   $self->mailmap_check;
   $self->dzil_plugin_check;
@@ -548,7 +548,7 @@ to the current distribution.
 
 It does this by spewing colored output.
 
-=for Pod::Coverage setup_installer dist_ini_meta_ok
+=for Pod::Coverage setup_installer
 has_new_changes_deps
 avoid_old_modules
 dzil_plugin_check
