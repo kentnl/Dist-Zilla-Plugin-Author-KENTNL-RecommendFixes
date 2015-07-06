@@ -489,6 +489,7 @@ sub setup_installer {
   $self->travis_yml;
   $self->contributing_pod;
   $self->makefile_pl;
+  $self->install_skip;
   $self->perltidyrc;
   $self->gitignore;
   $self->changes;
