@@ -343,7 +343,7 @@ _after_true 'perlcritic_gen' => sub {
 
 _after_true 'git_config' => sub {
   my ( $rval, $self ) = @_;
-  undef $rval unless $self->_pc->should_not( have_line => $config, qr/kentfredric/ );
+  undef $rval unless $self->_pc->should_not( have_line => $rval, qr/kentfredric/ );
   return $rval;
 };
 
