@@ -216,6 +216,7 @@ after "gitignore" => sub {
   my ($self) = @_;
   my $file = $amap{'gitignore'};
   return unless $_[0]->_pc->test( exist => $file );
+  $_[0]->_pc->should( have_line => $file, qr/\A\.build\z/ );
   $_[0]->_pc->should( have_line => $file, qr/\AMETA\.json\z/ );
   $_[0]->_pc->should( have_line => $file, qr/\AMYMETA\.json\z/ );
   $_[0]->_pc->should( have_line => $file, qr/AMETA\.yml\z/ );

@@ -1,3 +1,10 @@
 .build
 Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes-*
 tmp/
+META.json
+MYMETA.jsom
+META.yml
+MYMETA.yml
+Makefile
+Makefile.old
+blib
