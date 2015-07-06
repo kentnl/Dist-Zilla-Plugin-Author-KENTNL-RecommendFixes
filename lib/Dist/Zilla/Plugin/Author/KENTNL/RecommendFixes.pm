@@ -274,7 +274,7 @@ _after_true install_skip => sub {
   for my $entry (@entries) {
     my $sub = $self->can("_have_${entry}");
     next unless $self->$sub();
-    my $entry_re = quotemeta( $amap{$entry} );
+    my $entry_re = quotemeta $amap{$entry};
     undef $ok unless $assert->should( have_line => $skipfile, qr/\A\Q$entry_re\E\$\z/ );
   }
   return $ok;
