@@ -188,21 +188,21 @@ sub _build__dc {
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
 my %amap = (
-  git            => '.git',
-  libdir         => 'lib',
-  dist_ini       => 'dist.ini',
-  git_config     => '.git/config',
-  dist_ini_meta  => 'dist.ini.meta',
-  weaver_ini     => 'weaver.ini',
-  travis_yml     => '.travis.yml',
-  perltidyrc     => '.perltidyrc',
-  gitignore      => '.gitignore',
-  changes        => 'Changes',
-  license        => 'LICENSE',
-  mailmap        => '.mailmap',
-  perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
+  git              => '.git',
+  libdir           => 'lib',
+  dist_ini         => 'dist.ini',
+  git_config       => '.git/config',
+  dist_ini_meta    => 'dist.ini.meta',
+  weaver_ini       => 'weaver.ini',
+  travis_yml       => '.travis.yml',
+  perltidyrc       => '.perltidyrc',
+  gitignore        => '.gitignore',
+  changes          => 'Changes',
+  license          => 'LICENSE',
+  mailmap          => '.mailmap',
+  perlcritic_gen   => 'maint/perlcritic.rc.gen.pl',
   contributing_pod => 'CONTRIBUTING.pod',
-  makefile_pl    => 'Makefile.PL',
+  makefile_pl      => 'Makefile.PL',
 );
 
 for my $key (qw( git libdir dist_ini )) {
