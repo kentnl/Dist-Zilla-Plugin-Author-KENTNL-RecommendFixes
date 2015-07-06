@@ -211,6 +211,7 @@ my %amap = (
   license           => 'LICENSE',
   mailmap           => '.mailmap',
   perlcritic_gen    => 'maint/perlcritic.rc.gen.pl',
+  perlcritic_deps   => 'misc/perlcritic.deps',
   contributing_pod  => 'CONTRIBUTING.pod',
   contributing_mkdn => 'CONTRIBUTING.mkdn',
   makefile_pl       => 'Makefile.PL',
@@ -323,14 +324,13 @@ sub has_new_changes_deps {
   return $ok;
 }
 
-sub has_new_perlcritic_deps {
-  my ($self) = @_;
-  my $ok     = 1;
+_after_true perlcritic_deps => sub {
+  my ( $file, $self ) = @_;
+  my $ok     = $file;
   my $assert = $self->_pc;
-  undef $ok unless $assert->should( exist => 'misc/perlcritic.deps' );
   undef $ok unless $assert->should_not( exist => 'perlcritic.deps' );
   return $ok;
-}
+};
 
 _after_true 'perlcritic_gen' => sub {
   my ( $file, $self ) = @_;
@@ -516,7 +516,7 @@ sub setup_installer {
   $self->changes;
   $self->license;
   $self->has_new_changes_deps;
-  $self->has_new_perlcritic_deps;
+  $self->perlcritic_deps;
   $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
   $self->avoid_old_modules;
@@ -545,7 +545,6 @@ It does this by spewing colored output.
 
 setup_installer dist_ini_meta_ok dist_ini_ok
 has_new_changes_deps
-has_new_perlcritic_deps
 weaver_ini_ok avoid_old_modules
 dzil_plugin_check
 mailmap_check
