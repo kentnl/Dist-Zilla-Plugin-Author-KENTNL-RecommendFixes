@@ -2,9 +2,10 @@
 Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes-*
 tmp/
 META.json
-MYMETA.jsom
+MYMETA.json
 META.yml
 MYMETA.yml
 Makefile
 Makefile.old
-blib
+blib*
+pm_to_blib
