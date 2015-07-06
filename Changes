@@ -1,6 +1,6 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.004004 2015-07-06T08:07:48Z 8ce8167
+0.005000 2015-07-06T08:07:48Z 8ce8167
  [Checks]
  - Change recommended preference regarding copyfiles= setting.
  - Recommend Makefile.PL
