@@ -201,6 +201,7 @@ my %amap = (
   license        => 'LICENSE',
   mailmap        => '.mailmap',
   perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
+  contributing_pod => 'CONTRIBUTING.pod',
   makefile_pl    => 'Makefile.PL',
 );
 
@@ -450,6 +451,7 @@ sub setup_installer {
   $self->dist_ini_meta;
   $self->weaver_ini;
   $self->travis_yml;
+  $self->contributing_pod;
   $self->makefile_pl;
   $self->perltidyrc;
   $self->gitignore;

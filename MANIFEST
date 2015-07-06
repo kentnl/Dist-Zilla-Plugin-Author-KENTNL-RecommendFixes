@@ -3,6 +3,7 @@
 .mailmap
 .perltidyrc
 .travis.yml
+CONTRIBUTING.pod
 Changes
 LICENSE
 MANIFEST
