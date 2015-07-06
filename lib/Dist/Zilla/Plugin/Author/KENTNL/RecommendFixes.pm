@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.004003';
+our $VERSION = '0.005000';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -38,6 +38,16 @@ sub _badly(&) {
 }
 ## use critic
 
+sub _after_true {
+  my ( $subname, $code ) = @_;
+  return around $subname, sub {
+    my ( $orig, $self, @args ) = @_;
+    return unless my $rval = $self->$orig(@args);
+    return $code->( $rval, $self, @args );
+  };
+
+}
+
 sub _rel {
   my ( $self, @args ) = @_;
   return $self->root->child(@args)->relative( $self->root );
@@ -54,6 +64,7 @@ sub _mk_assertions {
           $self->log("should $name: $message");
           return;
         }
+        $self->log_debug("ok:should $name: $message");
         return $slurpy[0];
       },
       should_not => sub {
@@ -62,6 +73,7 @@ sub _mk_assertions {
           $self->log("should_not $name: $message");
           return;
         }
+        $self->log_debug("ok:should not $name: $message");
         return $slurpy[0];
       },
       must => sub {
@@ -188,19 +200,26 @@ sub _build__dc {
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
 my %amap = (
-  git            => '.git',
-  libdir         => 'lib',
-  dist_ini       => 'dist.ini',
-  git_config     => '.git/config',
-  dist_ini_meta  => 'dist.ini.meta',
-  weaver_ini     => 'weaver.ini',
-  travis_yml     => '.travis.yml',
-  perltidyrc     => '.perltidyrc',
-  gitignore      => '.gitignore',
-  changes        => 'Changes',
-  license        => 'LICENSE',
-  mailmap        => '.mailmap',
-  perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
+  git               => '.git',
+  libdir            => 'lib',
+  dist_ini          => 'dist.ini',
+  git_config        => '.git/config',
+  dist_ini_meta     => 'dist.ini.meta',
+  weaver_ini        => 'weaver.ini',
+  travis_yml        => '.travis.yml',
+  perltidyrc        => '.perltidyrc',
+  gitignore         => '.gitignore',
+  changes           => 'Changes',
+  license           => 'LICENSE',
+  mailmap           => '.mailmap',
+  perlcritic_gen    => 'maint/perlcritic.rc.gen.pl',
+  perlcritic_deps   => 'misc/perlcritic.deps',
+  contributing_pod  => 'CONTRIBUTING.pod',
+  contributing_mkdn => 'CONTRIBUTING.mkdn',
+  makefile_pl       => 'Makefile.PL',
+  install_skip      => 'INSTALL.SKIP',
+  readme_pod        => 'README.pod',
+  tdir              => 't',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -210,9 +229,56 @@ for my $key (qw( git libdir dist_ini )) {
 for my $key ( keys %amap ) {
   my $value = $amap{$key};
   lsub $key => sub { $_[0]->_pc->should( exist => $value ) };
+  lsub "_have_$key" => sub { $_[0]->_pc->test( exist => $value ) };
 }
 
-lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
+_after_true makefile_pl => sub {
+  my ( $file, $self ) = @_;
+  undef $file if $self->install_skip;
+  return $file;
+};
+
+_after_true contributing_pod => sub {
+  my ( $file, $self ) = @_;
+  undef $file if $self->_pc->should_not( exist => $amap{contributing_mkdn} );
+  return $file;
+};
+
+_after_true gitignore => sub {
+  my ( $rval, $self, ) = @_;
+  my $file   = $amap{'gitignore'};
+  my $assert = $self->_pc;
+  my $ok     = $rval;
+  undef $ok unless $assert->should( have_line => $file, qr/\A\.build\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\Atmp\/\z/ );
+  if ( $self->_have_makefile_pl ) {
+    ## no critic ( RegularExpressions::ProhibitFixedStringMatches )
+    undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.json\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.json\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.yml\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.yml\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\.old\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\Ablib\/\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\Apm_to_blib\z/ );
+  }
+  return $ok;
+};
+
+_after_true install_skip => sub {
+  my ( $rval, $self, ) = @_;
+  my $skipfile  = $amap{'install_skip'};
+  my (@entries) = qw( contributing_pod readme_pod );
+  my $assert    = $self->_pc;
+  my $ok        = $rval;
+  for my $entry (@entries) {
+    my $sub = $self->can("_have_${entry}");
+    next unless $self->$sub();
+    my $entry_re = quotemeta $amap{$entry};
+    undef $ok unless $assert->should( have_line => $skipfile, qr/\A\Q$entry_re\E\$\z/ );
+  }
+  return $ok;
+};
 
 lsub changes_deps_files => sub { return [qw( Changes.deps Changes.deps.all Changes.deps.dev Changes.deps.all )] };
 
@@ -260,40 +326,36 @@ sub has_new_changes_deps {
   return $ok;
 }
 
-sub has_new_perlcritic_deps {
-  my ($self) = @_;
-  my $ok     = 1;
+_after_true perlcritic_deps => sub {
+  my ( $file, $self ) = @_;
+  my $ok     = $file;
   my $assert = $self->_pc;
-  undef $ok unless $assert->should( exist => 'misc/perlcritic.deps' );
   undef $ok unless $assert->should_not( exist => 'perlcritic.deps' );
   return $ok;
-}
+};
 
-sub has_new_perlcritic_gen {
-  my ($self) = @_;
-  return unless my $file = $self->perlcritic_gen;
+_after_true 'perlcritic_gen' => sub {
+  my ( $file, $self ) = @_;
   my $assert = $self->_pc;
-  my $ok     = 1;
+  my $ok     = $file;
   undef $ok unless $assert->should( have_line => $file, qr/Path::Tiny/ );
   undef $ok unless $assert->should( have_line => $file, qr/\.\/misc/ );
   return $ok;
-}
+};
 
-sub git_repo_notkentfredric {
-  my ($self) = @_;
-  return unless my $config = $self->git_config;
-  return $self->_pc->should_not( have_line => $config, qr/kentfredric/ );
-}
+_after_true 'git_config' => sub {
+  my ( $rval, $self ) = @_;
+  undef $rval unless $self->_pc->should_not( have_line => $rval, qr/kentfredric/ );
+  return $rval;
+};
 
 sub _matrix_include_perl { my ($perl)   = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
 sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
 
-sub travis_conf_ok {
-  my ($self) = @_;
-  return unless my $yaml = $self->travis_yml;
+_after_true 'travis_yml' => sub {
+  my ( $yaml, $self ) = @_;
   my $assert = $self->_dc;
-
-  my $ok = 1;
+  my $ok     = $yaml;
 
   undef $ok unless $assert->should( yaml_have_dpath => $yaml, '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' );
 
@@ -319,61 +381,60 @@ sub travis_conf_ok {
   }
 
   return $ok;
-}
+};
 
-sub dist_ini_ok {
-  my ($self) = @_;
-  return unless my $ini = $self->dist_ini;
+_after_true 'dist_ini' => sub {
+  my ( $ini, $self ) = @_;
   my $assert = $self->_pc;
-  my $ok     = 1;
+  my $ok     = $ini;
   my (@tests) = ( qr/dzil bakeini/, qr/normal_form\s*=\s*numify/, qr/mantissa\s*=\s*6/, );
   for my $test (@tests) {
-    $assert->should( have_line => $ini, $test );
+    undef $ok unless $assert->should( have_line => $ini, $test );
   }
   if ( not $assert->test( have_line => $ini, qr/dzil bakeini/ ) ) {
-    _is_bad { $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
+    _is_bad { undef $ok unless $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
   }
   return $ok;
-}
+};
 
-sub weaver_ini_ok {
-  my ($self) = @_;
-  return unless my $weave = $self->weaver_ini;
+_after_true 'weaver_ini' => sub {
+  my ( $weave, $self ) = @_;
   my $assert = $self->_pc;
-
-  my $ok = 1;
+  my $ok     = $weave;
   undef $ok unless $assert->should( have_line => $weave, qr/-SingleEncoding/, );
   undef $ok unless $assert->should_not( have_line => $weave, qr/-Encoding/, );
   return $ok;
-}
+};
 
-sub dist_ini_meta_ok {
-  my ($self) = @_;
-  return unless my $dmeta = $self->dist_ini_meta;
+_after_true 'dist_ini_meta' => sub {
+  my ( $file, $self ) = @_;
   my $assert = $self->_pc;
   my (@wanted_regex) = (
-    qr/bumpversions\s*=\s*1/,            qr/toolkit\s*=\s*eumm/,
-    qr/toolkit_hardness\s*=\s*soft/,     qr/copyfiles\s*=.*LICENSE/,
-    qr/srcreadme\s*=.*/,                 qr/copyright_holder\s*=.*<[^@]+@[^>]+>/,
-    qr/twitter_extra_hash_tags\s*=\s*#/, qr/;\s*vim:\s+.*syntax=dosini/,
+    qr/bumpversions\s*=\s*1/,                qr/toolkit\s*=\s*eumm/,
+    qr/toolkit_hardness\s*=\s*soft/,         qr/srcreadme\s*=.*/,
+    qr/copyright_holder\s*=.*<[^@]+@[^>]+>/, qr/twitter_extra_hash_tags\s*=\s*#/,
+    qr/;\s*vim:\s+.*syntax=dosini/,
   );
   my (@unwanted_regex) = (
     #
+    qr/copyfiles\s*=.*LICENSE/,
     qr/author.*=.*kentfredric/, qr/git_versions/,    #
     qr/twitter_hash_tags\s*=\s*#perl\s+#cpan\s*/,    #
   );
-  my $ok = 1;
+  my $ok = $file;
   for my $test (@wanted_regex) {
-    undef $ok unless $assert->should( have_line => $dmeta, $test );
+    undef $ok unless $assert->should( have_line => $file, $test );
   }
   for my $test (@unwanted_regex) {
-    undef $ok unless $assert->should_not( have_line => $dmeta, $test );
+    undef $ok unless $assert->should_not( have_line => $file, $test );
   }
 
-  _is_bad { $assert->should( have_one_of_line => $dmeta, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
+  _is_bad {
+    undef $ok unless $assert->should( have_one_of_line => $file, qr/bumpversions\s*=\s*1/, qr/git_versions/ );
+  };
 
   return $ok;
-}
+};
 
 lsub unrecommend => sub {
   [
@@ -404,11 +465,12 @@ sub avoid_old_modules {
   return $ok;
 }
 
-sub mailmap_check {
-  my ($self) = @_;
-  return unless my $mailmap = $self->mailmap;
-  return $self->_pc->should( have_line => $mailmap, qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/ );
-}
+_after_true 'mailmap' => sub {
+  my ( $mailmap, $self ) = @_;
+  my $ok = $mailmap;
+  undef $ok unless $self->_pc->should( have_line => $mailmap, qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/ );
+  return $ok;
+};
 
 # Hack to avoid matching ourselves.
 sub _plugin_re {
@@ -448,21 +510,18 @@ sub setup_installer {
   $self->dist_ini_meta;
   $self->weaver_ini;
   $self->travis_yml;
+  $self->contributing_pod;
+  $self->makefile_pl;
   $self->perltidyrc;
   $self->gitignore;
   $self->changes;
   $self->license;
   $self->has_new_changes_deps;
-  $self->has_new_perlcritic_deps;
-  $self->has_new_perlcritic_gen;
-  $self->git_repo_notkentfredric;
-  $self->travis_conf_ok;
-  $self->dist_ini_ok;
-  $self->dist_ini_meta_ok;
+  $self->perlcritic_deps;
+  $self->perlcritic_gen;
   $self->avoid_old_modules;
-  $self->mailmap_check;
+  $self->mailmap;
   $self->dzil_plugin_check;
-  $self->weaver_ini_ok;
   return;
 }
 
@@ -483,7 +542,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.004003
+version 0.005000
 
 =head1 DESCRIPTION
 
@@ -495,12 +554,10 @@ to the current distribution.
 
 It does this by spewing colored output.
 
-=for Pod::Coverage setup_installer dist_ini_meta_ok dist_ini_ok
-git_repo_notkentfredric has_new_changes_deps
-has_new_perlcritic_deps has_new_perlcritic_gen
-travis_conf_ok weaver_ini_ok avoid_old_modules
+=for Pod::Coverage setup_installer
+has_new_changes_deps
+avoid_old_modules
 dzil_plugin_check
-mailmap_check
 
 =head1 AUTHOR
 
