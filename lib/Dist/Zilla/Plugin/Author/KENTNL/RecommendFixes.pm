@@ -40,11 +40,12 @@ sub _badly(&) {
 
 sub _after_true {
   my ( $subname, $code ) = @_;
-  around $subname, sub {
+  return around $subname, sub {
     my ( $orig, $self, @args ) = @_;
     return unless my $rval = $self->$orig(@args);
     return $code->( $rval, $self, @args );
   };
+
 }
 
 sub _rel {
@@ -244,13 +245,14 @@ _after_true contributing_pod => sub {
 };
 
 _after_true gitignore => sub {
-  my ( $rval, $self, @args ) = @_;
+  my ( $rval, $self, ) = @_;
   my $file   = $amap{'gitignore'};
   my $assert = $self->_pc;
-  my $ok     = 1;
+  my $ok     = $rval;
   undef $ok unless $assert->should( have_line => $file, qr/\A\.build\z/ );
   undef $ok unless $assert->should( have_line => $file, qr/\Atmp\/\z/ );
   if ( $self->_have_makefile_pl ) {
+    ## no critic ( RegularExpressions::ProhibitFixedStringMatches )
     undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.json\z/ );
     undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.json\z/ );
     undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.yml\z/ );
@@ -264,11 +266,11 @@ _after_true gitignore => sub {
 };
 
 _after_true install_skip => sub {
-  my ( $rval, $self, @args ) = @_;
+  my ( $rval, $self, ) = @_;
   my $skipfile  = $amap{'install_skip'};
   my (@entries) = qw( contributing_pod readme_pod );
   my $assert    = $self->_pc;
-  my $ok        = 1;
+  my $ok        = $rval;
   for my $entry (@entries) {
     my $sub = $self->can("_have_${entry}");
     next unless $self->$sub();
