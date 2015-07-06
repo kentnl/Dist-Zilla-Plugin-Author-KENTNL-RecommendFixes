@@ -487,6 +487,8 @@ sub setup_installer {
   $self->dist_ini_meta;
   $self->weaver_ini;
   $self->travis_yml;
+  $self->contributing_pod;
+  $self->makefile_pl;
   $self->perltidyrc;
   $self->gitignore;
   $self->changes;
