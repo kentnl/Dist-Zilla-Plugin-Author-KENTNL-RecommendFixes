@@ -380,7 +380,7 @@ _after_true 'travis_yml' => sub {
 };
 
 _after_true 'dist_ini' => sub {
-  my ($ini, $self) = @_;
+  my ( $ini, $self ) = @_;
   my $assert = $self->_pc;
   my $ok     = $ini;
   my (@tests) = ( qr/dzil bakeini/, qr/normal_form\s*=\s*numify/, qr/mantissa\s*=\s*6/, );
@@ -393,16 +393,14 @@ _after_true 'dist_ini' => sub {
   return $ok;
 };
 
-sub weaver_ini_ok {
-  my ($self) = @_;
-  return unless my $weave = $self->weaver_ini;
+_after_true 'weaver_ini' => sub {
+  my ( $weave, $self ) = @_;
   my $assert = $self->_pc;
-
-  my $ok = 1;
+  my $ok     = $weave;
   undef $ok unless $assert->should( have_line => $weave, qr/-SingleEncoding/, );
   undef $ok unless $assert->should_not( have_line => $weave, qr/-Encoding/, );
   return $ok;
-}
+};
 
 sub dist_ini_meta_ok {
   my ($self) = @_;
@@ -518,7 +516,6 @@ sub setup_installer {
   $self->avoid_old_modules;
   $self->mailmap_check;
   $self->dzil_plugin_check;
-  $self->weaver_ini_ok;
   return;
 }
 
@@ -551,9 +548,9 @@ to the current distribution.
 
 It does this by spewing colored output.
 
-=for Pod::Coverage setup_installer dist_ini_meta_ok dist_ini_ok
+=for Pod::Coverage setup_installer dist_ini_meta_ok
 has_new_changes_deps
-weaver_ini_ok avoid_old_modules
+avoid_old_modules
 dzil_plugin_check
 mailmap_check
 
