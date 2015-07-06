@@ -214,6 +214,7 @@ my %amap = (
   contributing_pod => 'CONTRIBUTING.pod',
   makefile_pl      => 'Makefile.PL',
   install_skip     => 'INSTALL.SKIP',
+  readme_pod       => 'README.pod',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -249,6 +250,21 @@ _after_true gitignore => sub {
     undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\.old\z/ );
     undef $ok unless $assert->should( have_line => $file, qr/\Ablib\/\z/ );
     undef $ok unless $assert->should( have_line => $file, qr/\Apm_to_blib\z/ );
+  }
+  return $ok;
+};
+
+_after_true install_skip => sub {
+  my ( $rval, $self, ) = @_;
+  my $skipfile  = $amap{'install_skip'};
+  my (@entries) = qw( contributing_pod readme_pod );
+  my $assert    = $self->_pc;
+  my $ok        = $rval;
+  for my $entry (@entries) {
+    my $sub = $self->can("_have_${entry}");
+    next unless $self->$sub();
+    my $entry_re = quotemeta $amap{$entry};
+    undef $ok unless $assert->should( have_line => $skipfile, qr/\A\Q$entry_re\E\$\z/ );
   }
   return $ok;
 };
