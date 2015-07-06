@@ -212,6 +212,7 @@ my %amap = (
   mailmap          => '.mailmap',
   perlcritic_gen   => 'maint/perlcritic.rc.gen.pl',
   contributing_pod => 'CONTRIBUTING.pod',
+  contributing_mkdn => 'CONTRIBUTING.mkdn',
   makefile_pl      => 'Makefile.PL',
   install_skip     => 'INSTALL.SKIP',
   readme_pod       => 'README.pod',
@@ -230,6 +231,12 @@ for my $key ( keys %amap ) {
 _after_true makefile_pl => sub {
   my ( $file, $self ) = @_;
   undef $file if $self->install_skip;
+  return $file;
+};
+
+_after_true contributing_pod => sub {
+  my ( $file, $self ) = @_;
+  undef $file if $self->_pc->should_not( exist => $amap{contributing_mkdn} );
   return $file;
 };
 
