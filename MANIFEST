@@ -3,7 +3,9 @@
 .mailmap
 .perltidyrc
 .travis.yml
+CONTRIBUTING.pod
 Changes
+INSTALL.SKIP
 LICENSE
 MANIFEST
 META.json

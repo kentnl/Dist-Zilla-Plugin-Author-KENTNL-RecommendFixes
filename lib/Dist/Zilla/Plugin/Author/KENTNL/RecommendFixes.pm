@@ -10,7 +10,7 @@ our $VERSION = '0.004004';
 
 our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 
-use Moose qw( with has around after );
+use Moose qw( with has around );
 use MooX::Lsub qw( lsub );
 use Path::Tiny qw( path );
 use YAML::Tiny;
@@ -38,6 +38,14 @@ sub _badly(&) {
 }
 ## use critic
 
+sub after_true {
+  my ( $subname, $code ) = @_;
+  around $subname, sub {
+    my ($orig, $self, @args ) = @_;
+    return unless $self->$orig(@args);
+    return $self->$code();
+  };
+}
 sub _rel {
   my ( $self, @args ) = @_;
   return $self->root->child(@args)->relative( $self->root );
@@ -217,20 +225,22 @@ for my $key ( keys %amap ) {
   lsub "have_$key" => sub { $_[0]->_pc->test( exist => $value ) };
 }
 
-after "gitignore" => sub {
-  my ($self) = @_;
-  my $file = $amap{'gitignore'};
-  return unless $_[0]->have_gitignore;
-  $_[0]->_pc->should( have_line => $file, qr/\A\.build\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\AMETA\.json\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\AMYMETA\.json\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\AMETA\.yml\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\AMYMETA\.yml\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\AMakefile\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\AMakefile\.old\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\Ablib\/\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\Apm_to_blib\z/ );
-  $_[0]->_pc->should( have_line => $file, qr/\Atmp\/\z/ );
+after_true "gitignore" => sub {
+  my ( $self, @args ) = @_;
+  my $file   = $amap{'gitignore'};
+  my $assert = $self->_pc;
+  my $ok     = 1;
+  undef $ok unless $assert->should( have_line => $file, qr/\A\.build\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.json\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.json\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.yml\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.yml\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\.old\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\Ablib\/\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\Apm_to_blib\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\Atmp\/\z/ );
+  return $ok;
 };
 
 lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
@@ -270,13 +280,12 @@ lsub tfiles => sub {
 
 };
 
-after 'install_skip' => sub {
-  my ($self)   = @_;
+after_true 'install_skip' => sub {
+  my ( $self, @args ) = @_;
   my $assert   = $self->_pc;
   my $skipfile = $amap{'install_skip'};
   my @entries  = qw( contributing_pod readme_pod );
-  return unless $self->have_install_skip;
-  my $ok = 1;
+  my $ok       = 1;
   for my $entry (@entries) {
     my $sub = $self->can("have_${entry}");
     next unless $self->$sub();
