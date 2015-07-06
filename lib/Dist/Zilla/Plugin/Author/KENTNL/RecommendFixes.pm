@@ -63,6 +63,7 @@ sub _mk_assertions {
           $self->log("should $name: $message");
           return;
         }
+        $self->log_debug("ok:should $name: $message");
         return $slurpy[0];
       },
       should_not => sub {
@@ -71,6 +72,7 @@ sub _mk_assertions {
           $self->log("should_not $name: $message");
           return;
         }
+        $self->log_debug("ok:should not $name: $message");
         return $slurpy[0];
       },
       must => sub {
