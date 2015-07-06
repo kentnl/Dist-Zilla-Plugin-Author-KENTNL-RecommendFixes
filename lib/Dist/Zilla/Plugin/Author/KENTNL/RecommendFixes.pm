@@ -514,6 +514,7 @@ sub setup_installer {
   $self->license;
   $self->has_new_changes_deps;
   $self->perlcritic_deps;
+  $self->perlcritic_gen;
   $self->avoid_old_modules;
   $self->mailmap;
   $self->dzil_plugin_check;
