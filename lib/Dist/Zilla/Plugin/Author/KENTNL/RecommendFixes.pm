@@ -38,6 +38,16 @@ sub _badly(&) {
 }
 ## use critic
 
+sub _after_true {
+  my ( $subname, $code ) = @_;
+  return around $subname, sub {
+    my ( $orig, $self, @args ) = @_;
+    return unless my $rval = $self->$orig(@args);
+    return $code->( $rval, $self, @args );
+  };
+
+}
+
 sub _rel {
   my ( $self, @args ) = @_;
   return $self->root->child(@args)->relative( $self->root );
