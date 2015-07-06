@@ -3,7 +3,7 @@ Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 0.004004 2015-06-30T02:54:56Z 6d81747
  [Checks]
  - Change recommended preference regarding copyfiles= setting.
- - New checks for .gitingore and bad files.
+ - Recommend Makefile.PL
 
  [Dependencies::Stats]
  - Dependencies changed since 0.004003, see misc/*.deps* for details

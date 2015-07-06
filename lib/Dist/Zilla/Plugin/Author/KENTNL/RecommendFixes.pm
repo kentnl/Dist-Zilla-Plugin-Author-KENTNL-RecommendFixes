@@ -38,14 +38,6 @@ sub _badly(&) {
 }
 ## use critic
 
-sub after_true {
-  my ( $subname, $code ) = @_;
-  around $subname, sub {
-    my ($orig, $self, @args ) = @_;
-    return unless $self->$orig(@args);
-    return $self->$code();
-  };
-}
 sub _rel {
   my ( $self, @args ) = @_;
   return $self->root->child(@args)->relative( $self->root );
@@ -196,23 +188,20 @@ sub _build__dc {
 lsub root => sub { my ($self) = @_; return path( $self->zilla->root ) };
 
 my %amap = (
-  git              => '.git',
-  libdir           => 'lib',
-  dist_ini         => 'dist.ini',
-  git_config       => '.git/config',
-  dist_ini_meta    => 'dist.ini.meta',
-  weaver_ini       => 'weaver.ini',
-  travis_yml       => '.travis.yml',
-  perltidyrc       => '.perltidyrc',
-  gitignore        => '.gitignore',
-  changes          => 'Changes',
-  license          => 'LICENSE',
-  mailmap          => '.mailmap',
-  perlcritic_gen   => 'maint/perlcritic.rc.gen.pl',
-  contributing_pod => 'CONTRIBUTING.pod',
-  makefile_pl      => 'Makefile.PL',
-  install_skip     => 'INSTALL.SKIP',
-  readme_pod       => 'README.pod',
+  git            => '.git',
+  libdir         => 'lib',
+  dist_ini       => 'dist.ini',
+  git_config     => '.git/config',
+  dist_ini_meta  => 'dist.ini.meta',
+  weaver_ini     => 'weaver.ini',
+  travis_yml     => '.travis.yml',
+  perltidyrc     => '.perltidyrc',
+  gitignore      => '.gitignore',
+  changes        => 'Changes',
+  license        => 'LICENSE',
+  mailmap        => '.mailmap',
+  perlcritic_gen => 'maint/perlcritic.rc.gen.pl',
+  makefile_pl    => 'Makefile.PL',
 );
 
 for my $key (qw( git libdir dist_ini )) {
@@ -222,26 +211,7 @@ for my $key (qw( git libdir dist_ini )) {
 for my $key ( keys %amap ) {
   my $value = $amap{$key};
   lsub $key => sub { $_[0]->_pc->should( exist => $value ) };
-  lsub "have_$key" => sub { $_[0]->_pc->test( exist => $value ) };
 }
-
-after_true "gitignore" => sub {
-  my ( $self, @args ) = @_;
-  my $file   = $amap{'gitignore'};
-  my $assert = $self->_pc;
-  my $ok     = 1;
-  undef $ok unless $assert->should( have_line => $file, qr/\A\.build\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.json\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.json\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.yml\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.yml\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\.old\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\Ablib\/\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\Apm_to_blib\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\Atmp\/\z/ );
-  return $ok;
-};
 
 lsub tdir => sub { $_[0]->_pc->should( exist => 't' ) };
 
@@ -278,21 +248,6 @@ lsub tfiles => sub {
   }
   return \@out;
 
-};
-
-after_true 'install_skip' => sub {
-  my ( $self, @args ) = @_;
-  my $assert   = $self->_pc;
-  my $skipfile = $amap{'install_skip'};
-  my @entries  = qw( contributing_pod readme_pod );
-  my $ok       = 1;
-  for my $entry (@entries) {
-    my $sub = $self->can("have_${entry}");
-    next unless $self->$sub();
-    my $entry_re = quotemeta( $amap{$entry} );
-    undef $ok unless $assert->should( have_line => $skipfile, qr/\A\Q$entry_re\E\$\z/ );
-  }
-  return $ok;
 };
 
 sub has_new_changes_deps {
@@ -495,9 +450,7 @@ sub setup_installer {
   $self->dist_ini_meta;
   $self->weaver_ini;
   $self->travis_yml;
-  $self->contributing_pod;
   $self->makefile_pl;
-  $self->install_skip;
   $self->perltidyrc;
   $self->gitignore;
   $self->changes;

@@ -7,7 +7,7 @@ This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL depen
  - Dist::Zilla::Plugin::RemovePrereqs::Provided
 
  [Changed / develop suggests]
- - Dist::Zilla::PluginBundle::Author::KENTNL 2.024001 → 2.025000
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024001 → 2.025001
 
  [Removed / develop requires]
  - Dist::Zilla::Plugin::MetaYAML
