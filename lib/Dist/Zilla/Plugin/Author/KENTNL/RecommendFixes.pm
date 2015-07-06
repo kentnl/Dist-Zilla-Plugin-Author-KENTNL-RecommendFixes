@@ -210,6 +210,7 @@ my %amap = (
   license           => 'LICENSE',
   mailmap           => '.mailmap',
   perlcritic_gen    => 'maint/perlcritic.rc.gen.pl',
+  perlcritic_deps   => 'misc/perlcritic.deps',
   contributing_pod  => 'CONTRIBUTING.pod',
   contributing_mkdn => 'CONTRIBUTING.mkdn',
   makefile_pl       => 'Makefile.PL',
@@ -229,11 +230,15 @@ for my $key ( keys %amap ) {
 }
 
 _after_true makefile_pl => sub {
-  return $_[1]->install_skip;
+  my ( $file, $self ) = @_;
+  undef $file if $self->install_skip;
+  return $file;
 };
 
 _after_true contributing_pod => sub {
-  return $_[1]->_pc->should_not( exist => $amap{contributing_mkdn} );
+  my ( $file, $self ) = @_;
+  undef $file if $self->_pc->should_not( exist => $amap{contributing_mkdn} );
+  return $file;
 };
 
 _after_true gitignore => sub {
@@ -317,39 +322,36 @@ sub has_new_changes_deps {
   return $ok;
 }
 
-sub has_new_perlcritic_deps {
-  my ($self) = @_;
-  my $ok     = 1;
+_after_true perlcritic_deps => sub {
+  my ( $file, $self ) = @_;
+  my $ok     = $file;
   my $assert = $self->_pc;
-  undef $ok unless $assert->should( exist => 'misc/perlcritic.deps' );
   undef $ok unless $assert->should_not( exist => 'perlcritic.deps' );
   return $ok;
-}
+};
 
 _after_true 'perlcritic_gen' => sub {
   my ( $file, $self ) = @_;
   my $assert = $self->_pc;
-  my $ok     = 1;
+  my $ok     = $file;
   undef $ok unless $assert->should( have_line => $file, qr/Path::Tiny/ );
   undef $ok unless $assert->should( have_line => $file, qr/\.\/misc/ );
-  return ( $ok ? $file : $ok );
+  return $ok;
 };
 
-sub git_repo_notkentfredric {
-  my ($self) = @_;
-  return unless my $config = $self->git_config;
-  return $self->_pc->should_not( have_line => $config, qr/kentfredric/ );
-}
+_after_true 'git_config' => sub {
+  my ( $rval, $self ) = @_;
+  undef $rval unless $self->_pc->should_not( have_line => $rval, qr/kentfredric/ );
+  return $rval;
+};
 
 sub _matrix_include_perl { my ($perl)   = @_; return "/matrix/include/*/perl[ value eq \"$perl\"]"; }
 sub _branch_only         { my ($branch) = @_; return '/branches/only/*[ value eq "' . $branch . '"]' }
 
-sub travis_conf_ok {
-  my ($self) = @_;
-  return unless my $yaml = $self->travis_yml;
+_after_true 'travis_yml' => sub {
+  my ( $yaml, $self ) = @_;
   my $assert = $self->_dc;
-
-  my $ok = 1;
+  my $ok     = $yaml;
 
   undef $ok unless $assert->should( yaml_have_dpath => $yaml, '/matrix/include/*/env[ value =~ /COVERAGE_TESTING=1/' );
 
@@ -375,22 +377,21 @@ sub travis_conf_ok {
   }
 
   return $ok;
-}
+};
 
-sub dist_ini_ok {
-  my ($self) = @_;
-  return unless my $ini = $self->dist_ini;
+_after_true 'dist_ini' => sub {
+  my ($ini, $self) = @_;
   my $assert = $self->_pc;
-  my $ok     = 1;
+  my $ok     = $ini;
   my (@tests) = ( qr/dzil bakeini/, qr/normal_form\s*=\s*numify/, qr/mantissa\s*=\s*6/, );
   for my $test (@tests) {
-    $assert->should( have_line => $ini, $test );
+    undef $ok unless $assert->should( have_line => $ini, $test );
   }
   if ( not $assert->test( have_line => $ini, qr/dzil bakeini/ ) ) {
-    _is_bad { $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
+    _is_bad { undef $ok unless $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
   }
   return $ok;
-}
+};
 
 sub weaver_ini_ok {
   my ($self) = @_;
@@ -512,10 +513,7 @@ sub setup_installer {
   $self->changes;
   $self->license;
   $self->has_new_changes_deps;
-  $self->has_new_perlcritic_deps;
-  $self->git_repo_notkentfredric;
-  $self->travis_conf_ok;
-  $self->dist_ini_ok;
+  $self->perlcritic_deps;
   $self->dist_ini_meta_ok;
   $self->avoid_old_modules;
   $self->mailmap_check;
@@ -554,9 +552,8 @@ to the current distribution.
 It does this by spewing colored output.
 
 =for Pod::Coverage setup_installer dist_ini_meta_ok dist_ini_ok
-git_repo_notkentfredric has_new_changes_deps
-has_new_perlcritic_deps has_new_perlcritic_gen
-travis_conf_ok weaver_ini_ok avoid_old_modules
+has_new_changes_deps
+weaver_ini_ok avoid_old_modules
 dzil_plugin_check
 mailmap_check
 
