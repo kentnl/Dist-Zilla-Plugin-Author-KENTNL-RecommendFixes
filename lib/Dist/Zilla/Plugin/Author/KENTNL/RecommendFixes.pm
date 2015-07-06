@@ -463,11 +463,12 @@ sub avoid_old_modules {
   return $ok;
 }
 
-sub mailmap_check {
-  my ($self) = @_;
-  return unless my $mailmap = $self->mailmap;
-  return $self->_pc->should( have_line => $mailmap, qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/ );
-}
+_after_true 'mailmap' => sub {
+  my ( $mailmap, $self ) = @_;
+  my $ok = $mailmap;
+  undef $ok unless $self->_pc->should( have_line => $mailmap, qr/<kentnl\@cpan.org>.*<kentfredric\@gmail.com>/ );
+  return $ok;
+};
 
 # Hack to avoid matching ourselves.
 sub _plugin_re {
@@ -516,7 +517,7 @@ sub setup_installer {
   $self->has_new_changes_deps;
   $self->perlcritic_deps;
   $self->avoid_old_modules;
-  $self->mailmap_check;
+  $self->mailmap;
   $self->dzil_plugin_check;
   return;
 }
@@ -542,7 +543,6 @@ setup_installer
 has_new_changes_deps
 avoid_old_modules
 dzil_plugin_check
-mailmap_check
 
 =end Pod::Coverage
 
