@@ -381,20 +381,19 @@ _after_true 'travis_yml' => sub {
   return $ok;
 };
 
-sub dist_ini_ok {
-  my ($self) = @_;
-  return unless my $ini = $self->dist_ini;
+_after_true 'dist_ini' => sub {
+  my ( $ini, $self ) = @_;
   my $assert = $self->_pc;
-  my $ok     = 1;
+  my $ok     = $ini;
   my (@tests) = ( qr/dzil bakeini/, qr/normal_form\s*=\s*numify/, qr/mantissa\s*=\s*6/, );
   for my $test (@tests) {
-    $assert->should( have_line => $ini, $test );
+    undef $ok unless $assert->should( have_line => $ini, $test );
   }
   if ( not $assert->test( have_line => $ini, qr/dzil bakeini/ ) ) {
-    _is_bad { $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
+    _is_bad { undef $ok unless $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
   }
   return $ok;
-}
+};
 
 sub weaver_ini_ok {
   my ($self) = @_;
@@ -517,7 +516,6 @@ sub setup_installer {
   $self->license;
   $self->has_new_changes_deps;
   $self->perlcritic_deps;
-  $self->dist_ini_ok;
   $self->dist_ini_meta_ok;
   $self->avoid_old_modules;
   $self->mailmap_check;
@@ -543,7 +541,7 @@ It does this by spewing colored output.
 
 =begin Pod::Coverage
 
-setup_installer dist_ini_meta_ok dist_ini_ok
+setup_installer dist_ini_meta_ok
 has_new_changes_deps
 weaver_ini_ok avoid_old_modules
 dzil_plugin_check
