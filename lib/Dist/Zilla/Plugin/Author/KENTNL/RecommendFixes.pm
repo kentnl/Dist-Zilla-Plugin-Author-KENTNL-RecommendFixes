@@ -253,8 +253,8 @@ _after_true gitignore => sub {
   undef $ok unless $assert->should( have_line => $file, qr/\A\/\.build\z/ );
   undef $ok unless $assert->should( have_line => $file, qr/\A\/tmp\/\z/ );
 
-  undef $ok unless $assert->should( have_line => $file, qr/\A\/\Q$distname\E\*\z/ );
-  undef $ok unless $assert->should_not( have_line => $file, qr/\A$distname\E\*\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\A\/\Q$distname\E-\*\z/ );
+  undef $ok unless $assert->should_not( have_line => $file, qr/\A\Q$distname\E-\*\z/ );
 
   if ( $self->_have_makefile_pl ) {
     ## no critic ( RegularExpressions::ProhibitFixedStringMatches )
