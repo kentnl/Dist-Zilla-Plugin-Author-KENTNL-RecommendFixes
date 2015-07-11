@@ -1,5 +1,10 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.005001 2015-07-11T14:36:47Z 0e55b0c
+ [Checks]
+ - gitignore: Make sure all important paths that are expected to be top-level paths match only top level paths.
+ - gitignore: Make sure the distname is correctly ignored.
+
 0.005000 2015-07-06T08:09:15Z b2c79f6
  [Checks]
  - Change recommended preference regarding copyfiles= setting.

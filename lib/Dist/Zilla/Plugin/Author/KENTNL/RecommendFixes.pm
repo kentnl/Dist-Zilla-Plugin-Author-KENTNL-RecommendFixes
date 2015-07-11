@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.005001';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -246,21 +246,26 @@ _after_true contributing_pod => sub {
 
 _after_true gitignore => sub {
   my ( $rval, $self, ) = @_;
-  my $file   = $amap{'gitignore'};
-  my $assert = $self->_pc;
-  my $ok     = $rval;
-  undef $ok unless $assert->should( have_line => $file, qr/\A\.build\z/ );
-  undef $ok unless $assert->should( have_line => $file, qr/\Atmp\/\z/ );
+  my $file     = $amap{'gitignore'};
+  my $assert   = $self->_pc;
+  my $ok       = $rval;
+  my $distname = $self->zilla->name;
+  undef $ok unless $assert->should( have_line => $file, qr/\A\/\.build\z/ );
+  undef $ok unless $assert->should( have_line => $file, qr/\A\/tmp\/\z/ );
+
+  undef $ok unless $assert->should( have_line => $file, qr/\A\/\Q$distname\E-\*\z/ );
+  undef $ok unless $assert->should_not( have_line => $file, qr/\A\Q$distname\E-\*\z/ );
+
   if ( $self->_have_makefile_pl ) {
     ## no critic ( RegularExpressions::ProhibitFixedStringMatches )
-    undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.json\z/ );
-    undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.json\z/ );
-    undef $ok unless $assert->should( have_line => $file, qr/\AMETA\.yml\z/ );
-    undef $ok unless $assert->should( have_line => $file, qr/\AMYMETA\.yml\z/ );
-    undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\z/ );
-    undef $ok unless $assert->should( have_line => $file, qr/\AMakefile\.old\z/ );
-    undef $ok unless $assert->should( have_line => $file, qr/\Ablib\/\z/ );
-    undef $ok unless $assert->should( have_line => $file, qr/\Apm_to_blib\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\A\/META\.json\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\A\/MYMETA\.json\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\A\/META\.yml\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\A\/MYMETA\.yml\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\A\/Makefile\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\A\/Makefile\.old\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\A\/blib\/\z/ );
+    undef $ok unless $assert->should( have_line => $file, qr/\A\/pm_to_blib\z/ );
   }
   return $ok;
 };
@@ -542,7 +547,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.005000
+version 0.005001
 
 =head1 DESCRIPTION
 
