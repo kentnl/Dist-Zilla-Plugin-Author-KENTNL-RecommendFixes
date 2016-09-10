@@ -20,7 +20,7 @@ use Generic::Assertions;
 
 with 'Dist::Zilla::Role::InstallTool';
 
-use Term::ANSIColor qw( colored );
+use Term::ANSIColor qw( colored ); () = eval { require Win32::Console::ANSI } if 'MSWin32' eq $^O;
 
 our $LOG_COLOR = 'yellow';
 
