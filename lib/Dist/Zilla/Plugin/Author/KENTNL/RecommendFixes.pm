@@ -499,10 +499,10 @@ sub dzil_plugin_check {
 FIND_DZTEST: {
     for my $tfile ( @{ $self->tfiles } ) {
       if ( $assert->test( have_line => $tfile, qr/dztest/ ) ) {
+        $self->log('Tests should probably not use dztest (Dist::Zilla::Util::Test::KENTNL)');
         last FIND_DZTEST;
       }
     }
-    $self->log('A test should probably use dztest (Dist::Zilla::Util::Test::KENTNL)');
   }
   return;
 }
