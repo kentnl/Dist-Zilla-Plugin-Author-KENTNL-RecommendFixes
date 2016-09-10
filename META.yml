@@ -22,7 +22,7 @@ name: Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 provides:
   Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes:
     file: lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm
-    version: '0.005002'
+    version: '0.005003'
 recommends:
   Moose: '2.000'
   Path::Tiny: '0.058'
@@ -43,4 +43,4 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes.git
-version: '0.005002'
+version: '0.005003'

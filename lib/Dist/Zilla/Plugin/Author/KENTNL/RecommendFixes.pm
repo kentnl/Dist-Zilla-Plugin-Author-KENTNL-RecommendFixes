@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.005002';
+our $VERSION = '0.005003';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -492,17 +492,17 @@ sub dzil_plugin_check {
   my (@plugins) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\//msx } @{ $self->libfiles };
   return unless @plugins;
   for my $plugin (@plugins) {
-    $assert->should( have_line => $plugin, _plugin_re('Dist+Zilla+Util+ConfigDumper') );
+    $assert->should_not( have_line => $plugin, _plugin_re('Dist+Zilla+Util+ConfigDumper') );
   }
   return unless $self->tdir;
   return unless @{ $self->tfiles };
 FIND_DZTEST: {
     for my $tfile ( @{ $self->tfiles } ) {
       if ( $assert->test( have_line => $tfile, qr/dztest/ ) ) {
+        $self->log('Tests should probably not use dztest (Dist::Zilla::Util::Test::KENTNL)');
         last FIND_DZTEST;
       }
     }
-    $self->log('A test should probably use dztest (Dist::Zilla::Util::Test::KENTNL)');
   }
   return;
 }
@@ -547,7 +547,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.005002
+version 0.005003
 
 =head1 DESCRIPTION
 
