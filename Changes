@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+
+0.005002 2016-09-10T06:01:15Z fa37013
  [Checks]
  - Derecommend use of ConfigDumper, it was a nice idea, but the dependency and test complexity I can do without.
  - Derecommend use of dztest, again, nice idea, but unwanted complexity proliferation.
