@@ -1,5 +1,18 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.005002 2016-09-10T06:01:15Z fa37013
+ [Checks]
+ - Derecommend use of ConfigDumper, it was a nice idea, but the dependency and test complexity I can do without.
+ - Derecommend use of dztest, again, nice idea, but unwanted complexity proliferation.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.005001, see misc/*.deps* for details
+ - develop: +2 ↑1 (suggests: ↑1)
+
+ [Features / Win32 Ansi Color support]
+ - ANSI Escape code colours should render correctly on Win32 if users have Win32::Console::ANSI installed.
+ - Patched (with thanks) by Roy Ivy III ( #1 )
+
 0.005001 2015-07-11T14:36:47Z 0e55b0c
  [Checks]
  - gitignore: Make sure all important paths that are expected to be top-level paths match only top level paths.

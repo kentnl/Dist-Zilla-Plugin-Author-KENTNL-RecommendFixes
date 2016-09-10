@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ name: Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 provides:
   Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes:
     file: lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm
-    version: '0.005001'
+    version: '0.005002'
 recommends:
   Moose: '2.000'
   Path::Tiny: '0.058'
@@ -43,4 +43,4 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes.git
-version: '0.005001'
+version: '0.005002'

@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.005001';
+our $VERSION = '0.005002';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -20,7 +20,7 @@ use Generic::Assertions;
 
 with 'Dist::Zilla::Role::InstallTool';
 
-use Term::ANSIColor qw( colored );
+use Term::ANSIColor qw( colored ); () = eval { require Win32::Console::ANSI } if 'MSWin32' eq $^O;
 
 our $LOG_COLOR = 'yellow';
 
@@ -492,17 +492,17 @@ sub dzil_plugin_check {
   my (@plugins) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\//msx } @{ $self->libfiles };
   return unless @plugins;
   for my $plugin (@plugins) {
-    $assert->should( have_line => $plugin, _plugin_re('Dist+Zilla+Util+ConfigDumper') );
+    $assert->should_not( have_line => $plugin, _plugin_re('Dist+Zilla+Util+ConfigDumper') );
   }
   return unless $self->tdir;
   return unless @{ $self->tfiles };
 FIND_DZTEST: {
     for my $tfile ( @{ $self->tfiles } ) {
       if ( $assert->test( have_line => $tfile, qr/dztest/ ) ) {
+        $self->log('Tests should probably not use dztest (Dist::Zilla::Util::Test::KENTNL)');
         last FIND_DZTEST;
       }
     }
-    $self->log('A test should probably use dztest (Dist::Zilla::Util::Test::KENTNL)');
   }
   return;
 }
@@ -547,7 +547,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.005001
+version 0.005002
 
 =head1 DESCRIPTION
 
@@ -570,7 +570,7 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2016 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
