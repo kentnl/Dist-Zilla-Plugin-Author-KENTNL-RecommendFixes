@@ -1,9 +1,13 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.005002 2016-09-10T05:47:38Z 6f3a208
+0.005002 2016-09-10T05:53:02Z 5334677
  [Dependencies::Stats]
  - Dependencies changed since 0.005001, see misc/*.deps* for details
  - develop: +2 ↑1 (suggests: ↑1)
+
+ [Features / Win32 Ansi Color support]
+ - ANSI Escape code colours should render correctly on Win32 if users have Win32::Console::ANSI installed.
+ - Patched (with thanks) by Roy Ivy III ( #1 )
 
 0.005001 2015-07-11T14:36:47Z 0e55b0c
  [Checks]
