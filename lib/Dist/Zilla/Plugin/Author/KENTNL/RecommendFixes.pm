@@ -492,7 +492,7 @@ sub dzil_plugin_check {
   my (@plugins) = grep { $_->stringify =~ /\Alib\/Dist\/Zilla\/Plugin\//msx } @{ $self->libfiles };
   return unless @plugins;
   for my $plugin (@plugins) {
-    $assert->should( have_line => $plugin, _plugin_re('Dist+Zilla+Util+ConfigDumper') );
+    $assert->should_not( have_line => $plugin, _plugin_re('Dist+Zilla+Util+ConfigDumper') );
   }
   return unless $self->tdir;
   return unless @{ $self->tfiles };
