@@ -25,7 +25,6 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Term::ANSIColor" => 0,
     "YAML::Tiny" => 0,
-    "constant" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -57,7 +56,6 @@ my %FallbackPrereqs = (
   "Test::DZil" => 0,
   "Test::More" => 0,
   "YAML::Tiny" => 0,
-  "constant" => 0,
   "strict" => 0,
   "warnings" => 0
 );

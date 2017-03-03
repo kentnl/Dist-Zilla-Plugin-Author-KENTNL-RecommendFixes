@@ -15,7 +15,6 @@ use MooX::Lsub qw( lsub );
 use Path::Tiny qw( path );
 use YAML::Tiny;
 use Data::DPath qw( dpath );
-use constant _CAN_VARIABLE_MAGIC => eval 'require Variable::Magic; require Tie::RefHash::Weak; 1';
 use Generic::Assertions;
 
 with 'Dist::Zilla::Role::InstallTool';
@@ -92,26 +91,14 @@ sub _mk_assertions {
 
 has _pc => ( is => ro =>, lazy => 1, builder => '_build__pc' );
 
-sub _mk_cache {
-  my %cache;
-  if (_CAN_VARIABLE_MAGIC) {
-    ## no critic (Miscellanea::ProhibitTies)
-    tie %cache, 'Tie::RefHash::Weak';
-  }
-  return sub {
-    return $cache{ \$_[0] } if exists $cache{ \$_[0] };
-    return ( $cache{ \$_[0] } = $_[1]->() );
-  };
-}
-
 sub _build__pc {
   my ($self) = @_;
 
-  my $line_cache = _mk_cache;
+  my %cache;
 
   my $get_lines = sub {
-    my ($path) = @_;
-    return $line_cache->( $path => sub { [ $path->lines_raw( { chomp => 1 } ) ] } );
+    exists $cache{ $_[0] } or ( $cache{ $_[0] } = [ $_[0]->lines_raw( { chomp => 1 } ) ] );
+    return $cache{ $_[0] };
   };
 
   return $self->_mk_assertions(
@@ -128,7 +115,9 @@ sub _build__pc {
     },
     have_line => sub {
       my ( $path, $regex ) = @_;
-      for my $line ( @{ $get_lines->($path) } ) {
+      my (@lines) = @{ $get_lines->($path) };
+      return ( 0, "$path has no lines ( none to match $regex )" ) unless @lines;
+      for my $line (@lines) {
         return ( 1, "$path Has line matching $regex" ) if $line =~ $regex;
       }
       return ( 0, "$path Does not have line matching $regex" );
@@ -159,21 +148,21 @@ has _dc => ( is => ro =>, lazy => 1, builder => '_build__dc' );
 sub _build__dc {
   my ($self) = @_;
 
-  my $yaml_cache = _mk_cache;
+  my %yaml_cache;
 
   my $get_yaml = sub {
-    my ($path) = @_;
-    return $yaml_cache->(
-      $path => sub {
+    exists $yaml_cache{ $_[0] } or (
+      $yaml_cache{ $_[0] } = do {
         my ( $r, $ok );
         ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         eval {
-          $r  = YAML::Tiny->read( path($path)->stringify )->[0];
+          $r  = YAML::Tiny->read( path( $_[0] )->stringify )->[0];
           $ok = 1;
         };
-        return $r;
-      },
+        $r;
+      }
     );
+    return $yaml_cache{ $_[0] };
   };
 
   return $self->_mk_assertions(

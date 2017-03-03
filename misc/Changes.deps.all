@@ -11,6 +11,9 @@ This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL depen
  [Changed / test requires]
  - Test::More 0.89 → 0
 
+ [Removed / runtime requires]
+ - constant
+
 0.005002 2016-09-10T06:01:15Z
  [Added / develop requires]
  - English
