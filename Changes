@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
 {{$NEXT}}
+
+0.005003 2017-03-03T22:36:43Z c92d181
  [Bugfix]
  - 1. Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
  - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues/2
