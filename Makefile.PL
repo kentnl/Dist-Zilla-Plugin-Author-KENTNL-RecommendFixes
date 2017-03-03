@@ -29,7 +29,6 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Dist::Zilla::Util::Test::KENTNL" => "1.0001002",
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::DZil" => 0,
@@ -45,7 +44,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::DPath" => 0,
   "Dist::Zilla::Role::InstallTool" => 0,
-  "Dist::Zilla::Util::Test::KENTNL" => "1.0001002",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Generic::Assertions" => 0,
