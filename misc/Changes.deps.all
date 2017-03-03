@@ -1,6 +1,23 @@
 This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
 
-0.005002
+0.005003
+ [Added / develop requires]
+ - Test::MinimumVersion
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING 0.001002 → 0.001003
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003902
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / runtime requires]
+ - constant
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.0001002
+
+0.005002 2016-09-10T06:01:15Z
  [Added / develop requires]
  - English
  - Software::License::Perl_5
