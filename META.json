@@ -133,7 +133,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm",
-         "version" : "0.005003"
+         "version" : "0.005004"
       }
    },
    "release_status" : "stable",
@@ -148,7 +148,7 @@
          "web" : "https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes"
       }
    },
-   "version" : "0.005003",
+   "version" : "0.005004",
    "x_BuiltWith" : {
       "external_file" : "misc/built_with.json"
    },
@@ -590,7 +590,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes",
             "name" : "@Author::KENTNL/Author::KENTNL::RecommendFixes",
-            "version" : "0.005003"
+            "version" : "0.005004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme::Brief",
@@ -692,7 +692,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.005003-source",
+                  "tag" : "0.005004-source",
                   "tag_format" : "%v-source",
                   "tag_message" : "v%v"
                },
@@ -786,7 +786,7 @@
                   "branch" : "releases",
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.005003",
+                  "tag" : "0.005004",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },
