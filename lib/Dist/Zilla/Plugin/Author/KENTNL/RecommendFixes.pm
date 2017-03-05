@@ -164,6 +164,25 @@ sub _build__pc {
       }
       return ( 1, 'Matches more than one of ( ' . ( join q[, ], @rematches ) . ' )' );
     },
+    have_assign => sub {
+      my ( $path, $key, $callback ) = @_;
+      my (@lines) = @{ $get_lines->($path) };
+      return ( 0, "$path has no lines ( none to assign to $key )" ) unless @lines;
+      my @failures;
+      for my $line (@lines) {
+        if ( $line =~ /\A\s*\Q$key\E\s*=\s*(.+$)/ ) {
+          my ( $result, $message ) = $callback->("$1");
+          if ($result) {
+            return ( $result, "${path}'s $key assigns ok ( $message )" );
+          }
+          push @failures, $message;
+        }
+      }
+      if ( not @failures ) {
+        return ( 0, "${path}'s $key is not assigned" );
+      }
+      return ( 0, "${path}'s $key does not assign ok (" . ( join q[, ], @failures ) . ')' );
+    },
   );
 }
 
