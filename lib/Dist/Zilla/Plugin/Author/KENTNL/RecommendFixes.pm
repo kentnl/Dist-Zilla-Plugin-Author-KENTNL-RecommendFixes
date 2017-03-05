@@ -57,6 +57,15 @@ sub _mk_assertions {
   return Generic::Assertions->new(
     @args,
     '-handlers' => {
+      test => sub {
+        my ( $status, $message, $name ) = @_;
+        if ( not $status ) {
+          $self->log_debug("test $name: $message");
+          return;
+        }
+        $self->log_debug("ok:test $name: $message");
+        return $status;
+      },
       should => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         if ( not $status ) {
