@@ -454,7 +454,7 @@ _after_true 'dist_ini_meta' => sub {
   );
   my (@unwanted_regex) = (
     #
-    qr/copyfiles\s*=.*LICENSE/,
+    qr/copy_?files\s*=.*LICENSE/,
     qr/author.*=.*kentfredric/, qr/git_versions/,    #
     qr/twitter_hash_tags\s*=\s*#perl\s+#cpan\s*/,    #
   );
