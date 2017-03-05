@@ -145,7 +145,7 @@ sub _build__pc {
         return ( 0, "Does not match at least one of ( @regexs )" );
       }
       if ( @rematches > 1 ) {
-        return ( 0, "Matches more than one of ( @rematches )" );
+        return ( 0, 'Matches more than one of ( ' . ( join q[, ], @rematches ) . ' )' );
       }
       return ( 1, "Matches only @rematches" );
     },
