@@ -149,6 +149,21 @@ sub _build__pc {
       }
       return ( 1, "Matches only @rematches" );
     },
+    have_any_of_line => sub {
+      my ( $path, @regexs ) = @_;
+      my (@rematches);
+      for my $line ( @{ $get_lines->($path) } ) {
+        for my $re (@regexs) {
+          if ( $line =~ $re ) {
+            push @rematches, "Has line matching $re";
+          }
+        }
+      }
+      if ( not @rematches ) {
+        return ( 0, "Does not match at least one of ( @regexs )" );
+      }
+      return ( 1, 'Matches more than one of ( ' . ( join q[, ], @rematches ) . ' )' );
+    },
   );
 }
 
