@@ -1,5 +1,7 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.005005 2017-03-05T06:16:29Z 33fa571
+
 0.005004 2017-03-05T06:13:51Z 085066a
  [Checks]
  - Extend support for bundle 2.025020+ arguments with _'s
