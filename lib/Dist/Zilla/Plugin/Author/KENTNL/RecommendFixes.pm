@@ -465,6 +465,18 @@ _after_true 'dist_ini_meta' => sub {
   for my $test (@unwanted_regex) {
     undef $ok unless $assert->should_not( have_line => $file, $test );
   }
+  my (@upgrade_regex) = ( qr/src_readme\s*=.*/, qr/bump_versions\s*=.*/, qr/copy_files\s*=.*/ );
+  if ( $assert->test( have_any_of_line => $file, @upgrade_regex ) ) {
+    my $check = sub {
+      my $v = $_[0];
+      return (
+          ( version->parse('2.025020') <= version->parse($v) )
+        ? ( 1, "version $v is at least 2.025020" )
+        : ( 0, "version $v is not at least 2.025020" )
+      );
+    };
+    undef $ok unless $assert->should( have_assign => $file, ':version' => $check );
+  }
 
   _is_bad {
     undef $ok unless $assert->should( have_one_of_line => $file, qr/bump_?versions\s*=\s*1/, qr/git_versions/ );
