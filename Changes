@@ -1,6 +1,6 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
-0.005004 2017-03-05T05:58:55Z 0e03568
+0.005004 2017-03-05T05:59:29Z fc5048c
  [Dependencies::Stats]
  - Dependencies changed since 0.005003, see misc/*.deps* for details
  - develop: (suggests: ↑2)
