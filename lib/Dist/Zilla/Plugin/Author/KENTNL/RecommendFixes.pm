@@ -429,7 +429,7 @@ _after_true 'dist_ini' => sub {
     undef $ok unless $assert->should( have_line => $ini, $test );
   }
   if ( not $assert->test( have_line => $ini, qr/dzil bakeini/ ) ) {
-    _is_bad { undef $ok unless $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
+    _is_bad { undef $ok unless $assert->should( have_one_of_line => $ini, qr/bump_?versions\s*=\s*1/, qr/git_versions/ ) };
   }
   return $ok;
 };
@@ -447,8 +447,8 @@ _after_true 'dist_ini_meta' => sub {
   my ( $file, $self ) = @_;
   my $assert = $self->_pc;
   my (@wanted_regex) = (
-    qr/bumpversions\s*=\s*1/,                qr/toolkit\s*=\s*eumm/,
-    qr/toolkit_hardness\s*=\s*soft/,         qr/srcreadme\s*=.*/,
+    qr/bump_?versions\s*=\s*1/,              qr/toolkit\s*=\s*eumm/,
+    qr/toolkit_hardness\s*=\s*soft/,         qr/src_?readme\s*=.*/,
     qr/copyright_holder\s*=.*<[^@]+@[^>]+>/, qr/twitter_extra_hash_tags\s*=\s*#/,
     qr/;\s*vim:\s+.*syntax=dosini/,
   );
@@ -467,7 +467,7 @@ _after_true 'dist_ini_meta' => sub {
   }
 
   _is_bad {
-    undef $ok unless $assert->should( have_one_of_line => $file, qr/bumpversions\s*=\s*1/, qr/git_versions/ );
+    undef $ok unless $assert->should( have_one_of_line => $file, qr/bump_?versions\s*=\s*1/, qr/git_versions/ );
   };
 
   return $ok;
