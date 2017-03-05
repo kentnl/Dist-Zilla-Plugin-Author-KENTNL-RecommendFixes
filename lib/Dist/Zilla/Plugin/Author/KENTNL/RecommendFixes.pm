@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.005004';
+our $VERSION = '0.005005';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
