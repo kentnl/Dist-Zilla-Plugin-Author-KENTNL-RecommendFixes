@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes;
 
-our $VERSION = '0.005003';
+our $VERSION = '0.005004';
 
 # ABSTRACT: Recommend generic changes to the dist.
 
@@ -57,6 +57,15 @@ sub _mk_assertions {
   return Generic::Assertions->new(
     @args,
     '-handlers' => {
+      test => sub {
+        my ( $status, $message, $name ) = @_;
+        if ( not $status ) {
+          $self->log_debug("test $name: $message");
+          return;
+        }
+        $self->log_debug("ok:test $name: $message");
+        return $status;
+      },
       should => sub {
         my ( $status, $message, $name, @slurpy ) = @_;
         if ( not $status ) {
@@ -136,9 +145,43 @@ sub _build__pc {
         return ( 0, "Does not match at least one of ( @regexs )" );
       }
       if ( @rematches > 1 ) {
-        return ( 0, "Matches more than one of ( @rematches )" );
+        return ( 0, 'Matches more than one of ( ' . ( join q[, ], @rematches ) . ' )' );
       }
       return ( 1, "Matches only @rematches" );
+    },
+    have_any_of_line => sub {
+      my ( $path, @regexs ) = @_;
+      my (@rematches);
+      for my $line ( @{ $get_lines->($path) } ) {
+        for my $re (@regexs) {
+          if ( $line =~ $re ) {
+            push @rematches, "Has line matching $re";
+          }
+        }
+      }
+      if ( not @rematches ) {
+        return ( 0, "Does not match at least one of ( @regexs )" );
+      }
+      return ( 1, 'Matches more than one of ( ' . ( join q[, ], @rematches ) . ' )' );
+    },
+    have_assign => sub {
+      my ( $path, $key, $callback ) = @_;
+      my (@lines) = @{ $get_lines->($path) };
+      return ( 0, "$path has no lines ( none to assign to $key )" ) unless @lines;
+      my @failures;
+      for my $line (@lines) {
+        if ( $line =~ /\A\s*\Q$key\E\s*=\s*(.+$)/ ) {
+          my ( $result, $message ) = $callback->("$1");
+          if ($result) {
+            return ( $result, "${path}'s $key assigns ok ( $message )" );
+          }
+          push @failures, $message;
+        }
+      }
+      if ( not @failures ) {
+        return ( 0, "${path}'s $key is not assigned" );
+      }
+      return ( 0, "${path}'s $key does not assign ok (" . ( join q[, ], @failures ) . ')' );
     },
   );
 }
@@ -386,7 +429,7 @@ _after_true 'dist_ini' => sub {
     undef $ok unless $assert->should( have_line => $ini, $test );
   }
   if ( not $assert->test( have_line => $ini, qr/dzil bakeini/ ) ) {
-    _is_bad { undef $ok unless $assert->should( have_one_of_line => $ini, qr/bumpversions\s*=\s*1/, qr/git_versions/ ) };
+    _is_bad { undef $ok unless $assert->should( have_one_of_line => $ini, qr/bump_?versions\s*=\s*1/, qr/git_versions/ ) };
   }
   return $ok;
 };
@@ -404,14 +447,14 @@ _after_true 'dist_ini_meta' => sub {
   my ( $file, $self ) = @_;
   my $assert = $self->_pc;
   my (@wanted_regex) = (
-    qr/bumpversions\s*=\s*1/,                qr/toolkit\s*=\s*eumm/,
-    qr/toolkit_hardness\s*=\s*soft/,         qr/srcreadme\s*=.*/,
+    qr/bump_?versions\s*=\s*1/,              qr/toolkit\s*=\s*eumm/,
+    qr/toolkit_hardness\s*=\s*soft/,         qr/src_?readme\s*=.*/,
     qr/copyright_holder\s*=.*<[^@]+@[^>]+>/, qr/twitter_extra_hash_tags\s*=\s*#/,
     qr/;\s*vim:\s+.*syntax=dosini/,
   );
   my (@unwanted_regex) = (
     #
-    qr/copyfiles\s*=.*LICENSE/,
+    qr/copy_?files\s*=.*LICENSE/,
     qr/author.*=.*kentfredric/, qr/git_versions/,    #
     qr/twitter_hash_tags\s*=\s*#perl\s+#cpan\s*/,    #
   );
@@ -422,9 +465,21 @@ _after_true 'dist_ini_meta' => sub {
   for my $test (@unwanted_regex) {
     undef $ok unless $assert->should_not( have_line => $file, $test );
   }
+  my (@upgrade_regex) = ( qr/src_readme\s*=.*/, qr/bump_versions\s*=.*/, qr/copy_files\s*=.*/ );
+  if ( $assert->test( have_any_of_line => $file, @upgrade_regex ) ) {
+    my $check = sub {
+      my $v = $_[0];
+      return (
+          ( version->parse('2.025020') <= version->parse($v) )
+        ? ( 1, "version $v is at least 2.025020" )
+        : ( 0, "version $v is not at least 2.025020" )
+      );
+    };
+    undef $ok unless $assert->should( have_assign => $file, ':version' => $check );
+  }
 
   _is_bad {
-    undef $ok unless $assert->should( have_one_of_line => $file, qr/bumpversions\s*=\s*1/, qr/git_versions/ );
+    undef $ok unless $assert->should( have_one_of_line => $file, qr/bump_?versions\s*=\s*1/, qr/git_versions/ );
   };
 
   return $ok;
@@ -536,7 +591,7 @@ Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes - Recommend generic changes 
 
 =head1 VERSION
 
-version 0.005003
+version 0.005004
 
 =head1 DESCRIPTION
 

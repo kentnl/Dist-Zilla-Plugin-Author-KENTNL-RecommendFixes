@@ -1,5 +1,14 @@
 Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
 
+0.005004 2017-03-05T06:13:51Z 085066a
+ [Checks]
+ - Extend support for bundle 2.025020+ arguments with _'s
+ - Add check to ensure >= 2.025020 if using its features
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.005003, see misc/*.deps* for details
+ - develop: +1 -1 (suggests: ↑2)
+
 0.005003 2017-03-03T22:36:43Z c92d181
  [Bugfix]
  - 1. Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
